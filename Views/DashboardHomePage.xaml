@@ -1,0 +1,231 @@
+<Page
+    x:Class="MyShopClient.Views.DashboardHomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:viewmodels="using:MyShopClient.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:DashboardViewModel}"
+    mc:Ignorable="d">
+
+    <Grid Background="#FFF5F5F7" Padding="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="{Binding GreetingText}"
+                           FontSize="22"
+                           FontWeight="SemiBold" />
+                <TextBlock Text="Sales management dashboard"
+                           Margin="0,4,0,0"
+                           Opacity="0.6" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Spacing="12">
+                <Ellipse Width="36" Height="36" Fill="#FF5D5FEF" />
+                <TextBlock Text="{Binding UserName}"
+                           VerticalAlignment="Center"
+                           FontWeight="SemiBold" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Summary cards -->
+        <Grid Grid.Row="1"
+              Margin="0,20,0,0"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Customers -->
+            <Border Grid.Column="0"
+                    Margin="4"
+                    Padding="16"
+                    CornerRadius="12"
+                    Background="White">
+                <StackPanel>
+                    <TextBlock Text="Customers"
+                               Opacity="0.6"
+                               FontSize="13" />
+                    <TextBlock Text="{Binding TotalCustomers}"
+                               FontSize="22"
+                               FontWeight="SemiBold"
+                               Margin="0,4,0,0" />
+                    <TextBlock Text="+4.15% from last week"
+                               FontSize="11"
+                               Foreground="#FF13B16A"
+                               Margin="0,6,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Revenue -->
+            <Border Grid.Column="1"
+                    Margin="4"
+                    Padding="16"
+                    CornerRadius="12"
+                    Background="White">
+                <StackPanel>
+                    <TextBlock Text="Revenue"
+                               Opacity="0.6"
+                               FontSize="13" />
+                    <TextBlock Text="{Binding Revenue}"
+                               FontSize="22"
+                               FontWeight="SemiBold"
+                               Margin="0,4,0,0" />
+                    <TextBlock Text="-0.30% from last week"
+                               FontSize="11"
+                               Foreground="#FFE55353"
+                               Margin="0,6,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Profit -->
+            <Border Grid.Column="2"
+                    Margin="4"
+                    Padding="16"
+                    CornerRadius="12"
+                    Background="White">
+                <StackPanel>
+                    <TextBlock Text="Profit"
+                               Opacity="0.6"
+                               FontSize="13" />
+                    <TextBlock Text="{Binding ProfitPercent}"
+                               FontSize="22"
+                               FontWeight="SemiBold"
+                               Margin="0,4,0,0" />
+                    <TextBlock Text="+2.1% from last week"
+                               FontSize="11"
+                               Foreground="#FF13B16A"
+                               Margin="0,6,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Invoices -->
+            <Border Grid.Column="3"
+                    Margin="4"
+                    Padding="16"
+                    CornerRadius="12"
+                    Background="White">
+                <StackPanel>
+                    <TextBlock Text="Invoices"
+                               Opacity="0.6"
+                               FontSize="13" />
+                    <TextBlock Text="{Binding TotalInvoices}"
+                               FontSize="22"
+                               FontWeight="SemiBold"
+                               Margin="0,4,0,0" />
+                    <TextBlock Text="+1.8% from last week"
+                               FontSize="11"
+                               Foreground="#FF13B16A"
+                               Margin="0,6,0,0" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Placeholder main content -->
+        <Grid Grid.Row="2" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: chart placeholder -->
+            <Border Grid.Column="0"
+                    Margin="0,0,10,0"
+                    Padding="16"
+                    CornerRadius="12"
+                    Background="White">
+                <StackPanel>
+                    <TextBlock Text="Invoice Statistics"
+                               FontSize="16"
+                               FontWeight="SemiBold" />
+                    <TextBlock Text="(placeholder)"
+                               FontSize="12"
+                               Opacity="0.5"
+                               Margin="0,4,0,0" />
+                    <Border Margin="0,12,0,0"
+                            Background="#FFF2F3F7"
+                            CornerRadius="8"
+                            Height="180">
+                        <TextBlock Text="Chart / donut goes here"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Opacity="0.4" />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Right: recent invoices placeholder -->
+            <Border Grid.Column="1"
+                    Margin="10,0,0,0"
+                    Padding="16"
+                    CornerRadius="12"
+                    Background="White">
+                <StackPanel>
+                    <TextBlock Text="Sales Analytics"
+                               FontSize="16"
+                               FontWeight="SemiBold" />
+                    <Border Margin="0,12,0,0"
+                            Background="#FFF2F3F7"
+                            CornerRadius="8"
+                            Height="140">
+                        <TextBlock Text="Line chart placeholder"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Opacity="0.4" />
+                    </Border>
+
+                    <TextBlock Text="Recent Invoices"
+                               Margin="0,16,0,4"
+                               FontWeight="SemiBold" />
+
+                    <!-- demo rows -->
+                    <StackPanel Spacing="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="#004589" />
+                            <TextBlock Text="Eren Yeager" Grid.Column="1" />
+                            <TextBlock Text="Paid" Grid.Column="2"
+                                       Foreground="#FF13B16A" />
+                            <TextBlock Text="$101" Grid.Column="3" />
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="#004599" />
+                            <TextBlock Text="Levi Ackerman" Grid.Column="1" />
+                            <TextBlock Text="Pending" Grid.Column="2"
+                                       Foreground="#FFE5A300" />
+                            <TextBlock Text="$134" Grid.Column="3" />
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

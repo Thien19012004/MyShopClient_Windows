@@ -1,0 +1,28 @@
+<Page
+    x:Class="MyShopClient.Views.DashboardPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="using:MyShopClient.Views"
+    mc:Ignorable="d">
+
+    <Grid Background="#FFF5F5F7">
+        <Grid.ColumnDefinitions>
+            <!-- cột sidebar: width phụ thuộc SidebarControl.Width -->
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- SIDEBAR DÙNG CHUNG -->
+        <views:SidebarControl x:Name="Sidebar"
+                              Grid.Column="0"
+                              DashboardRequested="Sidebar_DashboardRequested"
+                              ProductsRequested="Sidebar_ProductsRequested"
+                              LogoutRequested="Sidebar_LogoutRequested" />
+
+        <!-- NỘI DUNG TRANG (FRAME CON) -->
+        <Frame x:Name="ContentFrame"
+               Grid.Column="1" />
+    </Grid>
+</Page>
