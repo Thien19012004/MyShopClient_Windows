@@ -4,8 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="using:MyShopClient.Models.Products"
-  xmlns:catmodels="using:MyShopClient.Models.Categories"
+    xmlns:models="using:MyShopClient.Models"
     xmlns:viewmodels="using:MyShopClient.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:ProductListViewModel}"
     mc:Ignorable="d">
@@ -14,509 +13,509 @@
 
         <!-- ================= MAIN CONTENT ================= -->
         <Grid x:Name="MainContent">
-   <Grid.RowDefinitions>
-          <RowDefinition Height="Auto" />
+            <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-             <RowDefinition Height="Auto" />
-<RowDefinition Height="*" />
-    <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-     <!-- Top bar: Title -->
+            <!-- Top bar: Title -->
             <TextBlock Grid.Row="0"
-             Text="Product"
-  FontSize="24"
-            FontWeight="SemiBold"
-                  VerticalAlignment="Center" />
+                       Text="Product"
+                       FontSize="24"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center" />
 
             <!-- Search + Import + Add -->
- <Grid Grid.Row="1" Margin="0,16,0,16">
-          <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="*" />
-   <ColumnDefinition Width="Auto" />
-             <ColumnDefinition Width="Auto" />
-   </Grid.ColumnDefinitions>
+            <Grid Grid.Row="1" Margin="0,16,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
- <!-- Search box -->
-              <Border Grid.Column="0"
-       Background="White"
-         CornerRadius="20"
-   Height="40"
- Padding="12,0">
-             <Grid>
-             <Grid.ColumnDefinitions>
-         <ColumnDefinition Width="Auto" />
-     <ColumnDefinition Width="*" />
-          <ColumnDefinition Width="Auto" />
-   </Grid.ColumnDefinitions>
+                <!-- Search box -->
+                <Border Grid.Column="0"
+                        Background="White"
+                        CornerRadius="20"
+                        Height="40"
+                        Padding="12,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-    <TextBlock Text="🔍"
-      VerticalAlignment="Center"
-        Margin="0,0,8,0" />
+                        <TextBlock Text="🔍"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0" />
 
-         <TextBox Grid.Column="1"
-      BorderThickness="0"
-   Background="Transparent"
-             PlaceholderText="Search product..."
-  Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Grid.Column="1"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 PlaceholderText="Search product..."
+                                 Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-    <Button Grid.Column="2"
-     Content="Search"
-          Command="{Binding SearchCommand}" />
-       </Grid>
-           </Border>
+                        <Button Grid.Column="2"
+                                Content="Search"
+                                Command="{Binding SearchCommand}" />
+                    </Grid>
+                </Border>
 
-     <!-- Import (mock) -->
-     <Button Grid.Column="1"
-                 x:Name="ImportButton"
-         Content="Import"
-    Height="40"
-            Margin="12,0,0,0"
-            Padding="16,0"
-      CornerRadius="20"
-      Click="ImportButton_Click" />
+                <!-- Import (mock) -->
+                <Button Grid.Column="1"
+                        x:Name="ImportButton"
+                        Content="Import"
+                        Height="40"
+                        Margin="12,0,0,0"
+                        Padding="16,0"
+                        CornerRadius="20"
+                        Click="ImportButton_Click" />
 
-              <!-- Add Item -->
+                <!-- Add Item -->
                 <Button Grid.Column="2"
-           Content="+ Add Item (mock)"
-         Height="40"
-                 Margin="12,0,0,0"
-        Padding="16,0"
-         CornerRadius="20"
-           Command="{Binding AddProductCommand}">
-       <Button.Background>
-       <SolidColorBrush Color="#FF5D5FEF" />
-         </Button.Background>
-     <Button.Foreground>
-             <SolidColorBrush Color="White" />
-   </Button.Foreground>
-            </Button>
- </Grid>
+                        Content="+ Add Item (mock)"
+                        Height="40"
+                        Margin="12,0,0,0"
+                        Padding="16,0"
+                        CornerRadius="20"
+                        Command="{Binding AddProductCommand}">
+                    <Button.Background>
+                        <SolidColorBrush Color="#FF5D5FEF" />
+                    </Button.Background>
+                    <Button.Foreground>
+                        <SolidColorBrush Color="White" />
+                    </Button.Foreground>
+                </Button>
+            </Grid>
 
             <!-- Filter + Sort -->
-  <Grid Grid.Row="2" Margin="0,0,0,12">
-       <Grid.ColumnDefinitions>
-             <ColumnDefinition Width="2*" />
-             <ColumnDefinition Width="2*" />
-           <ColumnDefinition Width="2*" />
-                 <ColumnDefinition Width="Auto" />
-      <ColumnDefinition Width="Auto" />
-  </Grid.ColumnDefinitions>
+            <Grid Grid.Row="2" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-      <!-- Category -->
-         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
-     <TextBlock Text="Category:" VerticalAlignment="Center" />
-  <ComboBox ItemsSource="{Binding Categories}"
- SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
-         DisplayMemberPath="Name"
-                Width="180" />
-     </StackPanel>
+                <!-- Category -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Category:" VerticalAlignment="Center" />
+                    <ComboBox ItemsSource="{Binding Categories}"
+                              SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                              DisplayMemberPath="Name"
+                              Width="180" />
+                </StackPanel>
 
-    <!-- Price range -->
-  <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-          <TextBlock Text="Price:" VerticalAlignment="Center" />
-             <TextBox Text="{Binding MinPriceText, Mode=TwoWay}"
-    Width="80"
-          PlaceholderText="Min" />
-          <TextBlock Text="-" VerticalAlignment="Center" />
+                <!-- Price range -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                    <TextBlock Text="Price:" VerticalAlignment="Center" />
+                    <TextBox Text="{Binding MinPriceText, Mode=TwoWay}"
+                             Width="80"
+                             PlaceholderText="Min" />
+                    <TextBlock Text="-" VerticalAlignment="Center" />
                     <TextBox Text="{Binding MaxPriceText, Mode=TwoWay}"
-              Width="80"
-               PlaceholderText="Max" />
-          </StackPanel>
+                             Width="80"
+                             PlaceholderText="Max" />
+                </StackPanel>
 
-           <!-- Sort -->
-     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-<TextBlock Text="Sort:" VerticalAlignment="Center" />
-    <ComboBox ItemsSource="{Binding SortOptions}"
- SelectedItem="{Binding SelectedSortOption, Mode=TwoWay}"
-      Width="150" />
-         </StackPanel>
+                <!-- Sort -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Sort:" VerticalAlignment="Center" />
+                    <ComboBox ItemsSource="{Binding SortOptions}"
+                              SelectedItem="{Binding SelectedSortOption, Mode=TwoWay}"
+                              Width="150" />
+                </StackPanel>
 
-  <Button Grid.Column="3"
-       Content="Apply"
-     Margin="12,0,0,0"
-    Command="{Binding ApplyFilterCommand}" />
+                <Button Grid.Column="3"
+                        Content="Apply"
+                        Margin="12,0,0,0"
+                        Command="{Binding ApplyFilterCommand}" />
 
-          <Button Grid.Column="4"
-     Content="Manage Categories"
-        Margin="12,0,0,0"
-              Command="{Binding OpenCategoryDialogCommand}" />    
+                <Button Grid.Column="4"
+                        Content="Manage Categories"
+                        Margin="12,0,0,0"
+                        Command="{Binding OpenCategoryDialogCommand}" />    
 
-       </Grid>
+            </Grid>
 
- <!-- Error message -->
+            <!-- Error message -->
             <TextBlock Grid.Row="3"
- Margin="0,0,0,4"
-         Text="{Binding ErrorMessage}"
-      Foreground="Red"
-   Visibility="{Binding HasError,
- Converter={StaticResource BooleanToVisibilityConverter}}" />
+                       Margin="0,0,0,4"
+                       Text="{Binding ErrorMessage}"
+                       Foreground="Red"
+                       Visibility="{Binding HasError,
+                                            Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-  <!-- Header + List -->
-     <Grid Grid.Row="3" Margin="0,20,0,0">
-            <Grid.RowDefinitions>
-     <RowDefinition Height="Auto" />
-           <RowDefinition Height="*" />
-          </Grid.RowDefinitions>
+            <!-- Header + List -->
+            <Grid Grid.Row="3" Margin="0,20,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-      <!-- Header row -->
-     <Grid Grid.Row="0"
-     Background="#FFEDEEF2"
-          Padding="16,10"
-       CornerRadius="8,8,0,0">
-       <Grid.ColumnDefinitions>
-  <ColumnDefinition Width="40" />
-        <ColumnDefinition Width="3*" />
-    <ColumnDefinition Width="2*" />
-       <ColumnDefinition Width="*" />
-      <ColumnDefinition Width="*" />
-  <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+                <!-- Header row -->
+                <Grid Grid.Row="0"
+                      Background="#FFEDEEF2"
+                      Padding="16,10"
+                      CornerRadius="8,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="3*" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-        <CheckBox />
-          <TextBlock Grid.Column="1" Text="Name" FontWeight="SemiBold" />
-      <TextBlock Grid.Column="2" Text="Category" FontWeight="SemiBold"  />
-         <TextBlock Grid.Column="3" Text="Stock" FontWeight="SemiBold"  />
-          <TextBlock Grid.Column="4" Text="Price" FontWeight="SemiBold"/>
-  <TextBlock Grid.Column="5" Text="Actions" FontWeight="SemiBold" />
+                    <CheckBox />
+                    <TextBlock Grid.Column="1" Text="Name" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="2" Text="Category" FontWeight="SemiBold"  />
+                    <TextBlock Grid.Column="3" Text="Stock" FontWeight="SemiBold"  />
+                    <TextBlock Grid.Column="4" Text="Price" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="5" Text="Actions" FontWeight="SemiBold" />
                 </Grid>
 
-           <!-- Items -->
-       <ListView Grid.Row="1"
-      x:Name="ProductListView"
-       ItemsSource="{Binding Products}"
-     Margin="0,-2,0,0"
-             Background="Transparent"
-    BorderThickness="0"
-IsItemClickEnabled="False">
-        <ListView.ItemContainerStyle>
-      <Style TargetType="ListViewItem">
-            <Setter Property="Padding" Value="0" />
-           <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="Background" Value="White" />
-                 <Setter Property="Margin" Value="0,1,0,0" />
-         </Style>
-            </ListView.ItemContainerStyle>
+                <!-- Items -->
+                <ListView Grid.Row="1"
+                          x:Name="ProductListView"
+                          ItemsSource="{Binding Products}"
+                          Margin="0,-2,0,0"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          IsItemClickEnabled="False">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Background" Value="White" />
+                            <Setter Property="Margin" Value="0,1,0,0" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
 
-         <ListView.ItemTemplate>
-           <DataTemplate x:DataType="models:ProductItemDto">
-            <Grid Padding="16,8">
-       <Grid.ColumnDefinitions>
-         <ColumnDefinition Width="40" />
-   <ColumnDefinition Width="3*" />
-   <ColumnDefinition Width="2*" />
-      <ColumnDefinition Width="*" />
-   <ColumnDefinition Width="*" />
-         <ColumnDefinition Width="Auto" />
-   </Grid.ColumnDefinitions>
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:ProductItemDto">
+                            <Grid Padding="16,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40" />
+                                    <ColumnDefinition Width="3*" />
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-            <CheckBox />
+                                <CheckBox />
 
-       <StackPanel Grid.Column="1" Spacing="2">
-               <TextBlock Text="{x:Bind Name}" />
-             <TextBlock Text="{x:Bind Sku}"
-         FontSize="11"
-           Opacity="0.6" />
-      </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="2">
+                                    <TextBlock Text="{x:Bind Name}" />
+                                    <TextBlock Text="{x:Bind Sku}"
+                                               FontSize="11"
+                                               Opacity="0.6" />
+                                </StackPanel>
 
-            <TextBlock Grid.Column="2" Text="{x:Bind CategoryName}" />
-          <TextBlock Grid.Column="3" Text="{x:Bind StockQuantity}" />
-<TextBlock Grid.Column="4" Text="{x:Bind SalePrice}" />
+                                <TextBlock Grid.Column="2" Text="{x:Bind CategoryName}" />
+                                <TextBlock Grid.Column="3" Text="{x:Bind StockQuantity}" />
+                                <TextBlock Grid.Column="4" Text="{x:Bind SalePrice}" />
 
-              <StackPanel Grid.Column="5"
-      Orientation="Horizontal"
-          HorizontalAlignment="Right"
-   Spacing="8">
-         <Button Content="👁"
-     Width="28" Height="28" Padding="0"
-       Command="{Binding DataContext.ViewProductCommand, ElementName=ProductListView}"
-         CommandParameter="{Binding}" />
- <Button Content="✏"
-      Width="28" Height="28" Padding="0"
-  Command="{Binding DataContext.EditProductCommand, ElementName=ProductListView}"
-  CommandParameter="{Binding}" />
-           <Button Content="🗑"
-             Width="28" Height="28" Padding="0"
-   Command="{Binding DataContext.DeleteProductCommand, ElementName=ProductListView}"
-          CommandParameter="{Binding}" />
-    </StackPanel>
-                 </Grid>
-          </DataTemplate>
-          </ListView.ItemTemplate>
- </ListView>
-    </Grid>
+                                <StackPanel Grid.Column="5"
+                                            Orientation="Horizontal"
+                                            HorizontalAlignment="Right"
+                                            Spacing="8">
+                                    <Button Content="👁"
+                                            Width="28" Height="28" Padding="0"
+                                            Command="{Binding DataContext.ViewProductCommand, ElementName=ProductListView}"
+                                            CommandParameter="{Binding}" />
+                                    <Button Content="✏"
+                                            Width="28" Height="28" Padding="0"
+                                            Command="{Binding DataContext.EditProductCommand, ElementName=ProductListView}"
+                                            CommandParameter="{Binding}" />
+                                    <Button Content="🗑"
+                                            Width="28" Height="28" Padding="0"
+                                            Command="{Binding DataContext.DeleteProductCommand, ElementName=ProductListView}"
+                                            CommandParameter="{Binding}" />
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
 
-          <!-- Pagination -->
+            <!-- Pagination -->
             <Grid Grid.Row="4"
-                Margin="0,16,0,0">
+                  Margin="0,16,0,0">
                 <Grid.ColumnDefinitions>
- <ColumnDefinition Width="*" />
-     <ColumnDefinition Width="Auto" />
-             </Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-     <TextBlock VerticalAlignment="Center">
-    <Run Text="Total: " />
-         <Run Text="{Binding TotalItems}" />
-   <Run Text=" items" />
-     </TextBlock>
+                <TextBlock VerticalAlignment="Center">
+                    <Run Text="Total: " />
+                    <Run Text="{Binding TotalItems}" />
+                    <Run Text=" items" />
+                </TextBlock>
 
-      <StackPanel Grid.Column="1"
-             Orientation="Horizontal"
-   Spacing="6"
-      VerticalAlignment="Center">
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="6"
+                            VerticalAlignment="Center">
 
-    <Button Content="Previous"
-       Command="{Binding PreviousPageCommand}" />
+                    <Button Content="Previous"
+                            Command="{Binding PreviousPageCommand}" />
 
-       <TextBlock Text="{Binding CurrentPage}" Margin="4,0" />
+                    <TextBlock Text="{Binding CurrentPage}" Margin="4,0" />
                     <TextBlock Text="/" />
                     <TextBlock Text="{Binding TotalPages}" Margin="0,0,4,0" />
 
-<Button Content="Next"
-  Command="{Binding NextPageCommand}" />
-           </StackPanel>
-         </Grid>
-    </Grid>
+                    <Button Content="Next"
+                            Command="{Binding NextPageCommand}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
 
-    <!-- ================= OVERLAY ADD PRODUCT ================= -->
-   <Grid x:Name="AddProductOverlay"
-      Background="#99000000"
-         Visibility="{Binding IsAddDialogOpen,
- Converter={StaticResource BooleanToVisibilityConverter}}">
+        <!-- ================= OVERLAY ADD PRODUCT ================= -->
+        <Grid x:Name="AddProductOverlay"
+              Background="#99000000"
+              Visibility="{Binding IsAddDialogOpen,
+                                   Converter={StaticResource BooleanToVisibilityConverter}}">
             <Border Width="480"
-         Padding="20"
-      Background="White"
-     CornerRadius="16"
-         HorizontalAlignment="Center"
-       VerticalAlignment="Center">
+                    Padding="20"
+                    Background="White"
+                    CornerRadius="16"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
                 <StackPanel Spacing="12">
-            <TextBlock Text="Add New Product"
-                FontSize="20"
-       FontWeight="SemiBold"
-           Margin="0,0,0,8"/>
+                    <TextBlock Text="Add New Product"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Margin="0,0,0,8"/>
 
-    <TextBox Header="SKU"
-           Text="{Binding NewProductSku, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Header="SKU"
+                             Text="{Binding NewProductSku, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-          <TextBox Header="Name"
-        Text="{Binding NewProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Header="Name"
+                             Text="{Binding NewProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-         <StackPanel Orientation="Horizontal" Spacing="8">
-         <TextBox Width="200"
-            Header="Import Price"
-   Text="{Binding NewProductImportPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox Width="200"
+                                 Header="Import Price"
+                                 Text="{Binding NewProductImportPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-    <TextBox Width="200"
-             Header="Sale Price"
-       Text="{Binding NewProductSalePriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-    </StackPanel>
+                        <TextBox Width="200"
+                                 Header="Sale Price"
+                                 Text="{Binding NewProductSalePriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
 
                     <TextBox Header="Stock Quantity"
- Text="{Binding NewProductStockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                             Text="{Binding NewProductStockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-  <ComboBox Header="Category"
-     ItemsSource="{Binding Categories}"
-   SelectedItem="{Binding NewProductCategory, Mode=TwoWay}">
-       <ComboBox.ItemTemplate>
-          <DataTemplate>
-    <TextBlock Text="{Binding Name}"/>
-       </DataTemplate>
-   </ComboBox.ItemTemplate>
-           </ComboBox>
+                    <ComboBox Header="Category"
+                              ItemsSource="{Binding Categories}"
+                              SelectedItem="{Binding NewProductCategory, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
-   <TextBox Header="Description"
-     Text="{Binding NewProductDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-        TextWrapping="Wrap"
-    AcceptsReturn="True"
-     Height="80"/>
+                    <TextBox Header="Description"
+                             Text="{Binding NewProductDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             TextWrapping="Wrap"
+                             AcceptsReturn="True"
+                             Height="80"/>
 
-   <TextBox Header="Image Path (optional)"
-                  Text="{Binding NewProductImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Header="Image Path (optional)"
+                             Text="{Binding NewProductImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-      <TextBlock Text="{Binding AddDialogError}"
-             Foreground="Red"
- TextWrapping="Wrap"
-                Visibility="{Binding HasAddDialogError,
-        Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <TextBlock Text="{Binding AddDialogError}"
+                               Foreground="Red"
+                               TextWrapping="Wrap"
+                               Visibility="{Binding HasAddDialogError,
+                                                    Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-        <StackPanel Orientation="Horizontal"
-       HorizontalAlignment="Right"
-   Spacing="8"
-     Margin="0,8,0,0">
-          <Button Content="Cancel"
-      Command="{Binding CancelAddDialogCommand}"/>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Spacing="8"
+                                Margin="0,8,0,0">
+                        <Button Content="Cancel"
+                                Command="{Binding CancelAddDialogCommand}"/>
 
-        <Button Content="Add"
-          Command="{Binding ConfirmAddProductCommand}"/>
-       </StackPanel>
-      </StackPanel>
+                        <Button Content="Add"
+                                Command="{Binding ConfirmAddProductCommand}"/>
+                    </StackPanel>
+                </StackPanel>
             </Border>
-  </Grid>
+        </Grid>
 
         <!-- ================= OVERLAY EDIT PRODUCT ================= -->
         <Grid x:Name="EditProductOverlay"
-    Background="#99000000"
+      Background="#99000000"
       Visibility="{Binding IsEditDialogOpen,
-        Converter={StaticResource BooleanToVisibilityConverter}}">
-        <Border Width="480"
-          Padding="20"
-       Background="White"
-      CornerRadius="16"
+                           Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="480"
+            Padding="20"
+            Background="White"
+            CornerRadius="16"
             HorizontalAlignment="Center"
-    VerticalAlignment="Center">
+            VerticalAlignment="Center">
                 <StackPanel Spacing="12">
-   <TextBlock Text="Edit Product"
-     FontSize="20"
-         FontWeight="SemiBold"
-            Margin="0,0,0,8"/>
+                    <TextBlock Text="Edit Product"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       Margin="0,0,0,8"/>
 
-         <!-- SKU: cho xem nhưng không sửa -->
-           <TextBox Header="SKU"
-               Text="{Binding EditProductSku}"
-      IsReadOnly="True" />
+                    <!-- SKU: cho xem nhưng không sửa -->
+                    <TextBox Header="SKU"
+                     Text="{Binding EditProductSku}"
+                     IsReadOnly="True" />
 
-                <TextBox Header="Name"
-      Text="{Binding EditProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Header="Name"
+                     Text="{Binding EditProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
- <StackPanel Orientation="Horizontal" Spacing="8">
-           <TextBox Width="200"
-                Header="Import Price"
-   Text="{Binding EditImportPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBox Width="200"
-     Header="Sale Price"
-     Text="{Binding EditSalePriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-   </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox Width="200"
+                         Header="Import Price"
+                         Text="{Binding EditImportPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Width="200"
+                         Header="Sale Price"
+                         Text="{Binding EditSalePriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
 
-            <TextBox Header="Stock Quantity"
-                Text="{Binding EditStockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Header="Stock Quantity"
+                     Text="{Binding EditStockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-         <ComboBox Header="Category"
-     ItemsSource="{Binding Categories}"
-      SelectedItem="{Binding EditCategory, Mode=TwoWay}">
-   <ComboBox.ItemTemplate>
-           <DataTemplate>
-   <TextBlock Text="{Binding Name}"/>
-           </DataTemplate>
-    </ComboBox.ItemTemplate>
-  </ComboBox>
+                    <ComboBox Header="Category"
+                      ItemsSource="{Binding Categories}"
+                      SelectedItem="{Binding EditCategory, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
-        <TextBox Header="Description"
-    Text="{Binding EditDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-     TextWrapping="Wrap"
-     AcceptsReturn="True"
-         Height="80"/>
+                    <TextBox Header="Description"
+                     Text="{Binding EditDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     Height="80"/>
 
-           <TextBox Header="Image Path (optional)"
-      Text="{Binding EditImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Header="Image Path (optional)"
+                     Text="{Binding EditImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
- <TextBlock Text="{Binding EditDialogError}"
-           Foreground="Red"
-              TextWrapping="Wrap"
-    Visibility="{Binding HasEditDialogError,
-        Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <TextBlock Text="{Binding EditDialogError}"
+                       Foreground="Red"
+                       TextWrapping="Wrap"
+                       Visibility="{Binding HasEditDialogError,
+                                            Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-        <StackPanel Orientation="Horizontal"
-      HorizontalAlignment="Right"
-          Spacing="8"
-      Margin="0,8,0,0">
-  <Button Content="Cancel"
-         Command="{Binding CancelEditDialogCommand}"/>
+                    <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8"
+                        Margin="0,8,0,0">
+                        <Button Content="Cancel"
+                        Command="{Binding CancelEditDialogCommand}"/>
 
-          <Button Content="Save"
-       Command="{Binding ConfirmEditProductCommand}"/>
-      </StackPanel>
-    </StackPanel>
+                        <Button Content="Save"
+                        Command="{Binding ConfirmEditProductCommand}"/>
+                    </StackPanel>
+                </StackPanel>
             </Border>
-   </Grid>
+        </Grid>
 
         <!-- ================= OVERLAY MANAGE CATEGORIES ================= -->
         <Grid x:Name="ManageCategoryOverlay"
-Background="#99000000"
+      Background="#99000000"
       Visibility="{Binding IsCategoryDialogOpen,
-   Converter={StaticResource BooleanToVisibilityConverter}}">
-     <Border Width="720"
-         Padding="20"
-    Background="White"
+                           Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="720"
+            Padding="20"
+            Background="White"
             CornerRadius="16"
-      HorizontalAlignment="Center"
+            HorizontalAlignment="Center"
             VerticalAlignment="Center">
-         <Grid>
-    <Grid.ColumnDefinitions>
-  <ColumnDefinition Width="2*" />
-      <ColumnDefinition Width="3*" />
-          </Grid.ColumnDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
 
-    <!-- Left: category list -->
-        <StackPanel Grid.Column="0" Spacing="8">
-         <TextBlock Text="Categories"
-          FontSize="18"
-        FontWeight="SemiBold" />
+                    <!-- Left: category list -->
+                    <StackPanel Grid.Column="0" Spacing="8">
+                        <TextBlock Text="Categories"
+                           FontSize="18"
+                           FontWeight="SemiBold" />
 
-     <TextBox PlaceholderText="Search category..."
-           Text="{Binding CategorySearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox PlaceholderText="Search category..."
+                         Text="{Binding CategorySearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <Button Content="Search"
-    Margin="0,4,0,4"
-            Command="{Binding CategorySearchCommand}" />
+                        <Button Content="Search"
+                        Margin="0,4,0,4"
+                        Command="{Binding CategorySearchCommand}" />
 
-            <ListView ItemsSource="{Binding CategoryItems}"
-              SelectedItem="{Binding SelectedCategoryItem, Mode=TwoWay}"
-      Height="260">
-       <ListView.ItemTemplate>
-       <DataTemplate x:DataType="catmodels:CategoryItemDto">
-  <StackPanel Spacing="2">
-         <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" />
-     <TextBlock Text="{x:Bind Description}" FontSize="11" Opacity="0.7" />
-  <TextBlock FontSize="11" Opacity="0.6">
-      <Run Text="Products: "/>
-          <Run Text="{x:Bind ProductCount}"/>
-         </TextBlock>
-          </StackPanel>
-    </DataTemplate>
-           </ListView.ItemTemplate>
-  </ListView>
- </StackPanel>
+                        <ListView ItemsSource="{Binding CategoryItems}"
+                          SelectedItem="{Binding SelectedCategoryItem, Mode=TwoWay}"
+                          Height="260">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="models:CategoryItemDto">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" />
+                                        <TextBlock Text="{x:Bind Description}" FontSize="11" Opacity="0.7" />
+                                        <TextBlock FontSize="11" Opacity="0.6">
+                                    <Run Text="Products: "/>
+                                    <Run Text="{x:Bind ProductCount}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
 
-   <!-- Right: detail form -->
-     <StackPanel Grid.Column="1" Spacing="8" Margin="16,0,0,0">
-    <TextBlock Text="Category Detail"
-       FontSize="18"
-        FontWeight="SemiBold" />
+                    <!-- Right: detail form -->
+                    <StackPanel Grid.Column="1" Spacing="8" Margin="16,0,0,0">
+                        <TextBlock Text="Category Detail"
+                           FontSize="18"
+                           FontWeight="SemiBold" />
 
-<TextBox Header="Name"
-  Text="{Binding CategoryNameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Header="Name"
+                         Text="{Binding CategoryNameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-     <TextBox Header="Description"
- Text="{Binding CategoryDescriptionText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-     TextWrapping="Wrap"
-           AcceptsReturn="True"
-     Height="80" />
+                        <TextBox Header="Description"
+                         Text="{Binding CategoryDescriptionText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         Height="80" />
 
-  <TextBlock Text="{Binding CategoryDialogError}"
-         Foreground="Red"
- TextWrapping="Wrap"
-            Visibility="{Binding HasCategoryDialogError,
-            Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <TextBlock Text="{Binding CategoryDialogError}"
+                           Foreground="Red"
+                           TextWrapping="Wrap"
+                           Visibility="{Binding HasCategoryDialogError,
+                                                Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-            <StackPanel Orientation="Horizontal"
-       HorizontalAlignment="Right"
-           Spacing="8"
-Margin="0,8,0,0">
-          <Button Content="New"
-       Command="{Binding NewCategoryCommand}" />
+                        <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Spacing="8"
+                            Margin="0,8,0,0">
+                            <Button Content="New"
+                            Command="{Binding NewCategoryCommand}" />
 
-       <Button Content="Delete"
-        Command="{Binding DeleteCategoryCommand}" />
+                            <Button Content="Delete"
+                            Command="{Binding DeleteCategoryCommand}" />
 
-          <Button Content="Close"
-              Command="{Binding CloseCategoryDialogCommand}" />
+                            <Button Content="Close"
+                            Command="{Binding CloseCategoryDialogCommand}" />
 
-    <Button Content="Save"
-    Command="{Binding SaveCategoryCommand}" />
-    </StackPanel>
-    </StackPanel>
-       </Grid>
-         </Border>
+                            <Button Content="Save"
+                            Command="{Binding SaveCategoryCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
 
 

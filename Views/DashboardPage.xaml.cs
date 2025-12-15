@@ -52,5 +52,12 @@ namespace MyShopClient.Views
             await _authService.LogoutAsync();
             _navigation.NavigateToLogin();
         }
+
+        private void Sidebar_OrdersRequested(object sender, System.EventArgs e)
+        {
+            Sidebar.SetActiveMenu(SidebarMenu.Orders);
+            if (ContentFrame.CurrentSourcePageType != typeof(OrderPage))
+                ContentFrame.Navigate(typeof(OrderPage));
+        }
     }
 }

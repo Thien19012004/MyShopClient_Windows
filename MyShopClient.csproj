@@ -17,6 +17,7 @@
     <None Remove="Views\DashboardHomePage.xaml" />
     <None Remove="Views\DashboardPage.xaml" />
     <None Remove="Views\LoginPage.xaml" />
+    <None Remove="Views\OrderPage.xaml" />
     <None Remove="Views\ProductPage.xaml" />
     <None Remove="Views\SidebarControl.xaml" />
   </ItemGroup>
@@ -50,6 +51,11 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7175" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\OrderPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\DashboardHomePage.xaml">

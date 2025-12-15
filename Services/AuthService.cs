@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using MyShopClient.Models;
-using MyShopClient.Services.Helpers;
+using System.Net.Http.Headers;
 
 namespace MyShopClient.Services
 {
@@ -39,7 +39,6 @@ namespace MyShopClient.Services
                     return new LoginResult(false, "Server URL is not configured.");
                 }
 
-                // Giả sử endpoint GraphQL là /graphql
                 var graphqlUrl = $"{baseUrl}/graphql";
 
                 var requestBody = new
@@ -73,10 +72,10 @@ mutation($username: String!, $password: String!) {
                     return new LoginResult(false, $"HTTP error: {(int)response.StatusCode}");
                 }
 
-                var content = await response.Content.ReadAsStringAsync();
-                var gql = GraphQlHelper.ExtractData<LoginRoot>(content);
+                var gql = await response.Content
+                    .ReadFromJsonAsync<GraphQlResponse<LoginRoot>>();
 
-                var loginPayload = gql?.Login;
+                var loginPayload = gql?.Data?.Login;
 
                 if (loginPayload == null)
                 {
@@ -88,10 +87,18 @@ mutation($username: String!, $password: String!) {
                     return new LoginResult(false, loginPayload.Message ?? "Login failed.");
                 }
 
-                // Lưu thông tin user + token
+                // ======= lưu user + token =======
                 CurrentUser = loginPayload.Data;
                 AccessToken = loginPayload.Data?.Token;
                 IsAuthenticated = true;
+
+                // Gắn Bearer token cho HttpClient dùng chung
+                _http.DefaultRequestHeaders.Authorization = null; // clear cũ nếu có
+                if (!string.IsNullOrEmpty(AccessToken))
+                {
+                    _http.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", AccessToken);
+                }
 
                 if (remember)
                 {
@@ -131,6 +138,10 @@ mutation($username: String!, $password: String!) {
             IsAuthenticated = false;
             AccessToken = null;
             CurrentUser = null;
+
+            // Bỏ Authorization header khi logout
+            _http.DefaultRequestHeaders.Authorization = null;
+
             await _secureStorage.DeleteAsync(CredentialKey);
             await Task.CompletedTask;
         }

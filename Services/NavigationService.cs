@@ -14,6 +14,7 @@ namespace MyShopClient.Services
         void NavigateToMainShell();
         void NavigateToConfig();
         void NavigateToProducts();
+        void NavigateToOrders();
     }
 
     public class NavigationService : INavigationService
@@ -40,5 +41,8 @@ namespace MyShopClient.Services
             Frame.Navigate(typeof(ProductPage));
         }
 
+        public void NavigateToOrders()         {
+            Frame.Navigate(typeof(OrderPage));
+        }
     }
 }

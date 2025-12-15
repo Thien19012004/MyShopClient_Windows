@@ -1,6 +1,4 @@
-﻿using MyShopClient.Models.Common;
-using MyShopClient.Models.Products;
-using MyShopClient.Services.Helpers;
+﻿using MyShopClient.Models;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -12,61 +10,111 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+
 namespace MyShopClient.Services
 {
-    /// <summary>
-    /// Service for Product GraphQL operations
-    /// </summary>
-    public class ProductService : GraphQlClientBase, IProductService
+    public class ProductService : IProductService
     {
-        private class ProductsPayload
-        {
-            public ApiResult<ProductPageResult> Products { get; set; } = null!;
-        }
-
-        private class ProductByIdPayload
-        {
-            public ApiResult<ProductDetailDto> ProductById { get; set; } = null!;
-        }
-
-        private class CreateProductPayload
-        {
-            public ApiResult<ProductDetailDto> CreateProduct { get; set; } = null!;
-        }
-
-        private class UpdateProductPayload
-        {
-            public ApiResult<ProductDetailDto> UpdateProduct { get; set; } = null!;
-        }
-
-        private class DeleteProductPayload
-        {
-            public ApiResult<object?> DeleteProduct { get; set; } = null!;
-        }
+        private readonly HttpClient _httpClient;
+        private readonly IServerConfigService _serverConfig;
 
         public ProductService(HttpClient httpClient, IServerConfigService serverConfig)
-            : base(httpClient, serverConfig)
         {
+            _httpClient = httpClient;
+            _serverConfig = serverConfig;
         }
 
-        /// <summary>
-        /// Build GraphQL query for getting products with filters
-        /// </summary>
+        // ============================================================
+        //  Helper chung gọi GraphQL
+        // ============================================================
+        private async Task<T?> PostGraphQlAsync<T>(string query, object? variables, CancellationToken ct)
+        {
+            var url = _serverConfig.GraphQlEndpoint; // thường là "/graphql"
+
+            var requestBody = new
+            {
+                query,
+                variables
+            };
+
+            using var response = await _httpClient.PostAsJsonAsync(url, requestBody, ct);
+            var content = await response.Content.ReadAsStringAsync(ct);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                // Ném ra exception có kèm body để ViewModel hiển thị trong ErrorMessage
+                throw new Exception(
+                    $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}: {content}");
+            }
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var gql = JsonSerializer.Deserialize<GraphQlResponse<T>>(content, options);
+            if (gql == null)
+            {
+                throw new Exception("Empty GraphQL response.");
+            }
+
+            if (gql.Errors != null && gql.Errors.Length > 0)
+            {
+                var msg = string.Join("; ", gql.Errors.Select(e => e.Message));
+                throw new Exception("GraphQL error: " + msg);
+            }
+
+            return gql.Data;
+        }
+
+        // ============================================================
+        //  Mapping enum FE -> enum GraphQL
+        // ============================================================
+        private static string ToGraphQlSortField(ProductSortField field)
+        {
+            // BE: NAME, SALE_PRICE, IMPORT_PRICE, STOCK_QUANTITY, CREATED_AT
+            return field switch
+            {
+                ProductSortField.Name => "NAME",
+                ProductSortField.SalePrice => "SALE_PRICE",
+                ProductSortField.ImportPrice => "IMPORT_PRICE",
+                ProductSortField.StockQuantity => "STOCK_QUANTITY",
+                ProductSortField.CreatedAt => "CREATED_AT",
+                _ => "NAME"
+            };
+        }
+
+        private static string ToStringLiteral(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return "null";
+
+            var s = value
+                .Replace("\\", "\\\\")
+                .Replace("\"", "\\\"");
+
+            return $"\"{s}\"";
+        }
+
+        private static string ToNullableIntLiteral(int? value)
+            => value.HasValue ? value.Value.ToString() : "null";
+
         private string BuildGetProductsQuery(ProductQueryOptions opt)
         {
-            var search = GraphQlHelper.ToStringLiteral(opt.Search);
-            var categoryId = GraphQlHelper.ToNullableIntLiteral(opt.CategoryId);
-            var minPrice = GraphQlHelper.ToNullableIntLiteral(opt.MinPrice);
-            var maxPrice = GraphQlHelper.ToNullableIntLiteral(opt.MaxPrice);
-            var sortField = ProductSortHelper.ToGraphQlField(opt.SortField);
-            var asc = GraphQlHelper.ToBoolLiteral(opt.SortAscending);
+            string searchLiteral = ToStringLiteral(opt.Search);
+            string categoryLiteral = ToNullableIntLiteral(opt.CategoryId);
+            string minPriceLiteral = ToNullableIntLiteral(opt.MinPrice);
+            string maxPriceLiteral = ToNullableIntLiteral(opt.MaxPrice);
+            string sortFieldLiteral = ToGraphQlSortField(opt.SortField);
+            string ascLiteral = opt.SortAscending ? "true" : "false";
 
+            // Query bám sát đúng mẫu bạn đã test trên backend
             return $@"
 query GetProducts {{
   products(
     pagination: {{ page: {opt.Page}, pageSize: {opt.PageSize} }}
-    filter: {{ search: {search}, categoryId: {categoryId}, minPrice: {minPrice}, maxPrice: {maxPrice} }}
-    sort: {{ field: {sortField}, asc: {asc} }}
+    filter: {{ search: {searchLiteral}, categoryId: {categoryLiteral}, minPrice: {minPriceLiteral}, maxPrice: {maxPriceLiteral} }}
+    sort: {{ field: {sortFieldLiteral}, asc: {ascLiteral} }}
   ) {{
     statusCode
     success
@@ -90,6 +138,12 @@ query GetProducts {{
 }}";
         }
 
+        private class GetProductsPayload
+        {
+            // JSON: { "data": { "products": { ... } } }
+            public ApiResult<ProductPageResult> Products { get; set; } = null!;
+        }
+
         // ============================================================
         //  GetProducts
         // ============================================================
@@ -99,25 +153,54 @@ query GetProducts {{
         {
             var query = BuildGetProductsQuery(opt);
 
-            try
+            // Không dùng variables vì đã build literal vào query
+            var data = await PostGraphQlAsync<GetProductsPayload>(query, null, cancellationToken);
+
+            return data?.Products ?? new ApiResult<ProductPageResult>
             {
-                var payload = await PostGraphQlAsync<ProductsPayload>(query, null, cancellationToken);
-                return payload.Products ?? new ApiResult<ProductPageResult>
-                {
-                    StatusCode = 500,
-                    Success = false,
-                    Message = "No data from server"
-                };
-            }
-            catch (Exception ex)
+                StatusCode = 500,
+                Success = false,
+                Message = "No data from server"
+            };
+        }
+
+        // ============================================================
+        //  DeleteProduct
+        // ============================================================
+        private const string DeleteProductMutation = @"
+mutation DeleteProduct($productId: Int!) {
+  deleteProduct(productId: $productId) {
+    statusCode
+    success
+    message
+  }
+}";
+
+        private class DeleteProductPayload
+        {
+            public ApiResult<object?> DeleteProduct { get; set; } = null!;
+        }
+
+        public async Task<ApiResult<bool>> DeleteProductAsync(
+            int productId,
+            CancellationToken cancellationToken = default)
+        {
+            var variables = new { productId };
+
+            var data = await PostGraphQlAsync<DeleteProductPayload>(
+                DeleteProductMutation,
+                variables,
+                cancellationToken);
+
+            var inner = data?.DeleteProduct;
+
+            return new ApiResult<bool>
             {
-                return new ApiResult<ProductPageResult>
-                {
-                    StatusCode = 500,
-                    Success = false,
-                    Message = ex.Message
-                };
-            }
+                StatusCode = inner?.StatusCode ?? 500,
+                Success = inner?.Success ?? false,
+                Message = inner?.Message,
+                Data = inner?.Success ?? false
+            };
         }
 
         // ============================================================
@@ -144,31 +227,28 @@ query GetProductById($productId: Int!) {
   }
 }";
 
+        private class GetProductByIdPayload
+        {
+            public ApiResult<ProductDetailDto> ProductById { get; set; } = null!;
+        }
+
         public async Task<ApiResult<ProductDetailDto>> GetProductByIdAsync(
             int productId,
             CancellationToken cancellationToken = default)
         {
             var variables = new { productId };
 
-            try
+            var data = await PostGraphQlAsync<GetProductByIdPayload>(
+                GetProductByIdQuery,
+                variables,
+                cancellationToken);
+
+            return data?.ProductById ?? new ApiResult<ProductDetailDto>
             {
-                var payload = await PostGraphQlAsync<ProductByIdPayload>(GetProductByIdQuery, variables, cancellationToken);
-                return payload.ProductById ?? new ApiResult<ProductDetailDto>
-                {
-                    StatusCode = 500,
-                    Success = false,
-                    Message = "No data from server"
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ApiResult<ProductDetailDto>
-                {
-                    StatusCode = 500,
-                    Success = false,
-                    Message = ex.Message
-                };
-            }
+                StatusCode = 500,
+                Success = false,
+                Message = "No data from server"
+            };
         }
 
         // ============================================================
@@ -191,31 +271,28 @@ mutation CreateProduct($input: CreateProductInput!) {
   }
 }";
 
+        private class CreateProductPayload
+        {
+            public ApiResult<ProductDetailDto> CreateProduct { get; set; } = null!;
+        }
+
         public async Task<ApiResult<ProductDetailDto>> CreateProductAsync(
             ProductCreateInput input,
             CancellationToken cancellationToken = default)
         {
             var variables = new { input };
 
-            try
+            var data = await PostGraphQlAsync<CreateProductPayload>(
+                CreateProductMutation,
+                variables,
+                cancellationToken);
+
+            return data?.CreateProduct ?? new ApiResult<ProductDetailDto>
             {
-                var payload = await PostGraphQlAsync<CreateProductPayload>(CreateProductMutation, variables, cancellationToken);
-                return payload.CreateProduct ?? new ApiResult<ProductDetailDto>
-                {
-                    StatusCode = 500,
-                    Success = false,
-                    Message = "No data from server"
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ApiResult<ProductDetailDto>
-                {
-                    StatusCode = 500,
-                    Success = false,
-                    Message = ex.Message
-                };
-            }
+                StatusCode = 500,
+                Success = false,
+                Message = "No data from server"
+            };
         }
 
         // ============================================================
@@ -237,6 +314,11 @@ mutation UpdateProduct($productId: Int!, $input: UpdateProductInput!) {
   }
 }";
 
+        private class UpdateProductPayload
+        {
+            public ApiResult<ProductDetailDto> UpdateProduct { get; set; } = null!;
+        }
+
         public async Task<ApiResult<ProductDetailDto>> UpdateProductAsync(
             int productId,
             ProductUpdateInput input,
@@ -244,67 +326,17 @@ mutation UpdateProduct($productId: Int!, $input: UpdateProductInput!) {
         {
             var variables = new { productId, input };
 
-            try
-            {
-                var payload = await PostGraphQlAsync<UpdateProductPayload>(UpdateProductMutation, variables, cancellationToken);
-                return payload.UpdateProduct ?? new ApiResult<ProductDetailDto>
-                {
-                    StatusCode = 500,
-                    Success = false,
-                    Message = "No data from server"
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ApiResult<ProductDetailDto>
-                {
-                    StatusCode = 500,
-                    Success = false,
-                    Message = ex.Message
-                };
-            }
-        }
+            var data = await PostGraphQlAsync<UpdateProductPayload>(
+                UpdateProductMutation,
+                variables,
+                cancellationToken);
 
-        // ============================================================
-        //  DeleteProduct
-        // ============================================================
-        private const string DeleteProductMutation = @"
-mutation DeleteProduct($productId: Int!) {
-  deleteProduct(productId: $productId) {
-    statusCode
-    success
-    message
-  }
-}";
-
-        public async Task<ApiResult<bool>> DeleteProductAsync(
-            int productId,
-            CancellationToken cancellationToken = default)
-        {
-            var variables = new { productId };
-
-            try
+            return data?.UpdateProduct ?? new ApiResult<ProductDetailDto>
             {
-                var payload = await PostGraphQlAsync<DeleteProductPayload>(DeleteProductMutation, variables, cancellationToken);
-                var inner = payload.DeleteProduct;
-
-                return new ApiResult<bool>
-                {
-                    StatusCode = inner?.StatusCode ?? 500,
-                    Success = inner?.Success ?? false,
-                    Message = inner?.Message,
-                    Data = inner?.Success ?? false
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ApiResult<bool>
-                {
-                    StatusCode = 500,
-                    Success = false,
-                    Message = ex.Message
-                };
-            }
+                StatusCode = 500,
+                Success = false,
+                Message = "No data from server"
+            };
         }
 
         public async Task<ApiResult<int>> ImportProductsFromExcelAsync(Stream excelStream)

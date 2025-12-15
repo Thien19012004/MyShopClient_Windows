@@ -1,13 +1,11 @@
-﻿using MyShopClient.Models.Common;
-
-namespace MyShopClient.Models
+﻿namespace MyShopClient.Models
 {
-    /// <summary>
-    /// Root response object for login mutation
-    /// Corresponds to GraphQL response data wrapper
-    /// </summary>
+    // Tương ứng với root "data"
     public class LoginRoot
     {
         public ApiResult<LoginUserDto>? Login { get; set; }
     }
+
+    // Tương ứng với root GraphQL: { data: {...} }
+   
 }

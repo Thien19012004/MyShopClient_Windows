@@ -9,7 +9,8 @@ namespace MyShopClient.Views
     public enum SidebarMenu
     {
         Dashboard,
-        Products
+        Products,
+        Orders,
     }
 
     public sealed partial class SidebarControl : UserControl
@@ -28,7 +29,7 @@ namespace MyShopClient.Views
         public event EventHandler? DashboardRequested;
         public event EventHandler? ProductsRequested;
         public event EventHandler? LogoutRequested;
-
+        public event EventHandler? OrdersRequested;
         private void Dashboard_Click(object sender, RoutedEventArgs e)
         {
             SetActiveMenu(SidebarMenu.Dashboard);
@@ -44,6 +45,11 @@ namespace MyShopClient.Views
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
             LogoutRequested?.Invoke(this, EventArgs.Empty);
+        }
+        private void Orders_Click(object sender, RoutedEventArgs e)
+        {
+            SetActiveMenu(SidebarMenu.Orders);
+            OrdersRequested?.Invoke(this, EventArgs.Empty);
         }
 
         // ===== Thu gọn / mở rộng sidebar =====
@@ -67,6 +73,7 @@ namespace MyShopClient.Views
             ProductsText.Visibility = visibility;
             SettingsText.Visibility = visibility;
             LogoutText.Visibility = visibility;
+            OrdersText.Visibility = visibility;
         }
 
 
@@ -80,6 +87,7 @@ namespace MyShopClient.Views
 
             DashboardButton.Background = (menu == SidebarMenu.Dashboard) ? activeBrush : inactiveBrush;
             ProductsButton.Background = (menu == SidebarMenu.Products) ? activeBrush : inactiveBrush;
+            OrdersButton.Background = (menu == SidebarMenu.Orders) ? activeBrush : inactiveBrush;
 
             // màu chữ: active thì trắng, inactive thì hơi mờ
             DashboardButton.Foreground = (menu == SidebarMenu.Dashboard)
@@ -87,6 +95,10 @@ namespace MyShopClient.Views
                 : new SolidColorBrush(Colors.Gainsboro);
 
             ProductsButton.Foreground = (menu == SidebarMenu.Products)
+                ? new SolidColorBrush(Colors.White)
+                : new SolidColorBrush(Colors.Gainsboro);
+
+            OrdersButton.Foreground = (menu == SidebarMenu.Orders)
                 ? new SolidColorBrush(Colors.White)
                 : new SolidColorBrush(Colors.Gainsboro);
         }

@@ -49,6 +49,8 @@ public partial class App : Application
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IProductService, ProductService>();
         services.AddSingleton<ICategoryService, CategoryService>();
+        services.AddSingleton<IOrderService, OrderService>();
+
 
 
         // 4. ViewModels
@@ -56,6 +58,8 @@ public partial class App : Application
         services.AddTransient<ConfigViewModel>();
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<ProductListViewModel>();
+        services.AddTransient<OrderListViewModel>();
+
 
         Services = services.BuildServiceProvider();
     }

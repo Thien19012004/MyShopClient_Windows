@@ -98,6 +98,20 @@
                                x:Name="ProductsText"/>
                 </StackPanel>
             </Button>
+            <Button x:Name="OrdersButton"
+                    HorizontalAlignment="Stretch"
+                    Margin="5,0"
+                    Background="{StaticResource SidebarInactiveBrush}"
+                    Foreground="#CCFFFFFF"
+                    BorderThickness="0"
+                    CornerRadius="6"
+                    Click="Orders_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="📦"/>
+                            <TextBlock Text="Orders"
+                               x:Name="OrdersText"/>
+                        </StackPanel>   
+            </Button>
 
             <!-- Settings placeholder -->
             <Button x:Name="SettingsButton"
