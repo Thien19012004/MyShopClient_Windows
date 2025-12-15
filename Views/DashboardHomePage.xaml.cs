@@ -6,12 +6,13 @@ namespace MyShopClient.Views
 {
     public sealed partial class DashboardHomePage : Page
     {
-        public DashboardViewModel ViewModel => (DashboardViewModel)DataContext;
+        public DashboardViewModel ViewModel { get; }
 
         public DashboardHomePage()
         {
             this.InitializeComponent();
-            DataContext = App.Services.GetService<DashboardViewModel>();
+            ViewModel = App.Services.GetRequiredService<DashboardViewModel>();
+            DataContext = ViewModel;
         }
     }
 }

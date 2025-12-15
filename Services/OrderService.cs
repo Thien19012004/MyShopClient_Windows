@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using MyShopClient.Models;
 
 namespace MyShopClient.Services
@@ -39,11 +40,19 @@ namespace MyShopClient.Services
             var payload = new { query, variables };
 
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
+            // Log request body for debugging
+            Debug.WriteLine("[GraphQL Request] Endpoint: " + new Uri(new Uri(_config.Current.BaseUrl), _config.GraphQlEndpoint));
+            Debug.WriteLine("[GraphQL Request Body] " + json);
+
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var endpoint = new Uri(new Uri(_config.Current.BaseUrl), _config.GraphQlEndpoint);
             var response = await _httpClient.PostAsync(endpoint, content);
             var responseJson = await response.Content.ReadAsStringAsync();
+
+            // Log response body for debugging
+            Debug.WriteLine("[GraphQL Response Status] " + ((int)response.StatusCode) + " " + response.ReasonPhrase);
+            Debug.WriteLine("[GraphQL Response Body] " + responseJson);
 
             GraphQlResponse<TData> graphQl;
             try
@@ -109,32 +118,14 @@ namespace MyShopClient.Services
         {
             var graphQlEndpoint = new Uri(new Uri(_config.Current.BaseUrl), _config.GraphQlEndpoint);
 
-            // Convert date-only inputs to explicit UTC ISO-8601 datetimes.
-            DateTime? fromDate = opt.FromDate?.Date;
-            DateTime? toDate = opt.ToDate?.Date;
-
-            string? fromIso = null;
-            string? toIso = null;
-
-            if (fromDate.HasValue)
-            {
-                // start of day in UTC
-                var fromUtc = DateTime.SpecifyKind(fromDate.Value.Date, DateTimeKind.Utc);
-                fromIso = fromUtc.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            }
-
-            if (toDate.HasValue)
-            {
-                // end of day in UTC
-                var endOfDay = toDate.Value.Date.AddDays(1).AddTicks(-1);
-                var toUtc = DateTime.SpecifyKind(endOfDay, DateTimeKind.Utc);
-                toIso = toUtc.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            }
+            // Convert date-only inputs to date string (yyyy-MM-dd) because GraphQL expects Date scalar
+            string? fromStr = opt.FromDate?.ToString("yyyy-MM-dd");
+            string? toStr = opt.ToDate?.ToString("yyyy-MM-dd");
 
             var query = @"
 query GetOrders($page: Int!, $pageSize: Int!,
                 $customerId: Int, $saleId: Int, $status: OrderStatus,
-                $from: DateTime, $to: DateTime) {
+                $from: Date, $to: Date) {
   orders(
     pagination: { page: $page, pageSize: $pageSize }
     filter: { customerId: $customerId, saleId: $saleId, status: $status }
@@ -168,9 +159,9 @@ query GetOrders($page: Int!, $pageSize: Int!,
                 customerId = opt.CustomerId,
                 saleId = opt.SaleId,
                 status = string.IsNullOrWhiteSpace(opt.Status) ? null : opt.Status,
-                // send ISO-8601 date-time strings (UTC) which HotChocolate DateTime scalar accepts
-                from = (object?)fromIso,
-                to = (object?)toIso
+                // send date-only strings to match GraphQL Date scalar
+                from = fromStr,
+                to = toStr
             };
 
             var payload = new
@@ -180,10 +171,13 @@ query GetOrders($page: Int!, $pageSize: Int!,
             };
 
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
+            Debug.WriteLine("[GetOrders Request Body] " + json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var httpResponse = await _httpClient.PostAsync(graphQlEndpoint, content);
             var responseString = await httpResponse.Content.ReadAsStringAsync();
+
+            Debug.WriteLine("[GetOrders Response] Status: " + ((int)httpResponse.StatusCode) + " Body: " + responseString);
 
             if (!httpResponse.IsSuccessStatusCode)
             {

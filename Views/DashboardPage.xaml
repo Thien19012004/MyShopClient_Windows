@@ -20,7 +20,8 @@
                               DashboardRequested="Sidebar_DashboardRequested"
                               ProductsRequested="Sidebar_ProductsRequested"
                               OrdersRequested="Sidebar_OrdersRequested"
-                              LogoutRequested="Sidebar_LogoutRequested" />
+                              LogoutRequested="Sidebar_LogoutRequested"
+                              ReportsRequested="Sidebar_ReportsRequested"/>
 
         <!-- NỘI DUNG TRANG (FRAME CON) -->
         <Frame x:Name="ContentFrame"

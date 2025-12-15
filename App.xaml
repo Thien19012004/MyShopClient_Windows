@@ -5,7 +5,13 @@
     xmlns:conv="using:MyShopClient.Converters">
 
     <Application.Resources>
-        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

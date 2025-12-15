@@ -11,6 +11,7 @@ namespace MyShopClient.Views
         Dashboard,
         Products,
         Orders,
+        Reports,
     }
 
     public sealed partial class SidebarControl : UserControl
@@ -30,6 +31,7 @@ namespace MyShopClient.Views
         public event EventHandler? ProductsRequested;
         public event EventHandler? LogoutRequested;
         public event EventHandler? OrdersRequested;
+        public event EventHandler? ReportsRequested;
         private void Dashboard_Click(object sender, RoutedEventArgs e)
         {
             SetActiveMenu(SidebarMenu.Dashboard);
@@ -50,6 +52,11 @@ namespace MyShopClient.Views
         {
             SetActiveMenu(SidebarMenu.Orders);
             OrdersRequested?.Invoke(this, EventArgs.Empty);
+        }
+        private void Reports_Click(object sender, RoutedEventArgs e)
+        {
+            SetActiveMenu(SidebarMenu.Reports);
+            ReportsRequested?.Invoke(this, EventArgs.Empty);
         }
 
         // ===== Thu gọn / mở rộng sidebar =====

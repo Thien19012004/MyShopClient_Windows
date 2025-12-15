@@ -59,5 +59,11 @@ namespace MyShopClient.Views
             if (ContentFrame.CurrentSourcePageType != typeof(OrderPage))
                 ContentFrame.Navigate(typeof(OrderPage));
         }
+        private void Sidebar_ReportsRequested(object sender, System.EventArgs e)
+        {
+            Sidebar.SetActiveMenu(SidebarMenu.Reports);
+            if (ContentFrame.CurrentSourcePageType != typeof(ReportPage))
+                ContentFrame.Navigate(typeof(ReportPage));
+        }
     }
 }
