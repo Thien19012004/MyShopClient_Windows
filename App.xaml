@@ -12,6 +12,12 @@
 
             <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+            <conv:FirstImageConverter x:Key="FirstImageConverter" />
+            <conv:SafeUriConverter x:Key="SafeUriConverter" />
+            <conv:CollectionHasItemsConverter x:Key="CollectionHasItemsConverter" />
+            <conv:ImageAtIndexConverter x:Key="ImageAtIndexConverter" />
+            <conv:HasMoreThanConverter x:Key="HasMoreThanConverter" />
+            <conv:CollectionHasExactlyConverter x:Key="CollectionHasExactlyConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

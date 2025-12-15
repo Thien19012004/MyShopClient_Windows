@@ -48,9 +48,9 @@ public partial class App : Application
         services.AddSingleton<HttpClient>(sp =>
      {
  var cfgService = sp.GetRequiredService<IServerConfigService>();
-       var baseUrl = cfgService.Current.BaseUrl;
+    var baseUrl = cfgService.Current.BaseUrl;
 
-            // fallback nếu file config trống
+   // fallback nếu file config trống
  if (string.IsNullOrWhiteSpace(baseUrl))
       baseUrl = "http://localhost:5135";
 
@@ -58,31 +58,36 @@ public partial class App : Application
 if (!baseUrl.EndsWith("/"))
         baseUrl += "/";
 
-            var handler = new SocketsHttpHandler
-            {
-      PooledConnectionLifetime = TimeSpan.FromMinutes(5),
-        PooledConnectionIdleTimeout = TimeSpan.FromMinutes(2),
-         MaxConnectionsPerServer = 10,
-           EnableMultipleHttp2Connections = true
+     var handler = new SocketsHttpHandler
+  {
+        PooledConnectionLifetime = TimeSpan.FromMinutes(5),
+      PooledConnectionIdleTimeout = TimeSpan.FromMinutes(2),
+    MaxConnectionsPerServer = 10,
+   EnableMultipleHttp2Connections = true,
+        // Keep connections alive
+    KeepAlivePingDelay = TimeSpan.FromSeconds(30),
+       KeepAlivePingTimeout = TimeSpan.FromSeconds(10),
+            KeepAlivePingPolicy = System.Net.Http.HttpKeepAlivePingPolicy.Always
  };
 
  var client = new HttpClient(handler, disposeHandler: false)
     {
      BaseAddress = new Uri(baseUrl, UriKind.Absolute),
-    Timeout = TimeSpan.FromSeconds(100)
+      Timeout = TimeSpan.FromSeconds(120) // Tăng timeout lên 120 giây
    };
 
     return client;
-        });
+    });
 
     // 3. Các service khác
    services.AddSingleton<ISecureStorageService, SecureStorageService>();
         services.AddSingleton<IAuthService, AuthService>();
         services.AddSingleton<INavigationService, NavigationService>();
-        services.AddSingleton<IProductService, ProductService>();
-services.AddSingleton<ICategoryService, CategoryService>();
+  services.AddSingleton<IProductService, ProductService>();
+        services.AddSingleton<ICategoryService, CategoryService>();
         services.AddSingleton<IOrderService, OrderService>();
-        services.AddSingleton<IReportService, ReportService>();
+  services.AddSingleton<IReportService, ReportService>();
+        services.AddSingleton<IImageUploadService, ImageUploadService>();
 
      // 4. ViewModels
         services.AddTransient<LoginViewModel>();

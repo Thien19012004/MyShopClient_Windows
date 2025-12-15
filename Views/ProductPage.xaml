@@ -13,22 +13,22 @@
 
         <!-- ================= MAIN CONTENT ================= -->
         <Grid x:Name="MainContent">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+  <Grid.RowDefinitions>
+     <RowDefinition Height="Auto" />
+           <RowDefinition Height="Auto" />
+           <RowDefinition Height="Auto" />
+     <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
 
-            <!-- Top bar: Title -->
-            <TextBlock Grid.Row="0"
-                       Text="Product"
-                       FontSize="24"
-                       FontWeight="SemiBold"
-                       VerticalAlignment="Center" />
+  <!-- Top bar: Title -->
+  <TextBlock Grid.Row="0"
+             Text="Product"
+             FontSize="24"
+             FontWeight="SemiBold"
+             VerticalAlignment="Center" />
 
-            <!-- Search + Import + Add -->
+<!-- Search + Import + Add -->
             <Grid Grid.Row="1" Margin="0,16,0,16">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -153,97 +153,161 @@
 
             <!-- Header + List -->
             <Grid Grid.Row="3" Margin="0,20,0,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+       <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+  </Grid.RowDefinitions>
 
-                <!-- Header row -->
-                <Grid Grid.Row="0"
-                      Background="#FFEDEEF2"
-                      Padding="16,10"
-                      CornerRadius="8,8,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="40" />
-                        <ColumnDefinition Width="3*" />
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+ <!-- Header row -->
+     <Grid Grid.Row="0"
+            Background="#FFEDEEF2"
+       Padding="16,10"
+      CornerRadius="8,8,0,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="40" />
+          <ColumnDefinition Width="150" />
+          <ColumnDefinition Width="3*" />
+        <ColumnDefinition Width="2*" />
+   <ColumnDefinition Width="*" />
+    <ColumnDefinition Width="*" />
+             <ColumnDefinition Width="Auto" />
+   </Grid.ColumnDefinitions>
 
-                    <CheckBox />
-                    <TextBlock Grid.Column="1" Text="Name" FontWeight="SemiBold" />
-                    <TextBlock Grid.Column="2" Text="Category" FontWeight="SemiBold"  />
-                    <TextBlock Grid.Column="3" Text="Stock" FontWeight="SemiBold"  />
-                    <TextBlock Grid.Column="4" Text="Price" FontWeight="SemiBold"/>
-                    <TextBlock Grid.Column="5" Text="Actions" FontWeight="SemiBold" />
-                </Grid>
+   <CheckBox />
+     <TextBlock Grid.Column="1" Text="Image" FontWeight="SemiBold" />
+            <TextBlock Grid.Column="2" Text="Name" FontWeight="SemiBold" />
+    <TextBlock Grid.Column="3" Text="Category" FontWeight="SemiBold"  />
+        <TextBlock Grid.Column="4" Text="Stock" FontWeight="SemiBold"  />
+        <TextBlock Grid.Column="5" Text="Price" FontWeight="SemiBold"/>
+          <TextBlock Grid.Column="6" Text="Actions" FontWeight="SemiBold" />
+ </Grid>
 
-                <!-- Items -->
-                <ListView Grid.Row="1"
-                          x:Name="ProductListView"
-                          ItemsSource="{Binding Products}"
-                          Margin="0,-2,0,0"
-                          Background="Transparent"
-                          BorderThickness="0"
-                          IsItemClickEnabled="False">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="Padding" Value="0" />
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="Background" Value="White" />
-                            <Setter Property="Margin" Value="0,1,0,0" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
+   <!-- Items -->
+       <ListView Grid.Row="1"
+    x:Name="ProductListView"
+   ItemsSource="{Binding Products}"
+   Margin="0,-2,0,0"
+ Background="Transparent"
+        BorderThickness="0"
+     IsItemClickEnabled="False">
+      <ListView.ItemContainerStyle>
+ <Style TargetType="ListViewItem">
+       <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Background" Value="White" />
+    <Setter Property="Margin" Value="0,1,0,0" />
+   </Style>
+      </ListView.ItemContainerStyle>
 
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="models:ProductItemDto">
-                            <Grid Padding="16,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="40" />
-                                    <ColumnDefinition Width="3*" />
-                                    <ColumnDefinition Width="2*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+         <ListView.ItemTemplate>
+      <DataTemplate x:DataType="models:ProductItemDto">
+     <Grid Padding="16,8">
+  <Grid.ColumnDefinitions>
+       <ColumnDefinition Width="40" />
+  <ColumnDefinition Width="150" />
+  <ColumnDefinition Width="3*" />
+    <ColumnDefinition Width="2*" />
+ <ColumnDefinition Width="*" />
+   <ColumnDefinition Width="*" />
+ <ColumnDefinition Width="Auto" />
+   </Grid.ColumnDefinitions>
 
-                                <CheckBox />
+  <CheckBox />
 
-                                <StackPanel Grid.Column="1" Spacing="2">
-                                    <TextBlock Text="{x:Bind Name}" />
-                                    <TextBlock Text="{x:Bind Sku}"
-                                               FontSize="11"
-                                               Opacity="0.6" />
-                                </StackPanel>
+     <!-- Multiple Product Images - Fixed Width with Clipping -->
+ <Border Grid.Column="1" 
+ Width="150"
+    Height="44"
+ HorizontalAlignment="Left">
+  <Border.Clip>
+  <RectangleGeometry Rect="0,0,150,44" />
+   </Border.Clip>
+  <StackPanel Orientation="Horizontal" 
+  Spacing="4">
+ <!-- Image 1: Always show if exists -->
+     <Border Width="40" Height="40" 
+   CornerRadius="4"
+    Background="#FFF0F0F0"
+Visibility="{Binding ImagePaths, Converter={StaticResource CollectionHasItemsConverter}, ConverterParameter=0}">
+  <Image Stretch="UniformToFill">
+     <Image.Source>
+         <BitmapImage UriSource="{Binding ImagePaths, Converter={StaticResource ImageAtIndexConverter}, ConverterParameter=0}" />
+        </Image.Source>
+   </Image>
+       </Border>
 
-                                <TextBlock Grid.Column="2" Text="{x:Bind CategoryName}" />
-                                <TextBlock Grid.Column="3" Text="{x:Bind StockQuantity}" />
-                                <TextBlock Grid.Column="4" Text="{x:Bind SalePrice}" />
+ <!-- Image 2: Always show if exists -->
+   <Border Width="40" Height="40" 
+ CornerRadius="4"
+ Background="#FFF0F0F0"
+      Visibility="{Binding ImagePaths, Converter={StaticResource CollectionHasItemsConverter}, ConverterParameter=1}">
+    <Image Stretch="UniformToFill">
+   <Image.Source>
+  <BitmapImage UriSource="{Binding ImagePaths, Converter={StaticResource ImageAtIndexConverter}, ConverterParameter=1}" />
+     </Image.Source>
+  </Image>
+      </Border>
 
-                                <StackPanel Grid.Column="5"
-                                            Orientation="Horizontal"
-                                            HorizontalAlignment="Right"
-                                            Spacing="8">
-                                    <Button Content="👁"
-                                            Width="28" Height="28" Padding="0"
-                                            Command="{Binding DataContext.ViewProductCommand, ElementName=ProductListView}"
-                                            CommandParameter="{Binding}" />
-                                    <Button Content="✏"
-                                            Width="28" Height="28" Padding="0"
-                                            Command="{Binding DataContext.EditProductCommand, ElementName=ProductListView}"
-                                            CommandParameter="{Binding}" />
-                                    <Button Content="🗑"
-                                            Width="28" Height="28" Padding="0"
-                                            Command="{Binding DataContext.DeleteProductCommand, ElementName=ProductListView}"
-                                            CommandParameter="{Binding}" />
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
+   <!-- Image 3: Only show if count is exactly 3 (NOT more than 3) -->
+       <Border Width="40" Height="40" 
+  CornerRadius="4"
+      Background="#FFF0F0F0"
+  Visibility="{Binding ImagePaths, Converter={StaticResource CollectionHasExactlyConverter}, ConverterParameter=3}">
+       <Image Stretch="UniformToFill">
+      <Image.Source>
+  <BitmapImage UriSource="{Binding ImagePaths, Converter={StaticResource ImageAtIndexConverter}, ConverterParameter=2}" />
+   </Image.Source>
+  </Image>
+    </Border>
+
+    <!-- More indicator: Show when count > 3 -->
+    <Border Width="40" Height="40"
+   CornerRadius="4"
+        Background="#FFE0E0E0"
+    Visibility="{Binding ImagePaths, Converter={StaticResource HasMoreThanConverter}, ConverterParameter=3}">
+  <TextBlock Text="..."
+        FontSize="18"
+      FontWeight="Bold"
+     HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+     Foreground="#FF666666" />
+            </Border>
+ </StackPanel>
+ </Border>
+
+        <StackPanel Grid.Column="2" Spacing="2">
+    <TextBlock Text="{x:Bind Name}" />
+        <TextBlock Text="{x:Bind Sku}"
+  FontSize="11"
+Opacity="0.6" />
+      </StackPanel>
+
+        <TextBlock Grid.Column="3" Text="{x:Bind CategoryName}" />
+   <TextBlock Grid.Column="4" Text="{x:Bind StockQuantity}" />
+            <TextBlock Grid.Column="5" Text="{x:Bind SalePrice}" />
+
+     <StackPanel Grid.Column="6"
+       Orientation="Horizontal"
+    HorizontalAlignment="Right"
+      Spacing="8">
+        <Button Content="👁"
+     Width="28" Height="28" Padding="0"
+          Command="{Binding DataContext.ViewProductCommand, ElementName=ProductListView}"
+        CommandParameter="{Binding}" />
+      <Button Content="✏"
+ Width="28" Height="28" Padding="0"
+     Command="{Binding DataContext.EditProductCommand, ElementName=ProductListView}"
+      CommandParameter="{Binding}" />
+ <Button Content="🗑"
+   Width="28" Height="28" Padding="0"
+         Command="{Binding DataContext.DeleteProductCommand, ElementName=ProductListView}"
+ CommandParameter="{Binding}" />
+      </StackPanel>
+   </Grid>
+            </DataTemplate>
+           </ListView.ItemTemplate>
+  </ListView>
+      </Grid>
 
             <!-- Pagination -->
             <Grid Grid.Row="4"
@@ -278,153 +342,316 @@
         </Grid>
 
         <!-- ================= OVERLAY ADD PRODUCT ================= -->
-        <Grid x:Name="AddProductOverlay"
-              Background="#99000000"
-              Visibility="{Binding IsAddDialogOpen,
-                                   Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Border Width="480"
-                    Padding="20"
-                    Background="White"
-                    CornerRadius="16"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-                <StackPanel Spacing="12">
-                    <TextBlock Text="Add New Product"
-                               FontSize="20"
-                               FontWeight="SemiBold"
-                               Margin="0,0,0,8"/>
+      <Grid x:Name="AddProductOverlay"
+    Background="#99000000"
+      Visibility="{Binding IsAddDialogOpen,
+     Converter={StaticResource BooleanToVisibilityConverter}}">
+   <Border Width="600"
+    MaxHeight="700"
+    Padding="20"
+Background="White"
+CornerRadius="16"
+          HorizontalAlignment="Center"
+           VerticalAlignment="Center">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel Spacing="12">
+        <TextBlock Text="Add New Product"
+      FontSize="20"
+  FontWeight="SemiBold"
+   Margin="0,0,0,8"/>
 
-                    <TextBox Header="SKU"
-                             Text="{Binding NewProductSku, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    <TextBox Header="SKU"
+   Text="{Binding NewProductSku, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBox Header="Name"
-                             Text="{Binding NewProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+      <TextBox Header="Name"
+                   Text="{Binding NewProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBox Width="200"
-                                 Header="Import Price"
-                                 Text="{Binding NewProductImportPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    <StackPanel Orientation="Horizontal" Spacing="8">
+           <TextBox Width="250"
+   Header="Import Price"
+             Text="{Binding NewProductImportPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBox Width="200"
-                                 Header="Sale Price"
-                                 Text="{Binding NewProductSalePriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    </StackPanel>
+    <TextBox Width="250"
+       Header="Sale Price"
+           Text="{Binding NewProductSalePriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
 
-                    <TextBox Header="Stock Quantity"
-                             Text="{Binding NewProductStockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+  <TextBox Header="Stock Quantity"
+         Text="{Binding NewProductStockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <ComboBox Header="Category"
-                              ItemsSource="{Binding Categories}"
-                              SelectedItem="{Binding NewProductCategory, Mode=TwoWay}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+       <ComboBox Header="Category"
+     ItemsSource="{Binding Categories}"
+        SelectedItem="{Binding NewProductCategory, Mode=TwoWay}">
+           <ComboBox.ItemTemplate>
+    <DataTemplate>
+ <TextBlock Text="{Binding Name}"/>
+        </DataTemplate>
+     </ComboBox.ItemTemplate>
+      </ComboBox>
 
-                    <TextBox Header="Description"
-                             Text="{Binding NewProductDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             TextWrapping="Wrap"
-                             AcceptsReturn="True"
-                             Height="80"/>
+          <TextBox Header="Description"
+ Text="{Binding NewProductDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+          TextWrapping="Wrap"
+        AcceptsReturn="True"
+       Height="80"/>
 
-                    <TextBox Header="Image Path (optional)"
-                             Text="{Binding NewProductImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+   <!-- Product Images Section -->
+     <StackPanel Spacing="8">
+     <TextBlock Text="Product Images" FontWeight="SemiBold" />
+            
+   <!-- Image upload controls -->
+   <StackPanel Orientation="Horizontal" Spacing="8">
+         <TextBox Width="300"
+             PlaceholderText="Image URL"
+   Text="{Binding NewProductImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Text="{Binding AddDialogError}"
-                               Foreground="Red"
-                               TextWrapping="Wrap"
-                               Visibility="{Binding HasAddDialogError,
-                                                    Converter={StaticResource BooleanToVisibilityConverter}}"/>
+         <Button Content="Add URL"
+  Command="{Binding AddImageUrlToNewProductCommand}" />
+ 
+           <Button Content="📁 Upload"
+     x:Name="AddUploadImageButton"
+   Click="AddUploadImageButton_Click" />
+      
+   <!-- TEST button -->
+          <Button Content="🧪 Test"
+        Command="{Binding AddTestImageCommand}"
+     ToolTipService.ToolTip="Add test image to verify binding"
+       Background="Orange"
+   Foreground="White" />
+      </StackPanel>
 
-                    <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Right"
-                                Spacing="8"
-                                Margin="0,8,0,0">
-                        <Button Content="Cancel"
-                                Command="{Binding CancelAddDialogCommand}"/>
+       <!-- Image list -->
+       <ItemsControl ItemsSource="{Binding NewProductImages}">
+  <ItemsControl.ItemTemplate>
+       <DataTemplate x:DataType="models:ProductImageItem">
+<Border Background="#FFF5F5F5"
+      Padding="8"
+     Margin="0,4"
+       CornerRadius="4">
+  <Grid>
+   <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50" />
+     <ColumnDefinition Width="*" />
+<ColumnDefinition Width="Auto" />
+       </Grid.ColumnDefinitions>
 
-                        <Button Content="Add"
-                                Command="{Binding ConfirmAddProductCommand}"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
+           <!-- Image preview with loading -->
+     <Border Width="50" Height="50" CornerRadius="4" Background="#FFE0E0E0">
+    <Grid>
+             <Image Stretch="UniformToFill">
+    <Image.Source>
+  <BitmapImage UriSource="{Binding Url, Mode=OneWay, Converter={StaticResource SafeUriConverter}}" />
+           </Image.Source>
+     </Image>
+           
+   <!-- Loading indicator -->
+        <ProgressRing IsActive="{Binding IsUploading, Mode=OneWay}"
+      Width="30"
+           Height="30"
+        Visibility="{Binding IsUploading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+   </Grid>
+   </Border>
+
+ <!-- URL text with error -->
+      <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0">
+  <TextBlock Text="{Binding Url, Mode=OneWay}"
+  TextTrimming="CharacterEllipsis" />
+           
+  <!-- Error message -->
+   <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}"
+    Foreground="Red"
+   FontSize="11"
+      Visibility="{Binding HasError, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+      </StackPanel>
+
+     <!-- Delete button -->
+        <Button Grid.Column="2"
+         Content="🗑"
+     Width="32"
+   Height="32"
+    Padding="0"
+       Command="{Binding DataContext.RemoveImageFromNewProductCommand, ElementName=AddProductOverlay}"
+     CommandParameter="{Binding}"
+      IsEnabled="{Binding IsDeleting, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}" />
+  </Grid>
+     </Border>
+      </DataTemplate>
+       </ItemsControl.ItemTemplate>
+    </ItemsControl>
+   </StackPanel>
+
+   <TextBlock Text="{Binding AddDialogError}"
+     Foreground="Red"
+              TextWrapping="Wrap"
+               Visibility="{Binding HasAddDialogError,
+        Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+         <StackPanel Orientation="Horizontal"
+         HorizontalAlignment="Right"
+   Spacing="8"
+           Margin="0,8,0,0">
+ <Button Content="Cancel"
+         Command="{Binding CancelAddDialogCommand}"/>
+
+     <Button Content="Add"
+   Command="{Binding ConfirmAddProductCommand}"/>
+       </StackPanel>
+           </StackPanel>
+         </ScrollViewer>
+  </Border>
         </Grid>
 
-        <!-- ================= OVERLAY EDIT PRODUCT ================= -->
+<!-- ================= OVERLAY EDIT PRODUCT ================= -->
         <Grid x:Name="EditProductOverlay"
-      Background="#99000000"
-      Visibility="{Binding IsEditDialogOpen,
-                           Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Border Width="480"
-            Padding="20"
-            Background="White"
-            CornerRadius="16"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center">
-                <StackPanel Spacing="12">
-                    <TextBlock Text="Edit Product"
-                       FontSize="20"
-                       FontWeight="SemiBold"
-                       Margin="0,0,0,8"/>
+Background="#99000000"
+  Visibility="{Binding IsEditDialogOpen,
+   Converter={StaticResource BooleanToVisibilityConverter}}">
+<Border Width="600"
+            MaxHeight="700"
+           Padding="20"
+             Background="White"
+             CornerRadius="16"
+         HorizontalAlignment="Center"
+ VerticalAlignment="Center">
+   <ScrollViewer VerticalScrollBarVisibility="Auto">
+   <StackPanel Spacing="12">
+  <TextBlock Text="Edit Product"
+      FontSize="20"
+   FontWeight="SemiBold"
+       Margin="0,0,0,8"/>
 
-                    <!-- SKU: cho xem nhưng không sửa -->
-                    <TextBox Header="SKU"
-                     Text="{Binding EditProductSku}"
-                     IsReadOnly="True" />
+ <!-- SKU: cho xem nhưng không sửa -->
+         <TextBox Header="SKU"
+    Text="{Binding EditProductSku}"
+           IsReadOnly="True" />
 
-                    <TextBox Header="Name"
-                     Text="{Binding EditProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Header="Name"
+Text="{Binding EditProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBox Width="200"
-                         Header="Import Price"
-                         Text="{Binding EditImportPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <TextBox Width="200"
-                         Header="Sale Price"
-                         Text="{Binding EditSalePriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+           <TextBox Width="250"
+     Header="Import Price"
+           Text="{Binding EditImportPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+           <TextBox Width="250"
+             Header="Sale Price"
+            Text="{Binding EditSalePriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+  </StackPanel>
 
-                    <TextBox Header="Stock Quantity"
-                     Text="{Binding EditStockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+           <TextBox Header="Stock Quantity"
+             Text="{Binding EditStockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <ComboBox Header="Category"
-                      ItemsSource="{Binding Categories}"
-                      SelectedItem="{Binding EditCategory, Mode=TwoWay}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+          <ComboBox Header="Category"
+          ItemsSource="{Binding Categories}"
+       SelectedItem="{Binding EditCategory, Mode=TwoWay}">
+    <ComboBox.ItemTemplate>
+ <DataTemplate>
+    <TextBlock Text="{Binding Name}"/>
+      </DataTemplate>
+   </ComboBox.ItemTemplate>
+   </ComboBox>
 
-                    <TextBox Header="Description"
-                     Text="{Binding EditDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     TextWrapping="Wrap"
-                     AcceptsReturn="True"
-                     Height="80"/>
+   <TextBox Header="Description"
+   Text="{Binding EditDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+         TextWrapping="Wrap"
+          AcceptsReturn="True"
+   Height="80"/>
 
-                    <TextBox Header="Image Path (optional)"
-                     Text="{Binding EditImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+       <!-- Product Images Section -->
+           <StackPanel Spacing="8">
+   <TextBlock Text="Product Images" FontWeight="SemiBold" />
+   
+        <!-- Image upload controls -->
+   <StackPanel Orientation="Horizontal" Spacing="8">
+      <TextBox Width="350"
+              PlaceholderText="Image URL"
+           Text="{Binding EditImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+          
+        <Button Content="Add URL"
+      Command="{Binding AddImageUrlToEditProductCommand}" />
+ 
+                   <Button Content="📁 Upload"
+        x:Name="EditUploadImageButton"
+       Click="EditUploadImageButton_Click" />
+            </StackPanel>
 
-                    <TextBlock Text="{Binding EditDialogError}"
-                       Foreground="Red"
-                       TextWrapping="Wrap"
-                       Visibility="{Binding HasEditDialogError,
-                                            Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <!-- Image list -->
+         <ItemsControl ItemsSource="{Binding EditProductImages}">
+       <ItemsControl.ItemTemplate>
+ <DataTemplate x:DataType="models:ProductImageItem">
+     <Border Background="#FFF5F5F5"
+         Padding="8"
+       Margin="0,4"
+ CornerRadius="4">
+          <Grid>
+  <Grid.ColumnDefinitions>
+     <ColumnDefinition Width="50" />
+      <ColumnDefinition Width="*" />
+  <ColumnDefinition Width="Auto" />
+    </Grid.ColumnDefinitions>
 
-                    <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Right"
-                        Spacing="8"
-                        Margin="0,8,0,0">
-                        <Button Content="Cancel"
-                        Command="{Binding CancelEditDialogCommand}"/>
+      <!-- Image preview with loading -->
+      <Border Width="50" Height="50" CornerRadius="4" Background="#FFE0E0E0">
+  <Grid>
+         <Image Stretch="UniformToFill">
+         <Image.Source>
+  <BitmapImage UriSource="{Binding Url, Mode=OneWay, Converter={StaticResource SafeUriConverter}}" />
+   </Image.Source>
+    </Image>
+     
+ <!-- Loading indicator -->
+        <ProgressRing IsActive="{Binding IsUploading, Mode=OneWay}"
+        Width="30"
+Height="30"
+  Visibility="{Binding IsUploading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+      </Grid>
+   </Border>
 
-                        <Button Content="Save"
-                        Command="{Binding ConfirmEditProductCommand}"/>
-                    </StackPanel>
+           <!-- URL text with error -->
+        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0">
+   <TextBlock Text="{Binding Url, Mode=OneWay}"
+     TextTrimming="CharacterEllipsis" />
+     
+         <!-- Error message -->
+        <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}"
+       Foreground="Red"
+FontSize="11"
+ Visibility="{Binding HasError, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+         </StackPanel>
+
+      <!-- Delete button -->
+  <Button Grid.Column="2"
+   Content="🗑"
+            Width="32"
+       Height="32"
+             Padding="0"
+                Command="{Binding DataContext.RemoveImageFromEditProductCommand, ElementName=EditProductOverlay}"
+            CommandParameter="{Binding}"
+   IsEnabled="{x:Bind IsDeleting, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}" />
+        </Grid>
+      </Border>
+     </DataTemplate>
+  </ItemsControl.ItemTemplate>
+          </ItemsControl>
                 </StackPanel>
+
+    <TextBlock Text="{Binding EditDialogError}"
+       Foreground="Red"
+           TextWrapping="Wrap"
+           Visibility="{Binding HasEditDialogError,
+      Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                 <StackPanel Orientation="Horizontal"
+    HorizontalAlignment="Right"
+       Spacing="8"
+     Margin="0,8,0,0">
+       <Button Content="Cancel"
+              Command="{Binding CancelEditDialogCommand}"/>
+
+     <Button Content="Save"
+           Command="{Binding ConfirmEditProductCommand}"/>
+        </StackPanel>
+        </StackPanel>
+       </ScrollViewer>
             </Border>
         </Grid>
 

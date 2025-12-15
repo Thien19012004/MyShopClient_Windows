@@ -25,7 +25,7 @@ namespace MyShopClient.Services
         }
 
         // ============================================================
-        //  Helper chung gọi GraphQL
+        //  Helper chung gọi GraphQL với Retry Logic
         // ============================================================
         private async Task<T?> PostGraphQlAsync<T>(string query, object? variables, CancellationToken ct)
         {
@@ -37,34 +37,76 @@ namespace MyShopClient.Services
                 variables
             };
 
-            using var response = await _httpClient.PostAsJsonAsync(url, requestBody, ct);
-            var content = await response.Content.ReadAsStringAsync(ct);
+            // Retry up to 3 times with exponential backoff
+            Exception lastException = null;
+            const int maxRetries = 3;
 
-            if (!response.IsSuccessStatusCode)
+            for (int attempt = 0; attempt <= maxRetries; attempt++)
             {
-                // Ném ra exception có kèm body để ViewModel hiển thị trong ErrorMessage
-                throw new Exception(
-                    $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}: {content}");
+                try
+                {
+                    using var response = await _httpClient.PostAsJsonAsync(url, requestBody, ct);
+                    var content = await response.Content.ReadAsStringAsync(ct);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        // Ném ra exception có kèm body để ViewModel hiển thị trong ErrorMessage
+                        throw new Exception(
+                            $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}: {content}");
+                    }
+
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+
+                    var gql = JsonSerializer.Deserialize<GraphQlResponse<T>>(content, options);
+                    if (gql == null)
+                    {
+                        throw new Exception("Empty GraphQL response.");
+                    }
+
+                    if (gql.Errors != null && gql.Errors.Length > 0)
+                    {
+                        var msg = string.Join("; ", gql.Errors.Select(e => e.Message));
+                        throw new Exception("GraphQL error: " + msg);
+                    }
+
+                    return gql.Data;
+                }
+                catch (Exception ex) when (IsTransientError(ex) && attempt < maxRetries)
+                {
+                    lastException = ex;
+
+                    System.Diagnostics.Debug.WriteLine(
+                        $"[GraphQL Retry] Attempt {attempt + 1}/{maxRetries + 1} failed: {ex.Message}");
+
+                    // Exponential backoff: 1s, 2s, 4s
+                    int delayMs = 1000 * (int)Math.Pow(2, attempt);
+                    await Task.Delay(delayMs, ct);
+                }
+                catch (Exception ex)
+                {
+                    // Non-transient error or last retry - rethrow immediately
+                    throw;
+                }
             }
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
+            // All retries failed
+            throw new HttpRequestException(
+                $"GraphQL request failed after {maxRetries + 1} attempts. See inner exception for details.",
+                lastException);
+        }
 
-            var gql = JsonSerializer.Deserialize<GraphQlResponse<T>>(content, options);
-            if (gql == null)
-            {
-                throw new Exception("Empty GraphQL response.");
-            }
-
-            if (gql.Errors != null && gql.Errors.Length > 0)
-            {
-                var msg = string.Join("; ", gql.Errors.Select(e => e.Message));
-                throw new Exception("GraphQL error: " + msg);
-            }
-
-            return gql.Data;
+        /// <summary>
+        /// Check if error is transient (network related) and should be retried
+        /// </summary>
+        private static bool IsTransientError(Exception ex)
+        {
+            return ex is IOException ||
+                   ex is System.Net.Sockets.SocketException ||
+                   ex is HttpRequestException ||
+                   (ex is TaskCanceledException tce && !tce.CancellationToken.IsCancellationRequested);
         }
 
         // ============================================================
@@ -109,6 +151,8 @@ namespace MyShopClient.Services
             string ascLiteral = opt.SortAscending ? "true" : "false";
 
             // Query bám sát đúng mẫu bạn đã test trên backend
+            // NOTE: ProductListItemDto không có imagePaths
+            // Chỉ productById (ProductDetailDto) mới có imagePaths
             return $@"
 query GetProducts {{
   products(

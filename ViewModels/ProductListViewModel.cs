@@ -20,56 +20,64 @@ namespace MyShopClient.ViewModels
     {
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
+        private readonly IImageUploadService _imageUploadService;
+    private readonly IServerConfigService _serverConfig;
 
         // cờ chỉ dùng nội bộ cho việc load product list
-        private bool _isLoadingProducts;
+      private bool _isLoadingProducts;
 
         public ObservableCollection<ProductItemDto> Products { get; } = new();
-        public ObservableCollection<CategoryOption> Categories { get; } = new();
+      public ObservableCollection<CategoryOption> Categories { get; } = new();
         public ObservableCollection<string> SortOptions { get; } =
-            new(new[] { "Name (A-Z)", "Name (Z-A)", "Price (Low → High)", "Price (High → Low)" });
+       new(new[] { "Name (A-Z)", "Name (Z-A)", "Price (Low → High)", "Price (High → Low)" });
 
         // list category cho dialog Manage Category
-        public ObservableCollection<CategoryItemDto> CategoryItems { get; } = new();
+   public ObservableCollection<CategoryItemDto> CategoryItems { get; } = new();
+
+        // danh sách ảnh cho Add Product dialog
+    public ObservableCollection<ProductImageItem> NewProductImages { get; } = new();
+
+     // danh sách ảnh cho Edit Product dialog
+        public ObservableCollection<ProductImageItem> EditProductImages { get; } = new();
 
         // ====== bộ lọc / phân trang sản phẩm ======
-        [ObservableProperty] private CategoryOption? selectedCategory;
+    [ObservableProperty] private CategoryOption? selectedCategory;
         [ObservableProperty] private string? searchText;
-        [ObservableProperty] private string? minPriceText;
-        [ObservableProperty] private string? maxPriceText;
+     [ObservableProperty] private string? minPriceText;
+     [ObservableProperty] private string? maxPriceText;
         [ObservableProperty] private string selectedSortOption = "Name (A-Z)";
 
-        [ObservableProperty] private int currentPage = 1;
-        [ObservableProperty] private int pageSize = 10;
-        [ObservableProperty] private int totalPages = 1;
-        [ObservableProperty] private int totalItems = 0;
+   [ObservableProperty] private int currentPage = 1;
+   [ObservableProperty] private int pageSize = 10;
+     [ObservableProperty] private int totalPages = 1;
+      [ObservableProperty] private int totalItems = 0;
 
         [ObservableProperty] private bool isBusy; // cho Add/Delete/Update/Category
-        [ObservableProperty] private string? errorMessage;
-        public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
+   [ObservableProperty] private string? errorMessage;
+    public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
-        // ====== Add Product dialog ======
+   // ====== Add Product dialog ======
         [ObservableProperty] private bool isAddDialogOpen;
 
-        [ObservableProperty] private string? addDialogError;
-        public bool HasAddDialogError => !string.IsNullOrWhiteSpace(AddDialogError);
+  [ObservableProperty] private string? addDialogError;
+public bool HasAddDialogError => !string.IsNullOrWhiteSpace(AddDialogError);
         partial void OnAddDialogErrorChanged(string? value) => OnPropertyChanged(nameof(HasAddDialogError));
 
         [ObservableProperty] private string? newProductSku;
-        [ObservableProperty] private string? newProductName;
-        [ObservableProperty] private string? newProductImportPriceText;
+     [ObservableProperty] private string? newProductName;
+     [ObservableProperty] private string? newProductImportPriceText;
         [ObservableProperty] private string? newProductSalePriceText;
-        [ObservableProperty] private string? newProductStockQuantityText;
+     [ObservableProperty] private string? newProductStockQuantityText;
         [ObservableProperty] private string? newProductDescription;
         [ObservableProperty] private string? newProductImagePath;
-        [ObservableProperty] private CategoryOption? newProductCategory;
+     [ObservableProperty] private CategoryOption? newProductCategory;
 
         // ====== Edit Product dialog ======
         [ObservableProperty] private bool isEditDialogOpen;
 
-        [ObservableProperty] private string? editDialogError;
-        public bool HasEditDialogError => !string.IsNullOrWhiteSpace(EditDialogError);
-        partial void OnEditDialogErrorChanged(string? value) => OnPropertyChanged(nameof(HasEditDialogError));
+     [ObservableProperty] private string? editDialogError;
+     public bool HasEditDialogError => !string.IsNullOrWhiteSpace(EditDialogError);
+   partial void OnEditDialogErrorChanged(string? value) => OnPropertyChanged(nameof(HasEditDialogError));
 
         [ObservableProperty] private int editingProductId;
         [ObservableProperty] private string? editProductSku;
@@ -77,49 +85,85 @@ namespace MyShopClient.ViewModels
         [ObservableProperty] private string? editImportPriceText;
         [ObservableProperty] private string? editSalePriceText;
         [ObservableProperty] private string? editStockQuantityText;
-        [ObservableProperty] private string? editDescription;
-        [ObservableProperty] private string? editImagePath;
-        [ObservableProperty] private CategoryOption? editCategory;
+ [ObservableProperty] private string? editDescription;
+     [ObservableProperty] private string? editImagePath;
+[ObservableProperty] private CategoryOption? editCategory;
 
-        // ====== Manage Category dialog ======
-        [ObservableProperty] private bool isCategoryDialogOpen;
+      // ====== Manage Category dialog ======
+[ObservableProperty] private bool isCategoryDialogOpen;
 
-        [ObservableProperty] private string? categorySearchText;
+ [ObservableProperty] private string? categorySearchText;
         [ObservableProperty] private string? categoryNameText;
         [ObservableProperty] private string? categoryDescriptionText;
-        [ObservableProperty] private CategoryItemDto? selectedCategoryItem;
+     [ObservableProperty] private CategoryItemDto? selectedCategoryItem;
 
-        [ObservableProperty] private string? categoryDialogError;
-        public bool HasCategoryDialogError => !string.IsNullOrWhiteSpace(CategoryDialogError);
+  [ObservableProperty] private string? categoryDialogError;
+      public bool HasCategoryDialogError => !string.IsNullOrWhiteSpace(CategoryDialogError);
         partial void OnCategoryDialogErrorChanged(string? value) => OnPropertyChanged(nameof(HasCategoryDialogError));
 
-        partial void OnSelectedCategoryItemChanged(CategoryItemDto? value)
-        {
-            if (value == null)
-            {
-                CategoryNameText = string.Empty;
-                CategoryDescriptionText = string.Empty;
+partial void OnSelectedCategoryItemChanged(CategoryItemDto? value)
+      {
+   if (value == null)
+  {
+         CategoryNameText = string.Empty;
+        CategoryDescriptionText = string.Empty;
             }
-            else
+    else
+    {
+           CategoryNameText = value.Name;
+ CategoryDescriptionText = value.Description;
+    }
+        }
+
+    public ProductListViewModel(
+  IProductService productService, 
+        ICategoryService categoryService,
+ IImageUploadService imageUploadService,
+        IServerConfigService serverConfig)
+  {
+       _productService = productService;
+    _categoryService = categoryService;
+      _imageUploadService = imageUploadService;
+ _serverConfig = serverConfig;
+
+      _ = InitializeAsync();
+   }
+
+     // Helper method để convert relative URL thành absolute URL
+ private string ToAbsoluteUrl(string url)
+        {
+        if (string.IsNullOrWhiteSpace(url))
+  return url;
+
+     // Nếu đã là absolute URL thì return nguyên
+      if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+       url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
+   url.StartsWith("ms-appx://", StringComparison.OrdinalIgnoreCase))
+     {
+ return url;
+  }
+
+// Nếu là relative URL thì ghép với base URL
+     if (url.StartsWith("/"))
             {
-                CategoryNameText = value.Name;
-                CategoryDescriptionText = value.Description;
-            }
+     var baseUrl = _serverConfig.Current.BaseUrl;
+    if (string.IsNullOrWhiteSpace(baseUrl))
+  baseUrl = "http://localhost:5135";
+
+     // Đảm bảo baseUrl không có '/' ở cuối
+   baseUrl = baseUrl.TrimEnd('/');
+      
+   return baseUrl + url;
+    }
+
+    return url;
         }
 
-        public ProductListViewModel(IProductService productService, ICategoryService categoryService)
+private async Task InitializeAsync()
         {
-            _productService = productService;
-            _categoryService = categoryService;
-
-            _ = InitializeAsync();
-        }
-
-        private async Task InitializeAsync()
-        {
-            await LoadCategoriesAsync();
-            await LoadPageAsync();
-        }
+     await LoadCategoriesAsync();
+     await LoadPageAsync();
+   }
 
         // ========== LOAD CATEGORY cho combobox / Add/Edit ==========
         private async Task LoadCategoriesAsync()
@@ -194,70 +238,106 @@ namespace MyShopClient.ViewModels
 
         private async Task LoadPageAsync(int? page = null)
         {
-            if (_isLoadingProducts) return;
-            _isLoadingProducts = true;
+          if (_isLoadingProducts) return;
+   _isLoadingProducts = true;
 
             ErrorMessage = string.Empty;
 
-            if (page.HasValue)
-                CurrentPage = page.Value;
+    if (page.HasValue)
+      CurrentPage = page.Value;
 
-            int? minPrice = int.TryParse(MinPriceText, out var min) ? min : null;
-            int? maxPrice = int.TryParse(MaxPriceText, out var max) ? max : null;
+ int? minPrice = int.TryParse(MinPriceText, out var min) ? min : null;
+  int? maxPrice = int.TryParse(MaxPriceText, out var max) ? max : null;
 
-            var (field, asc) = ParseSortOption(SelectedSortOption);
+  var (field, asc) = ParseSortOption(SelectedSortOption);
 
             var options = new ProductQueryOptions
-            {
-                Page = CurrentPage,
-                PageSize = PageSize,
-                Search = SearchText,
-                CategoryId = SelectedCategory?.Id,
-                MinPrice = minPrice,
-                MaxPrice = maxPrice,
-                SortField = field,
-                SortAscending = asc
-            };
+        {
+        Page = CurrentPage,
+          PageSize = PageSize,
+    Search = SearchText,
+      CategoryId = SelectedCategory?.Id,
+    MinPrice = minPrice,
+     MaxPrice = maxPrice,
+     SortField = field,
+    SortAscending = asc
+       };
 
-            try
-            {
-                var result = await _productService.GetProductsAsync(options);
+     try
+  {
+var result = await _productService.GetProductsAsync(options);
 
-                if (!result.Success || result.Data == null)
-                {
-                    ErrorMessage = result.Message ?? "Cannot load products.";
-                    Products.Clear();
-                    TotalItems = 0;
-                    TotalPages = 1;
-                    return;
-                }
+     if (!result.Success || result.Data == null)
+        {
+  ErrorMessage = result.Message ?? "Cannot load products.";
+           Products.Clear();
+      TotalItems = 0;
+      TotalPages = 1;
+  return;
+    }
 
-                var pageData = result.Data;
+       var pageData = result.Data;
 
-                Products.Clear();
-                foreach (var p in pageData.Items)
-                {
-                    Products.Add(p);
-                }
+      Products.Clear();
+foreach (var p in pageData.Items)
+ {
+     Products.Add(p);
+        }
 
-                CurrentPage = pageData.Page;
-                PageSize = pageData.PageSize;
-                TotalItems = pageData.TotalItems;
-                TotalPages = Math.Max(1, pageData.TotalPages);
-            }
+         CurrentPage = pageData.Page;
+    PageSize = pageData.PageSize;
+    TotalItems = pageData.TotalItems;
+          TotalPages = Math.Max(1, pageData.TotalPages);
+ 
+      // Lazy load images cho tất cả products
+                _ = LoadProductImagesAsync();
+          }
             catch (Exception ex)
             {
-                ErrorMessage = ex.Message;
-                Products.Clear();
-                TotalItems = 0;
-                TotalPages = 1;
-            }
-            finally
+     ErrorMessage = ex.Message;
+Products.Clear();
+           TotalItems = 0;
+    TotalPages = 1;
+ }
+      finally
             {
-                _isLoadingProducts = false;
-                OnPropertyChanged(nameof(HasError));
+             _isLoadingProducts = false;
+      OnPropertyChanged(nameof(HasError));
             }
         }
+
+        // Lazy load images cho tất cả products trong list
+        private async Task LoadProductImagesAsync()
+      {
+       var baseUrl = _serverConfig.Current.BaseUrl;
+    
+    var tasks = Products
+        .Where(p => !p.ImagesLoaded)
+  .Select(async product =>
+      {
+try
+  {
+     var detail = await _productService.GetProductByIdAsync(product.ProductId);
+  if (detail.Success && detail.Data != null && detail.Data.ImagePaths != null)
+  {
+     // Convert relative URLs thành absolute URLs
+    var absoluteUrls = detail.Data.ImagePaths
+    .Select(url => Helpers.UrlHelper.ToAbsoluteUrl(url, baseUrl))
+   .ToList();
+    
+     // Set property để trigger PropertyChanged
+     product.ImagePaths = absoluteUrls;
+ product.ImagesLoaded = true;
+   }
+       }
+  catch
+    {
+  // Silent fail - ảnh sẽ dùng placeholder
+  }
+   });
+
+  await Task.WhenAll(tasks);
+ }
 
         private Task ReloadCurrentPageAsync() => LoadPageAsync(CurrentPage);
 
@@ -336,239 +416,509 @@ namespace MyShopClient.ViewModels
             }
         }
 
+        // ================= IMAGE MANAGEMENT (ADD DIALOG) =================
+
+ [RelayCommand]
+     private void AddImageUrlToNewProduct()
+        {
+            if (string.IsNullOrWhiteSpace(NewProductImagePath))
+        {
+      AddDialogError = "Please enter image URL.";
+      return;
+     }
+
+            NewProductImages.Add(new ProductImageItem
+            {
+            Url = NewProductImagePath,
+       PublicId = string.Empty
+     });
+
+          NewProductImagePath = string.Empty;
+      AddDialogError = string.Empty;
+        }
+
+  // TEST: Thêm ảnh test để verify binding
+        [RelayCommand]
+        private void AddTestImage()
+        {
+            System.Diagnostics.Debug.WriteLine("[Test] Adding test image");
+            NewProductImages.Add(new ProductImageItem
+    {
+        Url = "https://via.placeholder.com/150",
+      PublicId = "test-placeholder"
+      });
+            System.Diagnostics.Debug.WriteLine($"[Test] NewProductImages count: {NewProductImages.Count}");
+      }
+
+  [RelayCommand]
+        private async Task RemoveImageFromNewProductAsync(ProductImageItem? image)
+        {
+     if (image == null) return;
+
+ // Nếu ảnh đã upload (có publicId) thì xóa trên server
+        if (!string.IsNullOrWhiteSpace(image.PublicId))
+            {
+    image.IsDeleting = true;
+            try
+    {
+    await _imageUploadService.DeleteImageAsync(image.PublicId);
+   }
+      catch
+        {
+   // Log error nhưng vẫn xóa khỏi UI
+        }
+   finally
+          {
+  image.IsDeleting = false;
+          }
+  }
+
+NewProductImages.Remove(image);
+        }
+
+        // ================= IMAGE MANAGEMENT (EDIT DIALOG) =================
+
+        [RelayCommand]
+        private void AddImageUrlToEditProduct()
+        {
+        if (string.IsNullOrWhiteSpace(EditImagePath))
+ {
+                EditDialogError = "Please enter image URL.";
+       return;
+            }
+
+            EditProductImages.Add(new ProductImageItem
+      {
+    Url = EditImagePath,
+     PublicId = string.Empty
+       });
+
+            EditImagePath = string.Empty;
+       EditDialogError = string.Empty;
+        }
+
+        [RelayCommand]
+        private async Task RemoveImageFromEditProductAsync(ProductImageItem? image)
+        {
+            if (image == null) return;
+
+            // Nếu ảnh đã upload (có publicId) thì xóa trên server
+    if (!string.IsNullOrWhiteSpace(image.PublicId))
+        {
+         image.IsDeleting = true;
+     try
+     {
+           await _imageUploadService.DeleteImageAsync(image.PublicId);
+      }
+                catch
+             {
+    // Log error nhưng vẫn xóa khỏi UI
+       }
+          finally
+   {
+              image.IsDeleting = false;
+       }
+            }
+
+     EditProductImages.Remove(image);
+        }
+
+        // ================= UPLOAD IMAGE FROM FILE =================
+
+        public async Task UploadImageForNewProductAsync(Stream imageStream, string fileName)
+        {
+            var imageItem = new ProductImageItem
+   {
+       Url = "Uploading...",
+      PublicId = string.Empty,
+  IsUploading = true
+            };
+
+            NewProductImages.Add(imageItem);
+
+   try
+  {
+       System.Diagnostics.Debug.WriteLine($"[Upload] Starting upload for {fileName}");
+         
+           var result = await _imageUploadService.UploadImageAsync(imageStream, fileName);
+   
+         System.Diagnostics.Debug.WriteLine($"[Upload] Result - Success: {result.Success}, Message: {result.Message}");
+    
+        if (result.Success && result.Data != null)
+       {
+imageItem.Url = result.Data.Url;
+  imageItem.PublicId = result.Data.PublicId;
+            System.Diagnostics.Debug.WriteLine($"[Upload] Image uploaded successfully. URL: {result.Data.Url}, PublicId: {result.Data.PublicId}");
+    }
+   else
+        {
+     imageItem.ErrorMessage = result.Message ?? "Upload failed";
+     imageItem.Url = string.Empty;
+          System.Diagnostics.Debug.WriteLine($"[Upload] Upload failed: {imageItem.ErrorMessage}");
+     }
+  }
+       catch (Exception ex)
+            {
+      imageItem.ErrorMessage = ex.Message;
+      imageItem.Url = string.Empty;
+  System.Diagnostics.Debug.WriteLine($"[Upload] Exception: {ex.Message}");
+    System.Diagnostics.Debug.WriteLine($"[Upload] Stack trace: {ex.StackTrace}");
+   }
+            finally
+         {
+  imageItem.IsUploading = false;
+  }
+      }
+
+   public async Task UploadImageForEditProductAsync(Stream imageStream, string fileName)
+        {
+var imageItem = new ProductImageItem
+      {
+          Url = "Uploading...",
+    PublicId = string.Empty,
+        IsUploading = true
+        };
+
+    EditProductImages.Add(imageItem);
+
+            try
+          {
+        System.Diagnostics.Debug.WriteLine($"[Upload] Starting upload for {fileName}");
+ 
+         var result = await _imageUploadService.UploadImageAsync(imageStream, fileName);
+      
+           System.Diagnostics.Debug.WriteLine($"[Upload] Result - Success: {result.Success}, Message: {result.Message}");
+      
+    if (result.Success && result.Data != null)
+        {
+            imageItem.Url = result.Data.Url;
+  imageItem.PublicId = result.Data.PublicId;
+                System.Diagnostics.Debug.WriteLine($"[Upload] Image uploaded successfully. URL: {result.Data.Url}, PublicId: {result.Data.PublicId}");
+                }
+     else
+        {
+         imageItem.ErrorMessage = result.Message ?? "Upload failed";
+           imageItem.Url = string.Empty;
+    System.Diagnostics.Debug.WriteLine($"[Upload] Upload failed: {imageItem.ErrorMessage}");
+       }
+            }
+      catch (Exception ex)
+      {
+       imageItem.ErrorMessage = ex.Message;
+    imageItem.Url = string.Empty;
+                System.Diagnostics.Debug.WriteLine($"[Upload] Exception: {ex.Message}");
+    System.Diagnostics.Debug.WriteLine($"[Upload] Stack trace: {ex.StackTrace}");
+          }
+   finally
+       {
+  imageItem.IsUploading = false;
+            }
+        }
+
         // ================= ADD PRODUCT DIALOG =================
 
         [RelayCommand]
         private void AddProduct()
-        {
-            if (IsBusy) return;
+      {
+     if (IsBusy) return;
 
-            AddDialogError = string.Empty;
+    AddDialogError = string.Empty;
 
-            NewProductSku = string.Empty;
-            NewProductName = string.Empty;
+       NewProductSku = string.Empty;
+   NewProductName = string.Empty;
             NewProductImportPriceText = string.Empty;
-            NewProductSalePriceText = string.Empty;
+  NewProductSalePriceText = string.Empty;
             NewProductStockQuantityText = string.Empty;
-            NewProductDescription = string.Empty;
-            NewProductImagePath = string.Empty;
+   NewProductDescription = string.Empty;
+ NewProductImagePath = string.Empty;
+     NewProductImages.Clear();
 
-            NewProductCategory = Categories.FirstOrDefault(c => c.Id != null);
+   NewProductCategory = Categories.FirstOrDefault(c => c.Id != null);
 
-            IsAddDialogOpen = true;
+    IsAddDialogOpen = true;
         }
 
-        [RelayCommand]
+     [RelayCommand]
         private void CancelAddDialog()
         {
-            IsAddDialogOpen = false;
-        }
+       IsAddDialogOpen = false;
+     NewProductImages.Clear();
+      }
 
-        [RelayCommand]
+    [RelayCommand]
         private async Task ConfirmAddProductAsync()
         {
-            if (IsBusy) return;
+       if (IsBusy) return;
 
-            AddDialogError = string.Empty;
+AddDialogError = string.Empty;
 
-            if (string.IsNullOrWhiteSpace(NewProductSku) ||
-                string.IsNullOrWhiteSpace(NewProductName))
-            {
-                AddDialogError = "SKU và Name là bắt buộc.";
-                return;
+    if (string.IsNullOrWhiteSpace(NewProductSku) ||
+  string.IsNullOrWhiteSpace(NewProductName))
+         {
+    AddDialogError = "SKU và Name là bắt buộc.";
+            return;
             }
 
-            if (!int.TryParse(NewProductImportPriceText, out var importPrice) || importPrice < 0)
-            {
-                AddDialogError = "Import price phải là số nguyên không âm.";
-                return;
+    if (!int.TryParse(NewProductImportPriceText, out var importPrice) || importPrice < 0)
+    {
+       AddDialogError = "Import price phải là số nguyên không âm.";
+    return;
+  }
+
+ if (!int.TryParse(NewProductSalePriceText, out var salePrice) || salePrice < 0)
+  {
+      AddDialogError = "Sale price phải là số nguyên không âm.";
+      return;
+     }
+
+  if (!int.TryParse(NewProductStockQuantityText, out var stock) || stock < 0)
+{
+            AddDialogError = "Stock quantity phải là số nguyên không âm.";
+   return;
+   }
+
+   if (NewProductCategory == null || NewProductCategory.Id == null)
+    {
+        AddDialogError = "Vui lòng chọn Category.";
+    return;
+      }
+
+      IsBusy = true;
+  bool created = false;
+
+   try
+      {
+       System.Diagnostics.Debug.WriteLine($"[ConfirmAdd] NewProductImages count: {NewProductImages.Count}");
+    
+    var imagePaths = NewProductImages
+        .Where(img => !string.IsNullOrWhiteSpace(img.Url) && img.Url != "Uploading...")
+          .Select(img => img.Url)
+ .ToList();
+
+      System.Diagnostics.Debug.WriteLine($"[ConfirmAdd] Filtered imagePaths count: {imagePaths.Count}");
+     foreach (var path in imagePaths)
+       {
+    System.Diagnostics.Debug.WriteLine($"[ConfirmAdd] ImagePath: {path}");
+      }
+
+ var input = new ProductCreateInput
+        {
+      Sku = NewProductSku!,
+ Name = NewProductName!,
+  ImportPrice = importPrice,
+        SalePrice = salePrice,
+ StockQuantity = stock,
+Description = NewProductDescription ?? string.Empty,
+    CategoryId = NewProductCategory.Id.Value,
+        ImagePaths = imagePaths
+         };
+
+     System.Diagnostics.Debug.WriteLine($"[ConfirmAdd] Calling CreateProductAsync with {input.ImagePaths?.Count ?? 0} images");
+
+     var result = await _productService.CreateProductAsync(input);
+     
+     System.Diagnostics.Debug.WriteLine($"[ConfirmAdd] Result - Success: {result.Success}, Message: {result.Message}");
+     
+     if (!result.Success)
+      {
+ AddDialogError = result.Message ?? "Create product failed.";
+  return;
+ }
+
+     created = true;
+     }
+         catch (Exception ex)
+  {
+          AddDialogError = ex.Message;
+      System.Diagnostics.Debug.WriteLine($"[ConfirmAdd] Exception: {ex.Message}");
+    }
+   finally
+{
+  IsBusy = false;
+           OnPropertyChanged(nameof(HasAddDialogError));
+          }
+
+if (created)
+     {
+ IsAddDialogOpen = false;
+   NewProductImages.Clear();
+await ReloadCurrentPageAsync();
             }
-
-            if (!int.TryParse(NewProductSalePriceText, out var salePrice) || salePrice < 0)
-            {
-                AddDialogError = "Sale price phải là số nguyên không âm.";
-                return;
-            }
-
-            if (!int.TryParse(NewProductStockQuantityText, out var stock) || stock < 0)
-            {
-                AddDialogError = "Stock quantity phải là số nguyên không âm.";
-                return;
-            }
-
-            if (NewProductCategory == null || NewProductCategory.Id == null)
-            {
-                AddDialogError = "Vui lòng chọn Category.";
-                return;
-            }
-
-            IsBusy = true;
-            bool created = false;
-
-            try
-            {
-                var input = new ProductCreateInput
-                {
-                    Sku = NewProductSku!,
-                    Name = NewProductName!,
-                    ImportPrice = importPrice,
-                    SalePrice = salePrice,
-                    StockQuantity = stock,
-                    Description = NewProductDescription ?? string.Empty,
-                    CategoryId = NewProductCategory.Id.Value,
-                    ImagePaths = string.IsNullOrWhiteSpace(NewProductImagePath)
-                        ? new()
-                        : new() { NewProductImagePath! }
-                };
-
-                var result = await _productService.CreateProductAsync(input);
-                if (!result.Success)
-                {
-                    AddDialogError = result.Message ?? "Create product failed.";
-                    return;
-                }
-
-                created = true;
-            }
-            catch (Exception ex)
-            {
-                AddDialogError = ex.Message;
-            }
-            finally
-            {
-                IsBusy = false;
-                OnPropertyChanged(nameof(HasAddDialogError));
-            }
-
-            if (created)
-            {
-                IsAddDialogOpen = false;
-                await ReloadCurrentPageAsync();
-            }
-        }
-
+      }
         // ================= EDIT PRODUCT DIALOG =================
 
-        [RelayCommand]
-        private Task EditProductAsync(ProductItemDto? product)
+  [RelayCommand]
+        private async Task EditProductAsync(ProductItemDto? product)
         {
-            if (product == null) return Task.CompletedTask;
-            if (IsBusy) return Task.CompletedTask;
+  if (product == null) return;
+         if (IsBusy) return;
 
-            EditDialogError = string.Empty;
+       EditDialogError = string.Empty;
+ IsBusy = true;
 
-            EditingProductId = product.ProductId;
-            EditProductSku = product.Sku;
-            EditProductName = product.Name;
-            EditImportPriceText = product.ImportPrice.ToString();
-            EditSalePriceText = product.SalePrice.ToString();
-            EditStockQuantityText = product.StockQuantity.ToString();
-            EditDescription = product.Description;
-            EditImagePath = product.ImagePaths?.FirstOrDefault();
+       try
+     {
+     // Load chi tiết product để lấy imagePaths
+     System.Diagnostics.Debug.WriteLine($"[EditProduct] Loading detail for product {product.ProductId}");
+  
+    var detailResult = await _productService.GetProductByIdAsync(product.ProductId);
+      
+      if (!detailResult.Success || detailResult.Data == null)
+    {
+    EditDialogError = detailResult.Message ?? "Cannot load product detail.";
+     return;
+    }
 
-            EditCategory = Categories.FirstOrDefault(c => c.Id == product.CategoryId)
-                           ?? Categories.FirstOrDefault(c => c.Id != null)
-                           ?? Categories.FirstOrDefault();
+    var detail = detailResult.Data;
+     
+   System.Diagnostics.Debug.WriteLine($"[EditProduct] Product has {detail.ImagePaths?.Count ?? 0} images");
 
-            IsEditDialogOpen = true;
+     EditingProductId = detail.ProductId;
+    EditProductSku = detail.Sku;
+ EditProductName = detail.Name;
+    EditImportPriceText = detail.ImportPrice.ToString();
+  EditSalePriceText = detail.SalePrice.ToString();
+ EditStockQuantityText = detail.StockQuantity.ToString();
+  EditDescription = detail.Description;
+     EditImagePath = string.Empty;
 
-            return Task.CompletedTask;
-        }
+ EditCategory = Categories.FirstOrDefault(c => c.Id == detail.CategoryId)
+        ?? Categories.FirstOrDefault(c => c.Id != null)
+ ?? Categories.FirstOrDefault();
+
+    // Load existing images - convert relative URLs to absolute
+      EditProductImages.Clear();
+   
+    var baseUrl = _serverConfig.Current.BaseUrl;
+    
+  if (detail.ImagePaths != null)
+   {
+     foreach (var imagePath in detail.ImagePaths)
+   {
+     var absoluteUrl = Helpers.UrlHelper.ToAbsoluteUrl(imagePath, baseUrl);
+  System.Diagnostics.Debug.WriteLine($"[EditProduct] Adding image: {imagePath} -> {absoluteUrl}");
+    EditProductImages.Add(new ProductImageItem
+         {
+   Url = absoluteUrl,
+    PublicId = string.Empty // Không có publicId cho ảnh đã có sẵn
+       });
+    }
+   }
+     
+  System.Diagnostics.Debug.WriteLine($"[EditProduct] EditProductImages count: {EditProductImages.Count}");
+
+    IsEditDialogOpen = true;
+   }
+   catch (Exception ex)
+  {
+    EditDialogError = ex.Message;
+ System.Diagnostics.Debug.WriteLine($"[EditProduct] Exception: {ex.Message}");
+}
+     finally
+  {
+    IsBusy = false;
+       }
+  }
 
         [RelayCommand]
         private void CancelEditDialog()
         {
-            IsEditDialogOpen = false;
-        }
+       IsEditDialogOpen = false;
+   EditProductImages.Clear();
+   }
 
         [RelayCommand]
         private async Task ConfirmEditProductAsync()
         {
-            if (IsBusy) return;
+         if (IsBusy) return;
 
             EditDialogError = string.Empty;
 
-            if (string.IsNullOrWhiteSpace(EditProductName))
-            {
-                EditDialogError = "Name is required.";
-                return;
-            }
+          if (string.IsNullOrWhiteSpace(EditProductName))
+    {
+          EditDialogError = "Name is required.";
+      return;
+         }
 
-            if (!int.TryParse(EditImportPriceText, out var importPrice) || importPrice < 0)
+        if (!int.TryParse(EditImportPriceText, out var importPrice) || importPrice < 0)
             {
-                EditDialogError = "Import price must be a non-negative integer.";
+           EditDialogError = "Import price must be a non-negative integer.";
                 return;
-            }
+       }
 
             if (!int.TryParse(EditSalePriceText, out var salePrice) || salePrice < 0)
             {
-                EditDialogError = "Sale price must be a non-negative integer.";
-                return;
+        EditDialogError = "Sale price must be a non-negative integer.";
+   return;
             }
 
-            if (!int.TryParse(EditStockQuantityText, out var stock) || stock < 0)
-            {
-                EditDialogError = "Stock quantity must be a non-negative integer.";
-                return;
+    if (!int.TryParse(EditStockQuantityText, out var stock) || stock < 0)
+       {
+      EditDialogError = "Stock quantity must be a non-negative integer.";
+            return;
+    }
+
+     if (EditCategory == null || EditCategory.Id == null)
+    {
+            EditDialogError = "Please select category.";
+       return;
             }
 
-            if (EditCategory == null || EditCategory.Id == null)
-            {
-                EditDialogError = "Please select category.";
-                return;
-            }
+       IsBusy = true;
+      bool updated = false;
 
-            IsBusy = true;
-            bool updated = false;
+   try
+        {
+  var imagePaths = EditProductImages
+    .Where(img => !string.IsNullOrWhiteSpace(img.Url) && img.Url != "Uploading...")
+        .Select(img => img.Url)
+  .ToList();
 
-            try
+          var input = new ProductUpdateInput
             {
-                var input = new ProductUpdateInput
-                {
-                    Name = EditProductName!,
-                    ImportPrice = importPrice,
-                    SalePrice = salePrice,
-                    StockQuantity = stock,
-                    Description = EditDescription,
-                    CategoryId = EditCategory.Id.Value,
-                    ImagePaths = string.IsNullOrWhiteSpace(EditImagePath)
-                        ? null
-                        : new() { EditImagePath! }
-                };
+      Name = EditProductName!,
+             ImportPrice = importPrice,
+    SalePrice = salePrice,
+          StockQuantity = stock,
+ Description = EditDescription,
+        CategoryId = EditCategory.Id.Value,
+  ImagePaths = imagePaths.Any() ? imagePaths : null
+};
 
                 var result = await _productService.UpdateProductAsync(EditingProductId, input);
-                if (!result.Success)
-                {
-                    EditDialogError = result.Message ?? "Update product failed.";
-                    return;
-                }
+      if (!result.Success)
+         {
+                EditDialogError = result.Message ?? "Update product failed.";
+          return;
+   }
 
                 updated = true;
             }
             catch (Exception ex)
             {
-                EditDialogError = ex.Message;
-            }
+        EditDialogError = ex.Message;
+ }
             finally
-            {
-                IsBusy = false;
-                OnPropertyChanged(nameof(HasEditDialogError));
+   {
+       IsBusy = false;
+        OnPropertyChanged(nameof(HasEditDialogError));
             }
 
-            if (updated)
-            {
-                IsEditDialogOpen = false;
-                await ReloadCurrentPageAsync();
-            }
+        if (updated)
+  {
+    IsEditDialogOpen = false;
+      EditProductImages.Clear();
+     await ReloadCurrentPageAsync();
+  }
         }
 
-        // ================= MANAGE CATEGORY DIALOG =================
+  // ================= MANAGE CATEGORY DIALOG =================
 
         [RelayCommand]
         private async Task OpenCategoryDialogAsync()
         {
             CategoryDialogError = string.Empty;
-            IsCategoryDialogOpen = true;
+  IsCategoryDialogOpen = true;
             await LoadCategoryListAsync();
         }
 
@@ -579,111 +929,110 @@ namespace MyShopClient.ViewModels
         }
 
         [RelayCommand]
-        private void NewCategory()
+  private void NewCategory()
         {
             SelectedCategoryItem = null;
-            CategoryNameText = string.Empty;
-            CategoryDescriptionText = string.Empty;
+         CategoryNameText = string.Empty;
+        CategoryDescriptionText = string.Empty;
             CategoryDialogError = string.Empty;
-        }
+    }
 
-        [RelayCommand]
-        private async Task SaveCategoryAsync()
+     [RelayCommand]
+   private async Task SaveCategoryAsync()
         {
             if (string.IsNullOrWhiteSpace(CategoryNameText))
             {
-                CategoryDialogError = "Name is required.";
-                return;
+    CategoryDialogError = "Name is required.";
+     return;
             }
 
             IsBusy = true;
-            CategoryDialogError = string.Empty;
+     CategoryDialogError = string.Empty;
 
-            try
+  try
             {
-                ApiResult<CategoryItemDto> result;
+         ApiResult<CategoryItemDto> result;
 
-                if (SelectedCategoryItem == null)
-                {
-                    var input = new CategoryCreateInput
-                    {
-                        Name = CategoryNameText!,
-                        Description = CategoryDescriptionText
-                    };
-                    result = await _categoryService.CreateCategoryAsync(input);
-                }
-                else
-                {
-                    var input = new CategoryUpdateInput
-                    {
-                        Name = CategoryNameText!,
-                        Description = CategoryDescriptionText
-                    };
-                    result = await _categoryService.UpdateCategoryAsync(
-                        SelectedCategoryItem.CategoryId, input);
-                }
+        if (SelectedCategoryItem == null)
+  {
+        var input = new CategoryCreateInput
+        {
+               Name = CategoryNameText!,
+     Description = CategoryDescriptionText
+          };
+     result = await _categoryService.CreateCategoryAsync(input);
+     }
+  else
+        {
+           var input = new CategoryUpdateInput
+             {
+         Name = CategoryNameText!,
+  Description = CategoryDescriptionText
+       };
+   result = await _categoryService.UpdateCategoryAsync(
+            SelectedCategoryItem.CategoryId, input);
+    }
 
-                if (!result.Success)
-                {
-                    CategoryDialogError = result.Message ?? "Save category failed.";
-                    return;
-                }
+    if (!result.Success)
+ {
+    CategoryDialogError = result.Message ?? "Save category failed.";
+     return;
+ }
 
-                // reload cả list trong dialog và combo Category chung
-                await LoadCategoryListAsync();
-                await LoadCategoriesAsync();
-                await LoadPageAsync(CurrentPage);
-            }
+        await LoadCategoryListAsync();
+         await LoadCategoriesAsync();
+       await LoadPageAsync(CurrentPage);
+        }
             catch (Exception ex)
-            {
-                CategoryDialogError = ex.Message;
-            }
-            finally
-            {
-                IsBusy = false;
-                OnPropertyChanged(nameof(HasCategoryDialogError));
-            }
+     {
+ CategoryDialogError = ex.Message;
+         }
+       finally
+        {
+       IsBusy = false;
+            OnPropertyChanged(nameof(HasCategoryDialogError));
+        }
         }
 
         [RelayCommand]
-        private async Task DeleteCategoryAsync(CategoryItemDto? item)
-        {
-            var target = item ?? SelectedCategoryItem;
-            if (target == null) return;
+    private async Task DeleteCategoryAsync(CategoryItemDto? item)
+      {
+       var target = item ?? SelectedCategoryItem;
+     if (target == null) return;
 
-            IsBusy = true;
-            CategoryDialogError = string.Empty;
+ IsBusy = true;
+     CategoryDialogError = string.Empty;
 
             try
-            {
-                var result = await _categoryService.DeleteCategoryAsync(target.CategoryId);
-                if (!result.Success)
-                {
-                    CategoryDialogError = result.Message ?? "Delete category failed.";
-                    return;
-                }
+   {
+           var result = await _categoryService.DeleteCategoryAsync(target.CategoryId);
+     if (!result.Success)
+             {
+       CategoryDialogError = result.Message ?? "Delete category failed.";
+            return;
+      }
 
-                SelectedCategoryItem = null;
+             SelectedCategoryItem = null;
 
                 await LoadCategoryListAsync();
-                await LoadCategoriesAsync();
-                await LoadPageAsync(CurrentPage);
-            }
+       await LoadCategoriesAsync();
+ await LoadPageAsync(CurrentPage);
+   }
             catch (Exception ex)
-            {
-                CategoryDialogError = ex.Message;
-            }
-            finally
-            {
-                IsBusy = false;
-                OnPropertyChanged(nameof(HasCategoryDialogError));
-            }
+   {
+    CategoryDialogError = ex.Message;
+       }
+       finally
+         {
+              IsBusy = false;
+          OnPropertyChanged(nameof(HasCategoryDialogError));
+         }
         }
 
         [RelayCommand]
         private void CloseCategoryDialog()
         {
-            IsCategoryDialogOpen = false;
+  IsCategoryDialogOpen = false;
         }
 
         // ================= MOCK KHÁC =================
@@ -703,34 +1052,35 @@ namespace MyShopClient.ViewModels
 
         public async Task ImportFromExcelAsync(Stream excelStream)
         {
-            if (IsBusy) return;
-            IsBusy = true;
+  if (IsBusy) return;
+      IsBusy = true;
             ErrorMessage = string.Empty;
 
-            try
-            {
+     try
+      {
                 var result = await _productService.ImportProductsFromExcelAsync(excelStream);
 
-                if (!result.Success)
-                {
-                    ErrorMessage = result.Message ?? "Import failed.";
-                }
-                else
-                {
-                    // Sau khi import xong → reload lại product list
-                    await LoadPageAsync(1);   // về page 1 cho dễ thấy
-                }
+         if (!result.Success)
+          {
+        ErrorMessage = result.Message ?? "Import failed.";
+         }
+           else
+         {
+           // Sau khi import xong → reload lại product list
+       await LoadPageAsync(1);   // về page 1 cho dễ thấy
+              }
             }
-            catch (Exception ex)
-            {
-                ErrorMessage = ex.Message;
-            }
-            finally
-            {
-                IsBusy = false;
-                OnPropertyChanged(nameof(HasError));
-            }
+ catch (Exception ex)
+     {
+        ErrorMessage = ex.Message;
+       }
+      finally
+      {
+             IsBusy = false;
+    OnPropertyChanged(nameof(HasError));
+  }
         }
 
+        // Keep all other existing methods unchanged
     }
 }
