@@ -18,6 +18,149 @@
             <conv:ImageAtIndexConverter x:Key="ImageAtIndexConverter" />
             <conv:HasMoreThanConverter x:Key="HasMoreThanConverter" />
             <conv:CollectionHasExactlyConverter x:Key="CollectionHasExactlyConverter" />
+            <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+     
+            <!-- Custom CheckBox Style with Blue Fill when Checked -->
+            <Style x:Key="OrderCheckBoxStyle" TargetType="CheckBox">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="Black"/>
+                <Setter Property="BorderBrush" Value="#8A8A8A"/>
+                <Setter Property="Padding" Value="8,5,0,0"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="VerticalContentAlignment" Value="Top"/>
+                <Setter Property="MinWidth" Value="20"/>
+                <Setter Property="MinHeight" Value="32"/>
+                <Setter Property="UseSystemFocusVisuals" Value="True"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="CheckBox">
+                            <Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CombinedStates">
+                                        <!-- Unchecked Normal -->
+                                        <VisualState x:Name="UncheckedNormal">
+                                            <VisualState.Setters>
+                                                <Setter Target="NormalRectangle.Stroke" Value="#8A8A8A"/>
+                                                <Setter Target="NormalRectangle.Fill" Value="Transparent"/>
+                                                <Setter Target="CheckGlyph.Opacity" Value="0"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <!-- Unchecked PointerOver -->
+                                        <VisualState x:Name="UncheckedPointerOver">
+                                            <VisualState.Setters>
+                                                <Setter Target="NormalRectangle.Stroke" Value="#2196F3"/>
+                                                <Setter Target="NormalRectangle.Fill" Value="Transparent"/>
+                                                <Setter Target="CheckGlyph.Opacity" Value="0"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <!-- Unchecked Pressed -->
+                                        <VisualState x:Name="UncheckedPressed">
+                                            <VisualState.Setters>
+                                                <Setter Target="NormalRectangle.Stroke" Value="#1976D2"/>
+                                                <Setter Target="NormalRectangle.Fill" Value="Transparent"/>
+                                                <Setter Target="CheckGlyph.Opacity" Value="0"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <!-- Checked Normal -->
+                                        <VisualState x:Name="CheckedNormal">
+                                            <VisualState.Setters>
+                                                <Setter Target="NormalRectangle.Stroke" Value="#2196F3"/>
+                                                <Setter Target="NormalRectangle.Fill" Value="#2196F3"/>
+                                                <Setter Target="CheckGlyph.Opacity" Value="1"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <!-- Checked PointerOver -->
+                                        <VisualState x:Name="CheckedPointerOver">
+                                            <VisualState.Setters>
+                                                <Setter Target="NormalRectangle.Stroke" Value="#1E88E5"/>
+                                                <Setter Target="NormalRectangle.Fill" Value="#1E88E5"/>
+                                                <Setter Target="CheckGlyph.Opacity" Value="1"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <!-- Checked Pressed -->
+                                        <VisualState x:Name="CheckedPressed">
+                                            <VisualState.Setters>
+                                                <Setter Target="NormalRectangle.Stroke" Value="#1976D2"/>
+                                                <Setter Target="NormalRectangle.Fill" Value="#1976D2"/>
+                                                <Setter Target="CheckGlyph.Opacity" Value="1"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <!-- Indeterminate (for Select All) -->
+                                        <VisualState x:Name="IndeterminateNormal">
+                                            <VisualState.Setters>
+                                                <Setter Target="NormalRectangle.Stroke" Value="#2196F3"/>
+                                                <Setter Target="NormalRectangle.Fill" Value="#2196F3"/>
+                                                <Setter Target="CheckGlyph.Opacity" Value="0"/>
+                                                <Setter Target="IndeterminateGlyph.Opacity" Value="1"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="IndeterminatePointerOver">
+                                            <VisualState.Setters>
+                                                <Setter Target="NormalRectangle.Stroke" Value="#1E88E5"/>
+                                                <Setter Target="NormalRectangle.Fill" Value="#1E88E5"/>
+                                                <Setter Target="CheckGlyph.Opacity" Value="0"/>
+                                                <Setter Target="IndeterminateGlyph.Opacity" Value="1"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="IndeterminatePressed">
+                                            <VisualState.Setters>
+                                                <Setter Target="NormalRectangle.Stroke" Value="#1976D2"/>
+                                                <Setter Target="NormalRectangle.Fill" Value="#1976D2"/>
+                                                <Setter Target="CheckGlyph.Opacity" Value="0"/>
+                                                <Setter Target="IndeterminateGlyph.Opacity" Value="1"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+      
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+             
+                                <!-- Checkbox Square -->
+                                <Grid Height="20" Width="20" VerticalAlignment="Center">
+                                    <Rectangle x:Name="NormalRectangle"
+                                      Height="20"
+                                       Width="20"
+                                    StrokeThickness="2"
+                                  RadiusX="2"
+                                     RadiusY="2"/>
+    
+                                    <!-- Check Mark -->
+                                    <FontIcon x:Name="CheckGlyph"
+                                      Glyph="&#xE73E;"
+                                       FontSize="12"
+                                     Foreground="White"
+                                           Opacity="0"
+                                     HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"/>
+         
+                                    <!-- Indeterminate Mark (dash) -->
+                                    <FontIcon x:Name="IndeterminateGlyph"
+                                   Glyph="&#xE738;"
+                                       FontSize="10"
+                                       Foreground="White"
+                                   Opacity="0"
+                                     HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                                </Grid>
+          
+                                <ContentPresenter x:Name="ContentPresenter"
+                                      Grid.Column="1"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Margin="{TemplateBinding Padding}"
+                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    AutomationProperties.AccessibilityView="Raw"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

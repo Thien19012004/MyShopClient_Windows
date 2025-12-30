@@ -1,16 +1,17 @@
 <Page
-    x:Class="MyShopClient.Views.OrderPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewmodels="using:MyShopClient.ViewModels"
-    xmlns:models="using:MyShopClient.Models"
-    xmlns:helpers="using:MyShopClient.Helpers"
-    mc:Ignorable="d"
-    d:DataContext="{d:DesignInstance Type=viewmodels:OrderListViewModel}">
+ x:Class="MyShopClient.Views.OrderPage"
+ x:Name="Root"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:viewmodels="using:MyShopClient.ViewModels"
+ xmlns:models="using:MyShopClient.Models"
+ xmlns:helpers="using:MyShopClient.Helpers"
+ xmlns:controls="using:MyShopClient.Controls"
+ mc:Ignorable="d"
+ d:DataContext="{d:DesignInstance Type=viewmodels:OrderListViewModel}">
 
-    <!-- GRID GỐC: không có RowDefinitions, các con sẽ chồng lên nhau -->
     <Grid Background="#FFF5F5F7">
 
         <!-- ================== MAIN CONTENT ================== -->
@@ -23,9 +24,9 @@
 
             <!-- Title -->
             <TextBlock Text="Orders"
-                       FontSize="24"
-                       FontWeight="SemiBold"
-                       Grid.Row="0"/>
+ FontSize="24"
+ FontWeight="SemiBold"
+ Grid.Row="0"/>
 
             <!-- Summary cards + filters -->
             <StackPanel Grid.Row="1" Margin="0,16,0,16" Spacing="12">
@@ -50,14 +51,23 @@
                         <StackPanel>
                             <TextBlock Text="Amount (page)" FontWeight="SemiBold"/>
                             <TextBlock>
-                                <Run Text="{Binding TotalAmountOnPage}"/>
-                                <Run Text=" đ"/>
+ <Run Text="{Binding TotalAmountOnPage}"/>
+ <Run Text=" đ"/>
                             </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Selected Count -->
+                    <Border Background="#FF5D5FEF" CornerRadius="12" Padding="16" Width="200"
+ Visibility="{Binding HasSelectedOrders, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock Text="Selected" FontWeight="SemiBold" Foreground="White"/>
+                            <TextBlock Text="{Binding SelectedOrdersCount}" FontSize="24" FontWeight="Bold" Foreground="White"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
 
-                <!-- Filters -->
+                <!-- Filters + Bulk Actions -->
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -67,45 +77,47 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <!-- Status -->
                     <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="0" Margin="0,0,16,0">
                         <TextBlock Text="Status:" VerticalAlignment="Center" Width="50"/>
                         <ComboBox ItemsSource="{Binding StatusOptions}"
-                                  SelectedItem="{Binding SelectedStatus, Mode=TwoWay}"
-                                  Width="140"
-                                  VerticalAlignment="Center"/>
+ SelectedItem="{Binding SelectedStatus, Mode=TwoWay}"
+ Width="140"
+ VerticalAlignment="Center"/>
                     </StackPanel>
 
                     <!-- CustomerId -->
                     <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="1" Margin="0,0,16,0">
                         <TextBlock Text="CustomerId:" VerticalAlignment="Center" Width="80"/>
                         <TextBox Width="100"
-                                 VerticalAlignment="Center"
-                                 Text="{Binding CustomerIdText, Mode=TwoWay}"/>
+ VerticalAlignment="Center"
+ Text="{Binding CustomerIdText, Mode=TwoWay}"/>
                     </StackPanel>
 
                     <!-- SaleId -->
                     <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="2" Margin="0,0,16,0">
                         <TextBlock Text="SaleId:" VerticalAlignment="Center" Width="50"/>
                         <TextBox Width="100"
-                                 VerticalAlignment="Center"
-                                 Text="{Binding SaleIdText, Mode=TwoWay}"/>
+ VerticalAlignment="Center"
+ Text="{Binding SaleIdText, Mode=TwoWay}"/>
                     </StackPanel>
 
                     <!-- Date range -->
-                    <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="3" Margin="0,0,16,0">
+                    <StackPanel x:Name="OrderDateRangePanel" Orientation="Horizontal" Spacing="8" Grid.Column="3" Margin="0,0,16,0">
                         <TextBlock Text="Date:" VerticalAlignment="Center" Width="40"/>
                         <TextBox Width="120"
-                                 PlaceholderText="From yyyy-MM-dd"
-                                 VerticalAlignment="Center"
-                                 Text="{Binding FromDateText, Mode=TwoWay}"/>
+ PlaceholderText="From yyyy-MM-dd"
+ VerticalAlignment="Center"
+ Text="{Binding FromDateText, Mode=TwoWay}"/>
                         <TextBlock Text="-" VerticalAlignment="Center"/>
                         <TextBox Width="120"
-                                 PlaceholderText="To yyyy-MM-dd"
-                                 VerticalAlignment="Center"
-                                 Text="{Binding ToDateText, Mode=TwoWay}"/>
+ PlaceholderText="To yyyy-MM-dd"
+ VerticalAlignment="Center"
+ Text="{Binding ToDateText, Mode=TwoWay}"/>
                     </StackPanel>
 
                     <!-- Spacer -->
@@ -113,23 +125,52 @@
 
                     <!-- Apply Button -->
                     <Button Grid.Column="5"
-                            Content="Apply"
-                            Margin="0,0,8,0"
-                            VerticalAlignment="Center"
-                            Command="{Binding ApplyFilterCommand}"/>
+ Content="Apply"
+ Margin="0,0,8,0"
+ VerticalAlignment="Center"
+ Command="{Binding ApplyFilterCommand}"/>
 
-                    <!-- Add Order Button -->
+                    <!-- Print Button (enabled when has selection) -->
                     <Button Grid.Column="6"
-                            Content="+ Add Order"
-                            VerticalAlignment="Center"
-                            Command="{Binding OpenAddDialogCommand}">
+ Content="🖨 Print"
+ Margin="0,0,8,0"
+ VerticalAlignment="Center"
+ IsEnabled="{Binding HasSelectedOrders}"
+ Command="{Binding OpenPrintConfirmCommand}">
                         <Button.Background>
-                            <SolidColorBrush Color="#FF5D5FEF"/>
+                            <SolidColorBrush Color="#FF4CAF50"/>
                         </Button.Background>
                         <Button.Foreground>
                             <SolidColorBrush Color="White"/>
                         </Button.Foreground>
                     </Button>
+
+                    <!-- Bulk Delete Button (enabled when has selection) -->
+                    <Button Grid.Column="7"
+ Content="🗑 Delete"
+ Margin="0,0,8,0"
+ VerticalAlignment="Center"
+ IsEnabled="{Binding HasSelectedOrders}"
+ Command="{Binding OpenBulkDeleteConfirmCommand}">
+                        <Button.Background>
+                            <SolidColorBrush Color="#FFF44336"/>
+                        </Button.Background>
+                        <Button.Foreground>
+                            <SolidColorBrush Color="White"/>
+                        </Button.Foreground>
+                    </Button>
+
+                    <!-- Add Order Button -->
+                    <StackPanel Grid.Column="8" Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="AddOrderButton" Content="+ Add Order" VerticalAlignment="Center" Command="{Binding AddVm.OpenCommand}">
+                            <Button.Background>
+                                <SolidColorBrush Color="#FF5D5FEF"/>
+                            </Button.Background>
+                            <Button.Foreground>
+                                <SolidColorBrush Color="White"/>
+                            </Button.Foreground>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </StackPanel>
 
@@ -143,10 +184,10 @@
 
                 <!-- Error -->
                 <TextBlock Grid.Row="0"
-                           Margin="0,0,0,4"
-                           Text="{Binding ErrorMessage}"
-                           Foreground="Red"
-                           Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+ Margin="0,0,0,4"
+ Text="{Binding ErrorMessage}"
+ Foreground="Red"
+ Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
                 <!-- Header + List -->
                 <Grid Grid.Row="1">
@@ -157,35 +198,46 @@
 
                     <!-- Header row -->
                     <Grid Grid.Row="0"
-                          Background="#FFEDEEF2"
-                          Padding="16,10"
-                          CornerRadius="8,8,0,0">
+ Background="#FFEDEEF2"
+ Padding="16,12"
+ Margin="0,0,0,0"
+ CornerRadius="8,8,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="2*"/>
                             <ColumnDefinition Width="2*"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <CheckBox/>
-                        <TextBlock Grid.Column="1" Text="Order" FontWeight="SemiBold"/>
-                        <TextBlock Grid.Column="2" Text="Customer" FontWeight="SemiBold"/>
-                        <TextBlock Grid.Column="3" Text="Created" FontWeight="SemiBold"/>
-                        <TextBlock Grid.Column="4" Text="Status" FontWeight="SemiBold"/>
-                        <TextBlock Grid.Column="5" Text="Total" FontWeight="SemiBold"/>
-                        <TextBlock Grid.Column="6" Text="Action" FontWeight="SemiBold"/>
+                        <controls:BlueCheckBox x:Name="SelectAllCheckBox"
+ Grid.Column="0"
+ VerticalAlignment="Center"
+ HorizontalAlignment="Left"
+ Margin="0,0,0,0"
+ Click="SelectAllCheckBox_Click"/>
+
+                        <TextBlock Grid.Column="1" Text="Order" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="Customer" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="3" Text="Sale" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="4" Text="Created" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="5" Text="Status" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="6" Text="Total" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="7" Text="Action" FontWeight="SemiBold" VerticalAlignment="Center"/>
                     </Grid>
 
                     <!-- List -->
                     <ListView Grid.Row="1"
-                              x:Name="OrderListView"
-                              ItemsSource="{Binding Orders}"
-                              Margin="0,-2,0,0"
-                              Background="Transparent"
-                              BorderThickness="0">
+ x:Name="OrderListView"
+ ItemsSource="{Binding Orders}"
+ SelectionMode="None"
+ Margin="0,-2,0,0"
+ Background="Transparent"
+ BorderThickness="0"
+ IsItemClickEnabled="False">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="Padding" Value="0"/>
@@ -197,70 +249,55 @@
 
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="models:OrderListItemDto">
-                                <Grid Padding="16,8">
+                                <Grid Padding="16,12">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="40"/>
-                                        <!-- checkbox -->
-                                        <ColumnDefinition Width="*"/>
-                                        <!-- Order -->
+                                        <ColumnDefinition Width="80"/>
                                         <ColumnDefinition Width="2*"/>
-                                        <!-- Customer -->
+                                        <ColumnDefinition Width="2*"/>
                                         <ColumnDefinition Width="*"/>
-                                        <!-- Created -->
-                                        <ColumnDefinition Width="*"/>
-                                        <!-- Status -->
-                                        <ColumnDefinition Width="*"/>
-                                        <!-- Total -->
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="120"/>
                                         <ColumnDefinition Width="Auto"/>
-                                        <!-- Action -->
                                     </Grid.ColumnDefinitions>
 
-                                    <CheckBox/>
+                                    <controls:BlueCheckBox Grid.Column="0"
+ IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+ VerticalAlignment="Center"
+ HorizontalAlignment="Left"
+ Margin="0,0,0,0"/>
 
-                                    <!-- Order number -->
-                                    <StackPanel Grid.Column="1" Spacing="2">
+                                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
                                         <TextBlock Text="{x:Bind helpers:FormatHelpers.FormatOrderId(OrderId)}"/>
                                     </StackPanel>
 
-                                    <!-- Customer -->
-                                    <TextBlock Grid.Column="2" Text="{x:Bind CustomerName}"/>
+                                    <TextBlock Grid.Column="2" Text="{x:Bind CustomerName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
 
-                                    <!-- Created at -->
-                                    <TextBlock Grid.Column="3"
-                                   Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(CreatedAt)}"/>
+                                    <TextBlock Grid.Column="3" Text="{x:Bind SaleName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
 
-                                                    <!-- Status badge -->
-                                                    <Border Grid.Column="4"
-                                            CornerRadius="12"
-                                            Padding="8,2"
-                                            HorizontalAlignment="Left"
-                                            Background="#FFEFEFEF">
-                                                                    <TextBlock Text="{x:Bind Status}"/>
-                                                                </Border>
+                                    <TextBlock Grid.Column="4"
+ Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(CreatedAt)}" VerticalAlignment="Center"/>
 
-                                                                <!-- Total -->
-                                        <TextBlock Grid.Column="5">
-                                        <Run Text="{x:Bind TotalPrice}"/>
-                                        <Run Text=" đ"/>    
-                                    </TextBlock>    
+                                    <Border Grid.Column="5"
+ CornerRadius="12"
+ Padding="8,4"
+ HorizontalAlignment="Left"
+ VerticalAlignment="Center"
+ Background="#FFEFEFEF">
+                                        <TextBlock Text="{x:Bind Status}"/>
+                                    </Border>
 
-                                    <!-- Actions -->
-                                    <StackPanel Grid.Column="6"
-                                            Orientation="Horizontal"
-                                            HorizontalAlignment="Right"
-                                            Spacing="8">
-                                            <Button Content="✏"
-                                            Width="28" Height="28" Padding="0"
-                                            Command="{Binding DataContext.OpenEditDialogCommand, ElementName=OrderListView}"
-                                            CommandParameter="{Binding}"/>
-                                        <Button Content="🗑"
-                                            Width="28" Height="28" Padding="0"
-                                            Command="{Binding DataContext.DeleteOrderCommand, ElementName=OrderListView}"
-                                            CommandParameter="{Binding}"/>  
+                                    <TextBlock Grid.Column="6" VerticalAlignment="Center">
+ <Run Text="{x:Bind TotalPrice}"/>
+ <Run Text=" d"/>
+                                    </TextBlock>
+
+                                    <StackPanel Grid.Column="7" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="8" Margin="8,0,0,0">
+                                        <Button Content="✏" Width="28" Height="28" Padding="0" Click="EditButton_Click" />
+                                        <Button Content="🗑" Width="28" Height="28" Padding="0" Click="DeleteButton_Click" />
                                     </StackPanel>
                                 </Grid>
-                                        </DataTemplate>
-
+                            </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                 </Grid>
@@ -273,136 +310,368 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock VerticalAlignment="Center">
-                        <Run Text="Total: "/>
-                        <Run Text="{Binding TotalItems}"/>
-                        <Run Text=" orders"/>
+ <Run Text="Total: "/>
+ <Run Text="{Binding TotalItems}"/>
+ <Run Text=" orders"/>
                     </TextBlock>
 
                     <StackPanel Grid.Column="1"
-                                Orientation="Horizontal"
-                                Spacing="6"
-                                VerticalAlignment="Center">
+ Orientation="Horizontal"
+ Spacing="6"
+ VerticalAlignment="Center">
                         <Button Content="Previous"
-                                Command="{Binding PreviousPageCommand}"/>
+ Command="{Binding PreviousPageCommand}"/>
                         <TextBlock Text="{Binding CurrentPage}" Margin="4,0"/>
                         <TextBlock Text="/"/>
                         <TextBlock Text="{Binding TotalPages}" Margin="0,0,4,0"/>
                         <Button Content="Next"
-                                Command="{Binding NextPageCommand}"/>
+ Command="{Binding NextPageCommand}"/>
                     </StackPanel>
                 </Grid>
             </Grid>
         </Grid>
+        <!-- End of main content grid (Padding="24") -->
 
         <!-- ================== OVERLAY ADD ORDER ================== -->
         <Grid Background="#99000000"
-              Visibility="{Binding IsAddDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Border Width="560"
-                    Background="White"
-                    CornerRadius="16"
-                    Padding="20"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-                <StackPanel Spacing="10">
-                    <TextBlock Text="Add New Order"
-                               FontSize="20"
-                               FontWeight="SemiBold"/>
+ Visibility="{Binding AddVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="560" Background="White" CornerRadius="16" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ScrollViewer>
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Add New Order"
+ FontSize="20"
+ FontWeight="SemiBold"/>
 
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBox Header="Customer Id"
-                                 Width="200"
-                                 Text="{Binding NewCustomerIdText, Mode=TwoWay}"/>
-                        <TextBox Header="Sale Id"
-                                 Width="200"
-                                 Text="{Binding NewSaleIdText, Mode=TwoWay}"/>
-                    </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Header="Customer Id"
+ Width="200"
+ Text="{Binding AddVm.CustomerIdText, Mode=TwoWay}"/>
+                            <TextBox Header="Sale Id"
+ Width="200"
+ Text="{Binding AddVm.SaleIdText, Mode=TwoWay}"/>
+                        </StackPanel>
 
-                    <TextBlock Text="Items" FontWeight="SemiBold" Margin="0,8,0,0"/>
+                        <!-- Order promotion (ORDER scope) -->
+                        <ComboBox Header="Order Promotion (ORDER scope)"
+ ItemsSource="{Binding AddVm.OrderPromotionOptions}"
+ SelectedItem="{Binding AddVm.SelectedOrderPromotion, Mode=TwoWay}"
+ DisplayMemberPath="Name" />
 
-                    <ItemsControl ItemsSource="{Binding NewOrderItems}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="viewmodels:OrderItemInputVM">
-                                <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
-                                    <TextBox Header="Product Id"
-                                             Width="120"
-                                             Text="{x:Bind ProductId, Mode=TwoWay}"/>
-                                    <TextBox Header="Qty"
-                                             Width="80"
-                                             Text="{x:Bind Quantity, Mode=TwoWay}"/>
-                                    <Button Content="−"
-                                            Width="32" Height="32"
-                                            Command="{Binding DataContext.RemoveOrderItemRowCommand, ElementName=OrderListView}"
-                                            CommandParameter="{Binding}"/>
+                        <!-- Pricing breakdown -->
+                        <Border Background="#FFF5F5F7" CornerRadius="10" Padding="12">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Subtotal:" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding AddVm.NewSubtotal}"/>
                                 </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Order discount:" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding AddVm.NewOrderDiscountAmount}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Total:" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding AddVm.NewTotalPrice}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
 
-                    <Button Content="+ Add item line"
-                            HorizontalAlignment="Left"
-                            Command="{Binding AddOrderItemRowCommand}"/>
+                        <TextBlock Text="Items" FontWeight="SemiBold" Margin="0,8,0,0"/>
 
-                    <TextBlock Text="{Binding AddDialogError}"
-                               Foreground="Red"
-                               TextWrapping="Wrap"
-                               Visibility="{Binding HasAddDialogError, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <ItemsControl ItemsSource="{Binding AddVm.NewOrderItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodels:OrderItemInputVM">
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
+                                        <TextBox Header="Product Id"
+ Width="120"
+ Text="{x:Bind ProductId, Mode=TwoWay}"/>
+                                        <TextBox Header="Qty"
+ Width="80"
+ Text="{x:Bind Quantity, Mode=TwoWay}"/>
+                                        <Button Content="−"
+ Width="32" Height="32"
+ Click="RemoveAddItemButton_Click"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Button Content="+ Add item line"
+ HorizontalAlignment="Left"
+ Command="{Binding AddVm.AddOrderItemRowCommand}"/>
+
+                        <TextBlock Text="{Binding AddVm.Error}"
+ Foreground="Red"
+ TextWrapping="Wrap"
+ Visibility="{Binding AddVm.HasError, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                        <StackPanel Orientation="Horizontal"
+ HorizontalAlignment="Right"
+ Spacing="8">
+                            <Button Content="Cancel"
+ Command="{Binding AddVm.CancelCommand}"/>
+                            <Button Content="Create"
+ Command="{Binding AddVm.ConfirmCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- ================== OVERLAY EDIT ORDER ================== -->
+        <Grid Background="#99000000" Visibility="{Binding EditVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="520" Background="White" CornerRadius="16" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ScrollViewer>
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Edit Order" FontSize="20" FontWeight="SemiBold"/>
+
+                        <TextBlock Text="{Binding EditVm.EditCustomerName}" FontWeight="SemiBold"/>
+
+                        <TextBox Header="Order Id" IsReadOnly="True" Text="{Binding EditVm.EditOrderId}"/>
+
+                        <!-- Order promotion (Edit dialog: show all promotions) -->
+                        <ComboBox Header="Order Promotion"
+ ItemsSource="{Binding EditVm.OrderPromotionOptions}"
+ SelectedItem="{Binding EditVm.EditSelectedOrderPromotion, Mode=TwoWay}"
+ DisplayMemberPath="Name"
+ IsEnabled="{Binding EditVm.EditOriginallyPaid, Converter={StaticResource InverseBooleanConverter}}" />
+
+                        <!-- Pricing breakdown -->
+                        <Border Background="#FFF5F5F7" CornerRadius="10" Padding="12">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Subtotal:" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding EditVm.EditSubtotal}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Order discount:" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding EditVm.EditOrderDiscountAmount}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Total:" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding EditVm.EditTotalPrice}"/>
+                                </StackPanel>
+
+                                <!-- Items in this order -->
+                                <TextBlock Text="Items in order:" FontWeight="SemiBold" Margin="0,8,0,4"/>
+                                <ItemsControl ItemsSource="{Binding EditVm.EditOrderItems}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:OrderItemDto">
+                                            <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,2,0,2">
+                                                <TextBlock Text="{x:Bind ProductName}" Width="240" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="Qty: " FontWeight="SemiBold"/>
+                                                <TextBlock Text="{x:Bind Quantity}"/>
+                                                <TextBlock Text=" — "/>
+                                                <TextBlock>
+ <Run Text="{x:Bind UnitPrice}"/>
+ <Run Text=" d"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+
+
+                                <!-- Applied Promotions Section -->
+                                <Border BorderBrush="#FFE0E0E0" 
+ BorderThickness="0,1,0,0" 
+ Padding="0,8,0,0" 
+ Margin="0,8,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="Applied promotions:" 
+ FontWeight="SemiBold" 
+ FontSize="13"
+ Margin="0,0,0,4"/>
+
+                                        <!-- Order-level promotions -->
+                                        <StackPanel Visibility="{Binding EditVm.OrderPromotionLines, Converter={StaticResource CollectionHasItemsConverter}}">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="📦" FontFamily="Segoe UI Emoji" FontSize="14" VerticalAlignment="Center"/>
+                                                <TextBlock Text="Order-level:" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <ItemsControl ItemsSource="{Binding EditVm.OrderPromotionLines}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}" FontSize="12" Foreground="#FF666666" TextWrapping="Wrap" Margin="8,2,0,0"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+
+                                        <!-- Product-level promotions -->
+                                        <StackPanel Visibility="{Binding EditVm.ProductPromotionLines, Converter={StaticResource CollectionHasItemsConverter}}" Margin="0,6,0,0">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="🏷️" FontFamily="Segoe UI Emoji" FontSize="14" VerticalAlignment="Center"/>
+                                                <TextBlock Text="Product-level:" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <ItemsControl ItemsSource="{Binding EditVm.ProductPromotionLines}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}" FontSize="12" Foreground="#FF666666" TextWrapping="Wrap" Margin="8,2,0,0"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+
+                                        <!-- Category-level promotions -->
+                                        <StackPanel Visibility="{Binding EditVm.CategoryPromotionLines, Converter={StaticResource CollectionHasItemsConverter}}" Margin="0,6,0,0">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="📁" FontFamily="Segoe UI Emoji" FontSize="14" VerticalAlignment="Center"/>
+                                                <TextBlock Text="Category-level:" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <ItemsControl ItemsSource="{Binding EditVm.CategoryPromotionLines}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}" FontSize="12" Foreground="#FF666666" TextWrapping="Wrap" Margin="8,2,0,0"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+
+                                        <!-- Fallback: plain text if EditPromotionText used elsewhere -->
+                                        <TextBlock Text="{Binding EditVm.EditPromotionText}" Visibility="{Binding EditVm.EditPromotionText, Converter={StaticResource StringToVisibilityConverter}}" TextWrapping="Wrap" FontSize="12" Foreground="#FF666666"/>
+                                    </StackPanel>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                        <ComboBox Header="Status"
+ ItemsSource="{Binding StatusOptions}"
+ SelectedItem="{Binding EditVm.EditStatusText, Mode=TwoWay}"
+ IsEnabled="{Binding EditVm.EditOriginallyPaid, Converter={StaticResource InverseBooleanConverter}}"/>
+
+                        <TextBlock Text="{Binding EditVm.Error}" Foreground="Red" TextWrapping="Wrap" Visibility="{Binding EditVm.Error, Converter={StaticResource StringToVisibilityConverter}}"/>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                            <Button Content="Cancel" Command="{Binding EditVm.CancelCommand}"/>
+                            <Button Content="Save" Command="{Binding EditVm.ConfirmCommand}"
+ IsEnabled="{Binding EditVm.EditOriginallyPaid, Converter={StaticResource InverseBooleanConverter}}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- ================== OVERLAY DELETE CONFIRM ================== -->
+        <Grid Background="#99000000"
+ Visibility="{Binding IsDeleteConfirmOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="420"
+ Background="White"
+ CornerRadius="16"
+ Padding="20"
+ HorizontalAlignment="Center"
+ VerticalAlignment="Center">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="⚠️ Confirm Delete"
+ FontSize="20"
+ FontWeight="SemiBold"
+ Foreground="#FFF44336"/>
+
+                    <TextBlock Text="{Binding DeleteConfirmMessage}"
+ TextWrapping="Wrap"
+ FontSize="14"/>
 
                     <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Right"
-                                Spacing="8">
+ HorizontalAlignment="Right"
+ Spacing="8">
                         <Button Content="Cancel"
-                                Command="{Binding CancelAddDialogCommand}"/>
-                        <Button Content="Create"
-                                Command="{Binding ConfirmAddOrderCommand}"/>
+ Command="{Binding CancelDeleteConfirmCommand}"/>
+                        <Button Content="Delete"
+ Command="{Binding ConfirmDeleteOrderCommand}">
+                            <Button.Background>
+                                <SolidColorBrush Color="#FFF44336"/>
+                            </Button.Background>
+                            <Button.Foreground>
+                                <SolidColorBrush Color="White"/>
+                            </Button.Foreground>
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>
 
-        <!-- ================== OVERLAY EDIT ORDER ================== -->
+        <!-- ================== OVERLAY BULK DELETE CONFIRM ================== -->
         <Grid Background="#99000000"
-              Visibility="{Binding IsEditDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Border Width="420"
-                    Background="White"
-                    CornerRadius="16"
-                    Padding="20"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-                <StackPanel Spacing="10">
-                    <TextBlock Text="Edit Order"
-                               FontSize="20"
-                               FontWeight="SemiBold"/>
+ Visibility="{Binding IsBulkDeleteConfirmOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="480"
+ Background="White"
+ CornerRadius="16"
+ Padding="20"
+ HorizontalAlignment="Center"
+ VerticalAlignment="Center">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="⚠️ Confirm Bulk Delete"
+ FontSize="20"
+ FontWeight="SemiBold"
+ Foreground="#FFF44336"/>
 
-                    <TextBlock Text="{Binding EditCustomerName}"
-                               FontWeight="SemiBold"/>
-
-                    <TextBox Header="Order Id"
-                             IsReadOnly="True"
-                             Text="{Binding EditOrderId}"/>
-
-                    <TextBox Header="Total Price"
-                             IsReadOnly="True"
-                             Text="{Binding EditTotalPrice}"/>
-
-                    <ComboBox Header="Status"
-                              ItemsSource="{Binding StatusOptions}"
-                              SelectedItem="{Binding EditStatus, Mode=TwoWay}"/>
-
-                    <TextBlock Text="{Binding EditDialogError}"
-                               Foreground="Red"
-                               Visibility="{Binding HasEditDialogError, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <TextBlock Text="{Binding BulkDeleteConfirmMessage}"
+ TextWrapping="Wrap"
+ FontSize="14"/>
 
                     <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Right"
-                                Spacing="8">
+ HorizontalAlignment="Right"
+ Spacing="8">
                         <Button Content="Cancel"
-                                Command="{Binding CancelEditDialogCommand}"/>
-                        <Button Content="Save"
-                                Command="{Binding ConfirmEditOrderCommand}"/>
+ Command="{Binding CancelBulkDeleteConfirmCommand}"/>
+                        <Button Content="Delete All"
+ Command="{Binding ConfirmBulkDeleteCommand}">
+                            <Button.Background>
+                                <SolidColorBrush Color="#FFF44336"/>
+                            </Button.Background>
+                            <Button.Foreground>
+                                <SolidColorBrush Color="White"/>
+                            </Button.Foreground>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ================== OVERLAY PRINT CONFIRM ================== -->
+        <Grid Background="#99000000"
+ Visibility="{Binding IsPrintConfirmOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="480"
+ Background="White"
+ CornerRadius="16"
+ Padding="20"
+ HorizontalAlignment="Center"
+ VerticalAlignment="Center">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="🖨️ Confirm Export to PDF"
+ FontSize="20"
+ FontWeight="SemiBold"
+ Foreground="#FF4CAF50"/>
+
+                    <TextBlock Text="{Binding PrintConfirmMessage}"
+ TextWrapping="Wrap"
+ FontSize="14"/>
+
+                    <TextBlock Text="The PDF will be saved to your Downloads folder."
+ FontSize="12"
+ Foreground="Gray"
+ FontStyle="Italic"/>
+
+                    <StackPanel Orientation="Horizontal"
+ HorizontalAlignment="Right"
+ Spacing="8">
+                        <Button Content="Cancel"
+ Command="{Binding CancelPrintConfirmCommand}"/>
+                        <Button Content="Export"
+ Command="{Binding ConfirmPrintOrdersCommand}">
+                            <Button.Background>
+                                <SolidColorBrush Color="#FF4CAF50"/>
+                            </Button.Background>
+                            <Button.Foreground>
+                                <SolidColorBrush Color="White"/>
+                            </Button.Foreground>
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>
 
     </Grid>
+    <!-- End of root Grid (Background="#FFF5F5F7") -->
 </Page>

@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:views="using:MyShopClient.Views"
+    xmlns:controls="using:MyShopClient.Controls"
     mc:Ignorable="d">
 
     <Grid Background="#FFF5F5F7">
@@ -20,11 +21,18 @@
                               DashboardRequested="Sidebar_DashboardRequested"
                               ProductsRequested="Sidebar_ProductsRequested"
                               OrdersRequested="Sidebar_OrdersRequested"
+                              CustomersRequested="Sidebar_CustomersRequested"
+                              PromotionsRequested="Sidebar_PromotionsRequested"
                               LogoutRequested="Sidebar_LogoutRequested"
-                              ReportsRequested="Sidebar_ReportsRequested"/>
+                              ReportsRequested="Sidebar_ReportsRequested"
+                              SettingsRequested="Sidebar_SettingsRequested"/>
 
-        <!-- NỘI DUNG TRANG (FRAME CON) -->
-        <Frame x:Name="ContentFrame"
-               Grid.Column="1" />
+        <Grid Grid.Column="1">
+            <!-- NỘI DUNG TRANG (FRAME CON) -->
+            <Frame x:Name="ContentFrame" />
+
+            <!-- overlay for onboarding teaching tips -->
+            <controls:OnboardingOverlay x:Name="OnboardingOverlay" />
+        </Grid>
     </Grid>
 </Page>

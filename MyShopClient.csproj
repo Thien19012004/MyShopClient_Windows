@@ -12,15 +12,21 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <!-- Remove these conflicting entries so the control XAML is compiled -->
   <ItemGroup>
     <None Remove="Views\ConfigPage.xaml" />
+    <None Remove="Views\CustomerPage.xaml" />
     <None Remove="Views\DashboardHomePage.xaml" />
     <None Remove="Views\DashboardPage.xaml" />
     <None Remove="Views\LoginPage.xaml" />
     <None Remove="Views\OrderPage.xaml" />
     <None Remove="Views\ProductPage.xaml" />
+    <None Remove="Views\PromotionPage.xaml" />
     <None Remove="Views\ReportPage.xaml" />
     <None Remove="Views\SidebarControl.xaml" />
+    <None Remove="Views\SettingsPage.xaml" />
+    <None Remove="Controls\OnboardingOverlay.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,9 +56,34 @@
     <PackageReference Include="CSharpMarkup.WinUI.LiveChartsCore.SkiaSharpView" Version="3.1.2" />
     <PackageReference Include="EPPlus" Version="7.7.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7175" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
+    <PackageReference Include="QuestPDF" Version="2024.12.3" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\OnboardingOverlay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <None Update="Views\SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\CustomerPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\BlueCheckBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\PromotionPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\ReportPage.xaml">
@@ -91,6 +122,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\LoginPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\SettingsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MyShopClient.Services;
+using MyShopClient.Services.Auth;
+using MyShopClient.Services.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

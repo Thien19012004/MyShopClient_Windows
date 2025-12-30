@@ -6,10 +6,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:MyShopClient.Models"
     xmlns:viewmodels="using:MyShopClient.ViewModels"
+    xmlns:controls="using:MyShopClient.Controls"
     d:DataContext="{d:DesignInstance Type=viewmodels:ProductListViewModel}"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Background="#FFF5F5F7">
 
-    <Grid Background="#FFF5F5F7" Padding="24">
+    <Grid Padding="24">
 
         <!-- ================= MAIN CONTENT ================= -->
         <Grid x:Name="MainContent">
@@ -36,8 +38,18 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Search box -->
-                <Border Grid.Column="0"
+                <!-- Search box + Selected summary -->
+                <StackPanel Grid.Column="0" Spacing="8">
+                <!-- Selected Count card (visible when any product selected) -->
+                <Border Background="#FF5D5FEF" CornerRadius="12" Padding="12" Width="220"
+                        Visibility="{Binding HasSelectedProducts, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel>
+                        <TextBlock Text="Selected" FontWeight="SemiBold" Foreground="White"/>
+                        <TextBlock Text="{Binding SelectedProductsCount}" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                    </StackPanel>
+                </Border>
+
+                <Border
                         Background="White"
                         CornerRadius="20"
                         Height="40"
@@ -54,6 +66,7 @@
                                    Margin="0,0,8,0" />
 
                         <TextBox Grid.Column="1"
+                                 x:Name="SearchTextBox"
                                  BorderThickness="0"
                                  Background="Transparent"
                                  PlaceholderText="Search product..."
@@ -64,6 +77,7 @@
                                 Command="{Binding SearchCommand}" />
                     </Grid>
                 </Border>
+                </StackPanel>
 
                 <!-- Import (mock) -->
                 <Button Grid.Column="1"
@@ -76,7 +90,8 @@
                         Click="ImportButton_Click" />
 
                 <!-- Add Item -->
-                <Button Grid.Column="2"
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                <Button x:Name="AddProductButton"
                         Content="+ Add Item (mock)"
                         Height="40"
                         Margin="12,0,0,0"
@@ -90,6 +105,25 @@
                         <SolidColorBrush Color="White" />
                     </Button.Foreground>
                 </Button>
+
+                <Button Content="🗑 Delete"
+                        Height="40"
+                        Margin="12,0,0,0"
+                        Padding="12,0"
+                        CornerRadius="20"
+                        Command="{Binding OpenBulkDeleteConfirmCommand}"
+                        IsEnabled="{Binding HasSelectedProducts}">
+                    <Button.Background>
+                        <SolidColorBrush Color="#FFF44336" />
+                    </Button.Background>
+                    <Button.Foreground>
+                        <SolidColorBrush Color="White" />
+                    </Button.Foreground>
+                </Button>
+
+                <TextBlock VerticalAlignment="Center" Margin="12,0,0,0" Text="Selected:"/>
+                <TextBlock VerticalAlignment="Center" Margin="4,0,0,0" Text="{Binding SelectedProductsCount}" FontWeight="Bold"/>
+                </StackPanel>
             </Grid>
 
             <!-- Filter + Sort -->
@@ -173,7 +207,8 @@
              <ColumnDefinition Width="Auto" />
    </Grid.ColumnDefinitions>
 
-   <CheckBox />
+   <controls:BlueCheckBox x:Name="SelectAllProductCheckBox" Click="SelectAllProductCheckBox_Click"/>
+
      <TextBlock Grid.Column="1" Text="Image" FontWeight="SemiBold" />
             <TextBlock Grid.Column="2" Text="Name" FontWeight="SemiBold" />
     <TextBlock Grid.Column="3" Text="Category" FontWeight="SemiBold"  />
@@ -212,7 +247,7 @@
  <ColumnDefinition Width="Auto" />
    </Grid.ColumnDefinitions>
 
-  <CheckBox />
+  <controls:BlueCheckBox IsChecked="{x:Bind IsSelected, Mode=TwoWay}"/>
 
      <!-- Multiple Product Images - Fixed Width with Clipping -->
  <Border Grid.Column="1" 
@@ -300,7 +335,7 @@ Opacity="0.6" />
       CommandParameter="{Binding}" />
  <Button Content="🗑"
    Width="28" Height="28" Padding="0"
-         Command="{Binding DataContext.DeleteProductCommand, ElementName=ProductListView}"
+         Command="{Binding DataContext.OpenDeleteConfirmCommand, ElementName=ProductListView}"
  CommandParameter="{Binding}" />
       </StackPanel>
    </Grid>
@@ -342,10 +377,10 @@ Opacity="0.6" />
         </Grid>
 
         <!-- ================= OVERLAY ADD PRODUCT ================= -->
-      <Grid x:Name="AddProductOverlay"
-    Background="#99000000"
-      Visibility="{Binding IsAddDialogOpen,
-     Converter={StaticResource BooleanToVisibilityConverter}}">
+      <Grid x:Name="AddProductOverlay" Visibility="{Binding IsAddDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+       <Grid.Background>
+  <SolidColorBrush Color="Black" Opacity="0.6"/>
+       </Grid.Background>
    <Border Width="600"
     MaxHeight="700"
     Padding="20"
@@ -502,11 +537,11 @@ CornerRadius="16"
         </Grid>
 
 <!-- ================= OVERLAY EDIT PRODUCT ================= -->
-        <Grid x:Name="EditProductOverlay"
-Background="#99000000"
-  Visibility="{Binding IsEditDialogOpen,
-   Converter={StaticResource BooleanToVisibilityConverter}}">
-<Border Width="600"
+        <Grid x:Name="EditProductOverlay" Visibility="{Binding IsEditDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+    <Grid.Background>
+     <SolidColorBrush Color="Black" Opacity="0.6"/>
+            </Grid.Background>
+   <Border Width="600"
             MaxHeight="700"
            Padding="20"
              Background="White"
@@ -656,10 +691,10 @@ FontSize="11"
         </Grid>
 
         <!-- ================= OVERLAY MANAGE CATEGORIES ================= -->
-        <Grid x:Name="ManageCategoryOverlay"
-      Background="#99000000"
-      Visibility="{Binding IsCategoryDialogOpen,
-                           Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Grid x:Name="ManageCategoryOverlay" Visibility="{Binding IsCategoryDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.Background>
+      <SolidColorBrush Color="Black" Opacity="0.6"/>
+    </Grid.Background>
             <Border Width="720"
             Padding="20"
             Background="White"
@@ -745,6 +780,52 @@ FontSize="11"
             </Border>
         </Grid>
 
+      <!-- ================= OVERLAY DELETE CONFIRM ================= -->
+        <Grid x:Name="DeleteConfirmOverlay" Visibility="{Binding IsDeleteConfirmOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+          <Grid.Background>
+          <SolidColorBrush Color="Black" Opacity="0.6"/>
+     </Grid.Background>
+   <Border Width="420" Background="White" CornerRadius="16" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+ <StackPanel Spacing="12">
+ <TextBlock Text="⚠️ Confirm Delete" FontSize="20" FontWeight="SemiBold" Foreground="#FFF44336"/>
+ <TextBlock Text="{Binding DeleteConfirmMessage}" TextWrapping="Wrap" FontSize="14"/>
+ <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+ <Button Content="Cancel" Command="{Binding CancelDeleteConfirmCommand}"/>
+ <Button Content="Delete" Command="{Binding ConfirmDeleteProductCommand}">
+ <Button.Background>
+ <SolidColorBrush Color="#FFF44336"/>
+ </Button.Background>
+ <Button.Foreground>
+ <SolidColorBrush Color="White"/>
+ </Button.Foreground>
+ </Button>
+ </StackPanel>
+ </StackPanel>
+ </Border>
+ </Grid>
 
+        <!-- ================== OVERLAY BULK DELETE CONFIRM ================== -->
+    <Grid x:Name="BulkDeleteConfirmOverlay" Visibility="{Binding IsBulkDeleteConfirmOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+     <Grid.Background>
+         <SolidColorBrush Color="Black" Opacity="0.6"/>
+            </Grid.Background>
+      <Border Width="480" Background="White" CornerRadius="16" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+ <StackPanel Spacing="12">
+ <TextBlock Text="⚠️ Confirm Bulk Delete" FontSize="20" FontWeight="SemiBold" Foreground="#FFF44336"/>
+ <TextBlock Text="{Binding BulkDeleteConfirmMessage}" TextWrapping="Wrap" FontSize="14"/>
+ <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+ <Button Content="Cancel" Command="{Binding CancelBulkDeleteConfirmCommand}"/>
+ <Button Content="Delete All" Command="{Binding ConfirmBulkDeleteCommand}">
+ <Button.Background>
+ <SolidColorBrush Color="#FFF44336"/>
+ </Button.Background>
+ <Button.Foreground>
+ <SolidColorBrush Color="White"/>
+ </Button.Foreground>
+ </Button>
+ </StackPanel>
+ </StackPanel>
+ </Border>
+ </Grid>
     </Grid>
 </Page>

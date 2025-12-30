@@ -5,7 +5,6 @@ using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using Microsoft.UI;
 using MyShopClient.Models;
-using MyShopClient.Services;
 using SkiaSharp;
 using System;
 using System.Collections.ObjectModel;
@@ -15,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UI.Dispatching;
 using System.Diagnostics;
+using MyShopClient.Services.Report;
 
 namespace MyShopClient.ViewModels
 {

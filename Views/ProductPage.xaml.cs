@@ -74,5 +74,16 @@ picker.FileTypeFilter.Add(".jpeg");
 using Stream stream = await file.OpenStreamForReadAsync();
             await ViewModel.UploadImageForEditProductAsync(stream, file.Name);
         }
+
+        private void SelectAllProductCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            var isChecked = (sender as Controls.BlueCheckBox)?.IsChecked ?? false;
+            var vm = (ProductListViewModel)DataContext;
+            if (vm == null) return;
+            foreach (var p in vm.Products)
+            {
+                p.IsSelected = isChecked;
+            }
+        }
     }
 }
