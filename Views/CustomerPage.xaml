@@ -1,0 +1,444 @@
+<Page
+ x:Class="MyShopClient.Views.CustomerPage"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:viewmodels="using:MyShopClient.ViewModels"
+ xmlns:models="using:MyShopClient.Models"
+ xmlns:controls="using:MyShopClient.Controls"
+ mc:Ignorable="d"
+ d:DataContext="{d:DesignInstance Type=viewmodels:CustomerListViewModel}">
+
+    <Grid Background="#FFF5F5F7">
+
+        <!-- ================== MAIN CONTENT ================== -->
+        <Grid Padding="24">
+            <Grid.RowDefinitions>
+         <RowDefinition Height="Auto"/>
+     <RowDefinition Height="Auto"/>
+ <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Title -->
+     <TextBlock Text="Customers"
+            FontSize="24"
+            FontWeight="SemiBold"
+              Grid.Row="0"/>
+
+            <!-- Summary cards + filters -->
+        <StackPanel Grid.Row="1" Margin="0,16,0,16" Spacing="12">
+
+  <!-- Summary -->
+           <StackPanel Orientation="Horizontal" Spacing="12">
+ <Border Background="White" CornerRadius="12" Padding="16" Width="200">
+     <StackPanel>
+     <TextBlock Text="Customers (page)" FontWeight="SemiBold"/>
+   <TextBlock Text="{Binding TotalCustomersOnPage}" FontSize="24" FontWeight="Bold"/>
+  </StackPanel>
+  </Border>
+
+            <!-- Selected Count -->
+   <Border Background="#FF5D5FEF" CornerRadius="12" Padding="16" Width="200"
+  Visibility="{Binding HasSelectedCustomers, Converter={StaticResource BooleanToVisibilityConverter}}">
+             <StackPanel>
+       <TextBlock Text="Selected" FontWeight="SemiBold" Foreground="White"/>
+         <TextBlock Text="{Binding SelectedCustomersCount}" FontSize="24" FontWeight="Bold" Foreground="White"/>
+     </StackPanel>
+ </Border>
+       </StackPanel>
+
+          <!-- Filters + Bulk Actions -->
+      <Grid>
+     <Grid.ColumnDefinitions>
+    <ColumnDefinition Width="Auto"/>
+     <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+       <ColumnDefinition Width="Auto"/>
+     <ColumnDefinition Width="Auto"/>
+</Grid.ColumnDefinitions>
+
+          <!-- Search -->
+ <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="0" Margin="0,0,16,0">
+        <TextBlock Text="Search:" VerticalAlignment="Center" Width="60"/>
+<TextBox Width="250"
+        PlaceholderText="Name, phone, or email"
+        VerticalAlignment="Center"
+Text="{Binding SearchText, Mode=TwoWay}"/>
+       <Button VerticalAlignment="Center"
+    Command="{Binding SearchCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+      <FontIcon Glyph="&#xE721;" FontSize="14"/>
+       <TextBlock Text="Search"/>
+  </StackPanel>
+        </Button>
+</StackPanel>
+
+ <!-- Spacer -->
+    <Border Grid.Column="1"/>
+
+      <!-- Bulk Delete Button -->
+   <Button Grid.Column="2"
+       Margin="0,0,8,0"
+     VerticalAlignment="Center"
+   IsEnabled="{Binding HasSelectedCustomers}"
+        Command="{Binding OpenBulkDeleteConfirmCommand}">
+    <Button.Background>
+<SolidColorBrush Color="#FFF44336"/>
+   </Button.Background>
+<Button.Foreground>
+      <SolidColorBrush Color="White"/>
+  </Button.Foreground>
+ <StackPanel Orientation="Horizontal" Spacing="4">
+   <FontIcon Glyph="&#xE74D;" FontSize="14" Foreground="White"/>
+             <TextBlock Text="Delete" Foreground="White"/>
+</StackPanel>
+   </Button>
+
+<!-- Add Customer Button -->
+     <Button Grid.Column="3"
+ x:Name="AddCustomerButton"
+        VerticalAlignment="Center"
+     Command="{Binding OpenAddDialogCommand}">
+           <Button.Background>
+    <SolidColorBrush Color="#FF5D5FEF"/>
+     </Button.Background>
+    <Button.Foreground>
+<SolidColorBrush Color="White"/>
+   </Button.Foreground>
+       <StackPanel Orientation="Horizontal" Spacing="4">
+      <FontIcon Glyph="&#xE710;" FontSize="14" Foreground="White"/>
+       <TextBlock Text="Add Customer" Foreground="White"/>
+    </StackPanel>
+     </Button>
+        </Grid>
+            </StackPanel>
+
+            <!-- List + error -->
+         <Grid Grid.Row="2">
+           <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+   <RowDefinition Height="*"/>
+       <RowDefinition Height="Auto"/>
+           </Grid.RowDefinitions>
+
+                <!-- Error -->
+    <TextBlock Grid.Row="0"
+           Margin="0,0,0,4"
+       Text="{Binding ErrorMessage}"
+               Foreground="Red"
+              Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                <!-- Header + List -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+ <RowDefinition Height="Auto"/>
+          <RowDefinition Height="*"/>
+  </Grid.RowDefinitions>
+
+          <!-- Header row -->
+       <Grid Grid.Row="0"
+            Background="#FFEDEEF2"
+        Padding="16,12"
+   Margin="0,0,0,0"
+            CornerRadius="8,8,0,0">
+             <Grid.ColumnDefinitions>
+  <ColumnDefinition Width="40"/>
+     <ColumnDefinition Width="80"/>
+           <ColumnDefinition Width="2*"/>
+           <ColumnDefinition Width="1.5*"/>
+ <ColumnDefinition Width="2*"/>
+           <ColumnDefinition Width="2*"/>
+         <ColumnDefinition Width="100"/>
+ <ColumnDefinition Width="Auto"/>
+ </Grid.ColumnDefinitions>
+
+ <controls:BlueCheckBox x:Name="SelectAllCheckBox"
+    Grid.Column="0"
+   VerticalAlignment="Center"
+  HorizontalAlignment="Left"
+        Click="SelectAllCheckBox_Click"/>
+
+        <TextBlock Grid.Column="1" Text="ID" FontWeight="SemiBold" VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="2" Text="Name" FontWeight="SemiBold" VerticalAlignment="Center"/>
+        <TextBlock Grid.Column="3" Text="Phone" FontWeight="SemiBold" VerticalAlignment="Center"/>
+        <TextBlock Grid.Column="4" Text="Email" FontWeight="SemiBold" VerticalAlignment="Center"/>
+     <TextBlock Grid.Column="5" Text="Address" FontWeight="SemiBold" VerticalAlignment="Center"/>
+       <TextBlock Grid.Column="6" Text="Orders" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="7" Text="Action" FontWeight="SemiBold" VerticalAlignment="Center"/>
+  </Grid>
+
+         <!-- List -->
+             <ListView Grid.Row="1"
+      x:Name="CustomerListView"
+    ItemsSource="{Binding Customers}"
+    SelectionMode="None"
+            Margin="0,-2,0,0"
+      Background="Transparent"
+     BorderThickness="0"
+        IsItemClickEnabled="False">
+                <ListView.ItemContainerStyle>
+  <Style TargetType="ListViewItem">
+ <Setter Property="Padding" Value="0"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+     <Setter Property="Background" Value="White"/>
+   <Setter Property="Margin" Value="0,1,0,0"/>
+      </Style>
+       </ListView.ItemContainerStyle>
+
+            <ListView.ItemTemplate>
+       <DataTemplate x:DataType="models:CustomerListItemDto">
+           <Grid Padding="16,12">
+  <Grid.ColumnDefinitions>
+     <ColumnDefinition Width="40"/>
+      <ColumnDefinition Width="80"/>
+       <ColumnDefinition Width="2*"/>
+   <ColumnDefinition Width="1.5*"/>
+    <ColumnDefinition Width="2*"/>
+           <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="100"/>
+     <ColumnDefinition Width="Auto"/>
+         </Grid.ColumnDefinitions>
+
+        <controls:BlueCheckBox Grid.Column="0"
+       IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+     VerticalAlignment="Center"
+         HorizontalAlignment="Left"/>
+
+              <TextBlock Grid.Column="1" Text="{x:Bind CustomerId}" VerticalAlignment="Center"/>
+     <TextBlock Grid.Column="2" Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="3" Text="{x:Bind Phone}" VerticalAlignment="Center"/>
+      <TextBlock Grid.Column="4" Text="{x:Bind Email}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+         <TextBlock Grid.Column="5" Text="{x:Bind Address}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+      <TextBlock Grid.Column="6" Text="{x:Bind OrderCount}" VerticalAlignment="Center"/>
+
+             <StackPanel Grid.Column="7"
+    Orientation="Horizontal"
+          HorizontalAlignment="Right"
+                 VerticalAlignment="Center"
+    Spacing="8"
+    Margin="8,0,0,0">
+            <Button Width="32" Height="32" Padding="0"
+     Command="{Binding DataContext.OpenEditDialogCommand, ElementName=CustomerListView}"
+      CommandParameter="{Binding}"
+ ToolTipService.ToolTip="Edit customer">
+       <FontIcon Glyph="&#xE70F;" FontSize="14"/>
+        </Button>
+       <Button Width="32" Height="32" Padding="0"
+           Command="{Binding DataContext.OpenDeleteConfirmCommand, ElementName=CustomerListView}"
+        CommandParameter="{Binding}"
+     ToolTipService.ToolTip="Delete customer">
+ <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+        </Button>
+      </StackPanel>
+       </Grid>
+   </DataTemplate>
+     </ListView.ItemTemplate>
+         </ListView>
+    </Grid>
+
+       <!-- Pagination -->
+                <Grid Grid.Row="2" Margin="0,16,0,0">
+        <Grid.ColumnDefinitions>
+   <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="Auto"/>
+    </Grid.ColumnDefinitions>
+
+         <TextBlock VerticalAlignment="Center">
+          <Run Text="Total: "/>
+              <Run Text="{Binding TotalItems}"/>
+          <Run Text=" customers"/>
+      </TextBlock>
+
+<StackPanel Grid.Column="1"
+           Orientation="Horizontal"
+  Spacing="6"
+  VerticalAlignment="Center">
+<Button Content="Previous"
+   Command="{Binding PreviousPageCommand}"/>
+         <TextBlock Text="{Binding CurrentPage}" Margin="4,0"/>
+ <TextBlock Text="/"/>
+      <TextBlock Text="{Binding TotalPages}" Margin="0,0,4,0"/>
+         <Button Content="Next"
+   Command="{Binding NextPageCommand}"/>
+   </StackPanel>
+           </Grid>
+     </Grid>
+        </Grid>
+
+        <!-- ================== OVERLAY ADD CUSTOMER ================== -->
+        <Grid Background="#99000000"
+            Visibility="{Binding AddVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Border Width="500"
+   Background="White"
+       CornerRadius="16"
+      Padding="20"
+    HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+        <StackPanel Spacing="10">
+         <TextBlock Text="Add New Customer"
+        FontSize="20"
+         FontWeight="SemiBold"/>
+
+      <TextBox Header="Name *"
+         Text="{Binding AddVm.Name, Mode=TwoWay}"/>
+
+        <TextBox Header="Phone *"
+     Text="{Binding AddVm.Phone, Mode=TwoWay}"/>
+
+                    <TextBox Header="Email"
+       Text="{Binding AddVm.Email, Mode=TwoWay}"/>
+
+      <TextBox Header="Address"
+          Text="{Binding AddVm.Address, Mode=TwoWay}"/>
+
+      <TextBlock Text="{Binding AddVm.Error}"
+     Foreground="Red"
+        TextWrapping="Wrap"
+   Visibility="{Binding AddVm.Error, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+   <StackPanel Orientation="Horizontal"
+  HorizontalAlignment="Right"
+    Spacing="8">
+       <Button Content="Cancel"
+        Command="{Binding AddVm.CancelCommand}"/>
+     <Button Content="Create"
+       Command="{Binding AddVm.ConfirmCommand}"/>
+          </StackPanel>
+     </StackPanel>
+         </Border>
+        </Grid>
+
+    <!-- ================== OVERLAY EDIT CUSTOMER ================== -->
+        <Grid Background="#99000000"
+   Visibility="{Binding EditVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+          <Border Width="500"
+    Background="White"
+   CornerRadius="16"
+    Padding="20"
+  HorizontalAlignment="Center"
+ VerticalAlignment="Center">
+        <StackPanel Spacing="10">
+             <TextBlock Text="Edit Customer"
+     FontSize="20"
+      FontWeight="SemiBold"/>
+
+         <TextBlock>
+        <Run Text="Customer ID: "/>
+     <Run Text="{Binding EditVm.Id}"/>
+        <Run Text=" | Orders: "/>
+       <Run Text="{Binding EditCustomerOrderCount}"/>
+         </TextBlock>
+
+            <TextBox Header="Name *"
+   Text="{Binding EditVm.Name, Mode=TwoWay}"/>
+
+       <TextBox Header="Phone *"
+    Text="{Binding EditVm.Phone, Mode=TwoWay}"/>
+
+   <TextBox Header="Email"
+           Text="{Binding EditVm.Email, Mode=TwoWay}"/>
+
+         <TextBox Header="Address"
+         Text="{Binding EditVm.Address, Mode=TwoWay}"/>
+
+        <TextBlock Text="{Binding EditVm.Error}"
+            Foreground="Red"
+              Visibility="{Binding EditVm.HasError, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+   <StackPanel Orientation="Horizontal"
+         HorizontalAlignment="Right"
+ Spacing="8">
+      <Button Content="Cancel"
+       Command="{Binding EditVm.CancelCommand}"/>
+   <Button Content="Save"
+         Command="{Binding EditVm.ConfirmCommand}"/>
+</StackPanel>
+        </StackPanel>
+       </Border>
+  </Grid>
+
+ <!-- ================== OVERLAY DELETE CONFIRM ================== -->
+        <Grid Background="#99000000"
+      Visibility="{Binding IsDeleteConfirmOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+  <Border Width="420"
+  Background="White"
+             CornerRadius="16"
+        Padding="20"
+     HorizontalAlignment="Center"
+ VerticalAlignment="Center">
+     <StackPanel Spacing="12">
+   <StackPanel Orientation="Horizontal" Spacing="8">
+     <FontIcon Glyph="&#xE7BA;" FontSize="24" Foreground="#FFF44336"/>
+                <TextBlock Text="Confirm Delete"
+       FontSize="20"
+        FontWeight="SemiBold"
+             Foreground="#FFF44336"/>
+            </StackPanel>
+
+         <TextBlock Text="{Binding DeleteConfirmMessage}"
+TextWrapping="Wrap"
+            FontSize="14"/>
+
+          <StackPanel Orientation="Horizontal"
+   HorizontalAlignment="Right"
+   Spacing="8">
+         <Button Content="Cancel"
+        Command="{Binding CancelDeleteConfirmCommand}"/>
+    <Button Content="Delete"
+Command="{Binding ConfirmDeleteCustomerCommand}">
+             <Button.Background>
+         <SolidColorBrush Color="#FFF44336"/>
+          </Button.Background>
+ <Button.Foreground>
+ <SolidColorBrush Color="White"/>
+        </Button.Foreground>
+    </Button>
+           </StackPanel>
+    </StackPanel>
+            </Border>
+        </Grid>
+
+   <!-- ================== OVERLAY BULK DELETE CONFIRM ================== -->
+        <Grid Background="#99000000"
+       Visibility="{Binding IsBulkDeleteConfirmOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+     <Border Width="480"
+  Background="White"
+      CornerRadius="16"
+     Padding="20"
+    HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+    <StackPanel Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+  <FontIcon Glyph="&#xE7BA;" FontSize="24" Foreground="#FFF44336"/>
+         <TextBlock Text="Confirm Bulk Delete"
+FontSize="20"
+ FontWeight="SemiBold"
+      Foreground="#FFF44336"/>
+   </StackPanel>
+
+      <TextBlock Text="{Binding BulkDeleteConfirmMessage}"
+    TextWrapping="Wrap"
+         FontSize="14"/>
+
+<StackPanel Orientation="Horizontal"
+     HorizontalAlignment="Right"
+         Spacing="8">
+      <Button Content="Cancel"
+      Command="{Binding CancelBulkDeleteConfirmCommand}"/>
+        <Button Content="Delete All"
+       Command="{Binding ConfirmBulkDeleteCommand}">
+      <Button.Background>
+   <SolidColorBrush Color="#FFF44336"/>
+  </Button.Background>
+ <Button.Foreground>
+    <SolidColorBrush Color="White"/>
+  </Button.Foreground>
+     </Button>
+       </StackPanel>
+        </StackPanel>
+            </Border>
+     </Grid>
+
+    </Grid>
+</Page>

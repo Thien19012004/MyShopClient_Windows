@@ -1,0 +1,515 @@
+<Page
+    x:Class="MyShopClient.Views.PromotionPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="using:MyShopClient.ViewModels"
+    xmlns:models="using:MyShopClient.Models"
+    xmlns:helpers="using:MyShopClient.Helpers"
+    xmlns:controls="using:MyShopClient.Controls"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=viewmodels:PromotionListViewModel}">
+
+    <!-- Main Grid -->
+    <Grid Background="#FFF5F5F7">
+
+        <!-- ================== MAIN CONTENT ================== -->
+        <Grid Padding="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Title -->
+            <TextBlock Text="Promotions"
+     FontSize="24"
+           FontWeight="SemiBold"
+           Grid.Row="0"/>
+
+            <!-- Summary cards + filters -->
+            <StackPanel Grid.Row="1" Margin="0,16,0,16" Spacing="12">
+
+                <!-- Summary -->
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Border Background="White" CornerRadius="12" Padding="16" Width="200">
+                        <StackPanel>
+                            <TextBlock Text="Total (page)" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding TotalPromotionsOnPage}" FontSize="24" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="White" CornerRadius="12" Padding="16" Width="200">
+                        <StackPanel>
+                            <TextBlock Text="Active (page)" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding TotalActiveOnPage}" FontSize="24" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Selected Count (visible only when any promotion is selected) -->
+                    <Border Background="#FF5D5FEF" CornerRadius="12" Padding="16" Width="200"
+         Visibility="{Binding HasSelectedPromotions, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock Text="Selected" FontWeight="SemiBold" Foreground="White"/>
+                            <TextBlock Text="{Binding SelectedPromotionsCount}" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Filters -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Search -->
+                    <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="0" Margin="0,0,16,0">
+                        <TextBlock Text="Search:" VerticalAlignment="Center" Width="60"/>
+                        <TextBox Width="200"
+                     PlaceholderText="Promotion name..."
+          VerticalAlignment="Center"
+        Text="{Binding SearchText, Mode=TwoWay}"/>
+                    </StackPanel>
+
+                    <!-- Only Active -->
+                    <CheckBox Grid.Column="1"
+           Content="Only Active"
+      Margin="0,0,16,0"
+     VerticalAlignment="Center"
+        IsChecked="{Binding OnlyActive, Mode=TwoWay}"/>
+
+                    <!-- Scope filter -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" Margin="0,0,16,0" VerticalAlignment="Center">
+                        <TextBlock Text="Scope:" VerticalAlignment="Center" />
+                        <ComboBox Width="140"
+                        ItemsSource="{Binding ScopeFilterOptions}"
+                        SelectedItem="{Binding SelectedScopeDisplay, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- Spacer -->
+                    <Border Grid.Column="3"/>
+
+                    <!-- Apply Button -->
+                    <Button Grid.Column="4"
+     Content="Apply"
+      Margin="0,0,8,0"
+  VerticalAlignment="Center"
+      Command="{Binding ApplyFilterCommand}"/>
+
+                    <!-- Add Promotion Button + Bulk Delete + Selected count -->
+                    <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="AddPromotionButton"
+             Content="+ Add Promotion"
+       VerticalAlignment="Center"
+        Command="{Binding AddVm.OpenCommand}">
+                            <Button.Background>
+                                <SolidColorBrush Color="#FF5D5FEF"/>
+                            </Button.Background>
+                            <Button.Foreground>
+                                <SolidColorBrush Color="White"/>
+                            </Button.Foreground>
+                        </Button>
+                        <Button Content="🗑 Delete"
+     VerticalAlignment="Center"
+     Margin="8,0,0,0"
+  Command="{Binding OpenBulkDeleteConfirmCommand}"
+     IsEnabled="{Binding HasSelectedPromotions}">
+                            <Button.Background>
+                                <SolidColorBrush Color="#FFF44336"/>
+                            </Button.Background>
+                            <Button.Foreground>
+                                <SolidColorBrush Color="White"/>
+                            </Button.Foreground>
+                        </Button>
+                        <TextBlock VerticalAlignment="Center" Margin="12,0,0,0" Text="Selected:"/>
+                        <TextBlock VerticalAlignment="Center" Margin="4,0,0,0" Text="{Binding SelectedPromotionsCount}" FontWeight="Bold"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <!-- List + error -->
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Error -->
+                <TextBlock Grid.Row="0"
+   Margin="0,0,0,4"
+    Text="{Binding ErrorMessage}"
+             Foreground="Red"
+            Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                <!-- Header + List -->
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header row -->
+                    <Grid Grid.Row="0"
+        Background="#FFEDEEF2"
+       Padding="16,10"
+    CornerRadius="8,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="140"/>
+                            <!-- Scope fixed to avoid squeeze -->
+                            <ColumnDefinition Width="120"/>
+                            <!-- Discount % fixed -->
+                            <ColumnDefinition Width="200"/>
+                            <!-- Start Date -->
+                            <ColumnDefinition Width="200"/>
+                            <!-- End Date -->
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <controls:BlueCheckBox x:Name="SelectAllPromotionCheckBox" Click="SelectAllPromotionCheckBox_Click"/>
+                        <TextBlock Grid.Column="1" Text="ID" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Column="2" Text="Name" FontWeight="SemiBold" Margin="6,0,0,0" HorizontalAlignment="Left"/>
+                        <StackPanel Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="Scope" FontWeight="SemiBold" TextAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="Discount %" FontWeight="SemiBold" TextAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="5" Text="Start Date" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="12,0,0,0"/>
+                        <TextBlock Grid.Column="6" Text="End Date" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="12,0,0,0"/>
+                        <TextBlock Grid.Column="7" Text="Action" FontWeight="SemiBold"/>
+                    </Grid>
+
+                    <!-- List -->
+                    <ListView Grid.Row="1"
+      x:Name="PromotionListView"
+       ItemsSource="{Binding Promotions}"
+         Margin="0,-2,0,0"
+        Background="Transparent"
+           BorderThickness="0">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Background" Value="White"/>
+                                <Setter Property="Margin" Value="0,1,0,0"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:PromotionItemDto">
+                                <Grid Padding="16,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="40"/>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="120"/>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <controls:BlueCheckBox IsChecked="{x:Bind IsSelected, Mode=TwoWay}"/>
+
+                                    <!-- ID -->
+                                    <TextBlock Grid.Column="1" Text="{x:Bind PromotionId}"/>
+
+                                    <!-- Name -->
+                                    <TextBlock Grid.Column="2" Text="{x:Bind Name}" Margin="6,0,0,0" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+
+                                    <!-- Scope -->
+                                    <StackPanel Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Text="{x:Bind Scope}" TextAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <!-- Discount % -->
+                                    <StackPanel Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock TextAlignment="Center">
+          <Run Text="{x:Bind DiscountPercent}"/>
+     <Run Text=" %"/>
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <!-- Start Date -->
+                                    <TextBlock Grid.Column="5" Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(StartDate)}" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left"/>
+
+                                    <!-- End Date -->
+                                    <TextBlock Grid.Column="6" Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(EndDate)}" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left"/>
+
+                                    <!-- Actions -->
+                                    <StackPanel Grid.Column="7"
+               Orientation="Horizontal"
+      HorizontalAlignment="Right"
+        Spacing="8">
+                                        <Button Content="✏"
+            Width="28" Height="28" Padding="0"
+           Command="{Binding DataContext.EditVm.OpenCommand, ElementName=PromotionListView}"
+         CommandParameter="{Binding}"/>
+                                        <Button Content="🗑"
+    Width="28" Height="28" Padding="0"
+    Command="{Binding DataContext.OpenDeleteConfirmCommand, ElementName=PromotionListView}"
+          CommandParameter="{Binding}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+
+                <!-- Pagination -->
+                <Grid Grid.Row="2" Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock VerticalAlignment="Center">
+        <Run Text="Total: "/>
+       <Run Text="{Binding TotalItems}"/>
+             <Run Text=" promotions"/>
+                    </TextBlock>
+
+                    <StackPanel Grid.Column="1"
+     Orientation="Horizontal"
+         Spacing="6"
+          VerticalAlignment="Center">
+                        <Button Content="Previous"
+           Command="{Binding PreviousPageCommand}"/>
+                        <TextBlock Text="{Binding CurrentPage}" Margin="4,0"/>
+                        <TextBlock Text="/"/>
+                        <TextBlock Text="{Binding TotalPages}" Margin="0,0,4,0"/>
+                        <Button Content="Next"
+ Command="{Binding NextPageCommand}"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- ================== OVERLAY ADD PROMOTION ================== -->
+        <Grid Background="#99000000"
+              Visibility="{Binding AddVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="560"
+          Background="White"
+          CornerRadius="16"
+      Padding="20"
+    HorizontalAlignment="Center"
+         VerticalAlignment="Center">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="600">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Add New Promotion"
+       FontSize="20"
+            FontWeight="SemiBold"/>
+
+                        <ComboBox Header="Scope *"
+                ItemsSource="{Binding ScopeOptions}"
+                SelectedItem="{Binding AddVm.NewScope, Mode=TwoWay}" />
+
+                        <TextBox Header="Name *"
+             Text="{Binding AddVm.NewName, Mode=TwoWay}"/>
+
+                        <TextBox Header="Discount Percent (0-100) *"
+             Text="{Binding AddVm.NewDiscountPercentText, Mode=TwoWay}"/>
+
+                        <CalendarDatePicker Header="Start Date *"
+                    Date="{Binding AddVm.NewStartDate, Mode=TwoWay}"
+   HorizontalAlignment="Stretch"/>
+
+                        <CalendarDatePicker Header="End Date *"
+     Date="{Binding AddVm.NewEndDate, Mode=TwoWay}"
+       HorizontalAlignment="Stretch"/>
+
+                        <TextBox Header="Product IDs (comma separated)"
+   PlaceholderText="e.g.,1,2,3"
+          Text="{Binding AddVm.NewProductIdsText, Mode=TwoWay}" />
+                        <TextBox Header="Category IDs (comma separated)"
+ PlaceholderText="e.g.,1,2"
+ Text="{Binding AddVm.NewCategoryIdsText, Mode=TwoWay}" />
+
+                        <TextBlock Text="{Binding AddVm.Error}"
+            Foreground="Red"
+        TextWrapping="Wrap"
+   Visibility="{Binding AddVm.HasError, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                        <StackPanel Orientation="Horizontal"
+             HorizontalAlignment="Right"
+  Spacing="8">
+                            <Button Content="Cancel"
+ Command="{Binding AddVm.CancelCommand}"/>
+                            <Button Content="Create"
+   Command="{Binding AddVm.ConfirmCommand}">
+                                <Button.Background>
+                                    <SolidColorBrush Color="#FF5D5FEF"/>
+                                </Button.Background>
+                                <Button.Foreground>
+                                    <SolidColorBrush Color="White"/>
+                                </Button.Foreground>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- ================== OVERLAY EDIT PROMOTION ================== -->
+        <Grid Background="#99000000"
+            Visibility="{Binding EditVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="560"
+        Background="White"
+     CornerRadius="16"
+      Padding="20"
+HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="600">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Edit Promotion"
+          FontSize="20"
+  FontWeight="SemiBold"/>
+
+                        <TextBlock Text="{Binding EditVm.Error}" Foreground="Red" TextWrapping="Wrap"
+           Visibility="{Binding EditVm.HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                        <ComboBox Header="Scope *"
+                ItemsSource="{Binding ScopeOptions}"
+                SelectedItem="{Binding EditVm.EditScope, Mode=TwoWay}"
+                IsEnabled="{Binding EditVm.EditIsActive, Converter={StaticResource InverseBooleanConverter}}" />
+
+                        <TextBox Header="Promotion ID"
+              IsReadOnly="True"
+    Text="{Binding EditVm.EditPromotionId}"/>
+
+                        <TextBox Header="Name"
+        Text="{Binding EditVm.EditName, Mode=TwoWay}"
+        IsEnabled="{Binding EditVm.EditIsActive, Converter={StaticResource InverseBooleanConverter}}"/>
+
+                        <TextBox Header="Discount Percent (0-100)"
+          Text="{Binding EditVm.EditDiscountPercentText, Mode=TwoWay}"
+          IsEnabled="{Binding EditVm.EditIsActive, Converter={StaticResource InverseBooleanConverter}}"/>
+
+                        <CalendarDatePicker Header="Start Date"
+            Date="{Binding EditVm.EditStartDate, Mode=TwoWay}"
+        HorizontalAlignment="Stretch"
+        IsEnabled="{Binding EditVm.EditIsActive, Converter={StaticResource InverseBooleanConverter}}"/>
+
+                        <CalendarDatePicker Header="End Date"
+     Date="{Binding EditVm.EditEndDate, Mode=TwoWay}"
+ HorizontalAlignment="Stretch"
+ IsEnabled="{Binding EditVm.EditIsActive, Converter={StaticResource InverseBooleanConverter}}"/>
+
+                        <TextBox Header="Product IDs (comma separated)"
+        PlaceholderText="e.g.,1,2,3"
+            Text="{Binding EditVm.EditProductIdsText, Mode=TwoWay}"
+            IsEnabled="{Binding EditVm.EditIsActive, Converter={StaticResource InverseBooleanConverter}}"/>
+
+                        <TextBox Header="Category IDs (comma separated)"
+        PlaceholderText="e.g.,1,2"
+            Text="{Binding EditVm.EditCategoryIdsText, Mode=TwoWay}"
+            IsEnabled="{Binding EditVm.EditIsActive, Converter={StaticResource InverseBooleanConverter}}"/>
+
+                        <StackPanel Orientation="Horizontal"
+   HorizontalAlignment="Right"
+         Spacing="8">
+                            <Button Content="Cancel"
+  Command="{Binding EditVm.CancelCommand}"/>
+                            <Button Content="Save"
+        Command="{Binding EditVm.ConfirmCommand}">
+                                <Button.Background>
+                                    <SolidColorBrush Color="#FF5D5FEF"/>
+                                </Button.Background>
+                                <Button.Foreground>
+                                    <SolidColorBrush Color="White"/>
+                                </Button.Foreground>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- ================== OVERLAY DELETE CONFIRM ================== -->
+        <Grid Background="#99000000"
+            Visibility="{Binding IsDeleteConfirmOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="420"
+        Background="White"
+     CornerRadius="16"
+      Padding="20"
+HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="⚠️ Confirm Delete"
+       FontSize="20"
+            FontWeight="SemiBold"
+            Foreground="#FFF44336"/>
+
+                    <TextBlock Text="{Binding DeleteConfirmMessage}"
+             TextWrapping="Wrap"
+            FontSize="14"/>
+
+                    <StackPanel Orientation="Horizontal"
+                 HorizontalAlignment="Right"
+         Spacing="8">
+                        <Button Content="Cancel"
+           Command="{Binding CancelDeleteConfirmCommand}"/>
+                        <Button Content="Delete"
+        Command="{Binding ConfirmDeletePromotionCommand}">
+                            <Button.Background>
+                                <SolidColorBrush Color="#FFF44336"/>
+                            </Button.Background>
+                            <Button.Foreground>
+                                <SolidColorBrush Color="White"/>
+                            </Button.Foreground>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ================== OVERLAY BULK DELETE CONFIRM ================== -->
+        <Grid Background="#99000000"
+ Visibility="{Binding IsBulkDeleteConfirmOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="480"
+ Background="White"
+ CornerRadius="16"
+ Padding="20"
+ HorizontalAlignment="Center"
+ VerticalAlignment="Center">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="⚠️ Confirm Bulk Delete"
+ FontSize="20"
+ FontWeight="SemiBold"
+ Foreground="#FFF44336"/>
+
+                    <TextBlock Text="{Binding BulkDeleteConfirmMessage}"
+ TextWrapping="Wrap"
+ FontSize="14"/>
+
+                    <StackPanel Orientation="Horizontal"
+ HorizontalAlignment="Right"
+ Spacing="8">
+                        <Button Content="Cancel"
+ Command="{Binding CancelBulkDeleteConfirmCommand}"/>
+                        <Button Content="Delete All"
+ Command="{Binding ConfirmBulkDeleteCommand}">
+                            <Button.Background>
+                                <SolidColorBrush Color="#FFF44336"/>
+                            </Button.Background>
+                            <Button.Foreground>
+                                <SolidColorBrush Color="White"/>
+                            </Button.Foreground>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+    </Grid>
+</Page>

@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using MyShopClient.Models;
 using MyShopClient.Services;
+using MyShopClient.Services.Navigation;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;

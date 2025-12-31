@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using MyShopClient.Services;
+using MyShopClient.Services.AppSettings;
+using MyShopClient.Services.Auth;
+using MyShopClient.Services.Navigation;
 using MyShopClient.Views;
 
 namespace MyShopClient
@@ -28,18 +30,21 @@ namespace MyShopClient
 
             var auth = App.Services.GetRequiredService<IAuthService>();
             var nav = App.Services.GetRequiredService<INavigationService>();
+            var settings = App.Services.GetRequiredService<IAppSettingsService>();
 
             // thử auto login bằng credentials đã lưu
             var auto = await auth.TryAutoLoginAsync();
 
             if (auto)
             {
-                // ✅ Đăng nhập lại thành công → vào thẳng Dashboard
+                // đảm bảo rằng chúng ta có giá trị last page mặc định
+                settings.LastVisitedPage ??= nameof(DashboardHomePage);
+
+                // vào shell; shell sẽ tự động khôi phục LastVisitedPage
                 nav.NavigateToMainShell();
             }
             else
             {
-                // ❌ Không auto login được → về Login
                 nav.NavigateToLogin();
             }
         }
