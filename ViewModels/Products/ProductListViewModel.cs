@@ -6,6 +6,8 @@ using MyShopClient.Services.AppSettings;
 using MyShopClient.Services.Category;
 using MyShopClient.Services.ImageUpload;
 using MyShopClient.Services.Product;
+using MyShopClient.ViewModels.Products;
+using MyShopClient.ViewModels.Products.Dialogs;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -28,6 +30,9 @@ namespace MyShopClient.ViewModels
         private readonly IServerConfigService _serverConfig;
         private readonly IAppSettingsService _appSettings;
 
+        // Dialogs container
+        public ProductDialogsViewModel Dialogs { get; }
+
         // cờ chỉ dùng nội bộ cho việc load product list
         private bool _isLoadingProducts;
 
@@ -40,10 +45,10 @@ namespace MyShopClient.ViewModels
         public ObservableCollection<CategoryItemDto> CategoryItems { get; } = new();
 
         // danh sách ảnh cho Add Product dialog
-        public ObservableCollection<ProductImageItem> NewProductImages { get; } = new();
+        public ObservableCollection<ProductImageItem> NewProductImages => Dialogs.AddVm.NewProductImages;
 
         // danh sách ảnh cho Edit Product dialog
-        public ObservableCollection<ProductImageItem> EditProductImages { get; } = new();
+        public ObservableCollection<ProductImageItem> EditProductImages => Dialogs.EditVm.EditProductImages;
 
         // ====== bộ lọc / phân trang sản phẩm ======
         [ObservableProperty] private CategoryOption? selectedCategory;
@@ -125,13 +130,20 @@ namespace MyShopClient.ViewModels
             ICategoryService categoryService,
      IImageUploadService imageUploadService,
             IServerConfigService serverConfig,
-            IAppSettingsService appSettings)
+            IAppSettingsService appsettings)
         {
             _productService = productService;
             _categoryService = categoryService;
             _imageUploadService = imageUploadService;
             _serverConfig = serverConfig;
-            _appSettings = appSettings;
+            _appSettings = appsettings;
+
+            // create dialogs and delete viewmodels with reload callback
+            Func<Task> reloadCallback = async () => await ReloadCurrentPageAsync();
+            var addVm = new ProductAddViewModel(_productService, _imageUploadService, reloadCallback);
+            var editVm = new ProductEditViewModel(_productService, _imageUploadService, reloadCallback);
+            var deleteVm = new ProductDeleteViewModel(_productService, reloadCallback);
+            Dialogs = new ProductDialogsViewModel(addVm, editVm, deleteVm);
 
             // apply persisted page size
             PageSize = _appSettings.ProductsPageSize;
@@ -795,115 +807,20 @@ namespace MyShopClient.ViewModels
 
             NewProductCategory = Categories.FirstOrDefault(c => c.Id != null);
 
-            IsAddDialogOpen = true;
+            // open dialogs.AddVm
+            Dialogs.AddVm.DoOpen(NewProductImages, NewProductCategory);
         }
 
         [RelayCommand]
         private void CancelAddDialog()
         {
-            IsAddDialogOpen = false;
-            NewProductImages.Clear();
+            Dialogs.AddVm.DoCancel();
         }
 
         [RelayCommand]
         private async Task ConfirmAddProductAsync()
         {
-            if (IsBusy) return;
-
-            AddDialogError = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(NewProductSku) ||
-          string.IsNullOrWhiteSpace(NewProductName))
-            {
-                AddDialogError = "SKU và Name là bắt buộc.";
-                return;
-            }
-
-            if (!int.TryParse(NewProductImportPriceText, out var importPrice) || importPrice < 0)
-            {
-                AddDialogError = "Import price phải là số nguyên không âm.";
-                return;
-            }
-
-            if (!int.TryParse(NewProductSalePriceText, out var salePrice) || salePrice < 0)
-            {
-                AddDialogError = "Sale price phải là số nguyên không âm.";
-                return;
-            }
-
-            if (!int.TryParse(NewProductStockQuantityText, out var stock) || stock < 0)
-            {
-                AddDialogError = "Stock quantity phải là số nguyên không âm.";
-                return;
-            }
-
-            if (NewProductCategory == null || NewProductCategory.Id == null)
-            {
-                AddDialogError = "Vui lòng chọn Category.";
-                return;
-            }
-
-            IsBusy = true;
-            bool created = false;
-
-            try
-            {
-                System.Diagnostics.Debug.WriteLine($"[ConfirmAdd] NewProductImages count: {NewProductImages.Count}");
-
-                var imagePaths = NewProductImages
-                    .Where(img => !string.IsNullOrWhiteSpace(img.Url) && img.Url != "Uploading...")
-                      .Select(img => img.Url)
-             .ToList();
-
-                System.Diagnostics.Debug.WriteLine($"[ConfirmAdd] Filtered imagePaths count: {imagePaths.Count}");
-                foreach (var path in imagePaths)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[ConfirmAdd] ImagePath: {path}");
-                }
-
-                var input = new ProductCreateInput
-                {
-                    Sku = NewProductSku!,
-                    Name = NewProductName!,
-                    ImportPrice = importPrice,
-                    SalePrice = salePrice,
-                    StockQuantity = stock,
-                    Description = NewProductDescription ?? string.Empty,
-                    CategoryId = NewProductCategory.Id.Value,
-                    ImagePaths = imagePaths
-                };
-
-                System.Diagnostics.Debug.WriteLine($"[ConfirmAdd] Calling CreateProductAsync with {input.ImagePaths?.Count ??0} images");
-
-                var result = await _productService.CreateProductAsync(input);
-
-                System.Diagnostics.Debug.WriteLine($"[ConfirmAdd] Result - Success: {result.Success}, Message: {result.Message}");
-
-                if (!result.Success)
-                {
-                    AddDialogError = result.Message ?? "Create product failed.";
-                    return;
-                }
-
-                created = true;
-            }
-            catch (Exception ex)
-            {
-                AddDialogError = ex.Message;
-                System.Diagnostics.Debug.WriteLine($"[ConfirmAdd] Exception: {ex.Message}");
-            }
-            finally
-            {
-                IsBusy = false;
-                OnPropertyChanged(nameof(HasAddDialogError));
-            }
-
-            if (created)
-            {
-                IsAddDialogOpen = false;
-                NewProductImages.Clear();
-                await ReloadCurrentPageAsync();
-            }
+            await Dialogs.AddVm.DoConfirmAsync();
         }
         // ================= EDIT PRODUCT DIALOG =================
 
@@ -918,55 +835,7 @@ namespace MyShopClient.ViewModels
 
             try
             {
-                // Load chi tiết product để lấy imagePaths
-                System.Diagnostics.Debug.WriteLine($"[EditProduct] Loading detail for product {product.ProductId}");
-
-                var detailResult = await _productService.GetProductByIdAsync(product.ProductId);
-
-                if (!detailResult.Success || detailResult.Data == null)
-                {
-                    EditDialogError = detailResult.Message ?? "Cannot load product detail.";
-                    return;
-                }
-
-                var detail = detailResult.Data;
-
-                System.Diagnostics.Debug.WriteLine($"[EditProduct] Product has {detail.ImagePaths?.Count ?? 0} images");
-
-                EditingProductId = detail.ProductId;
-                EditProductSku = detail.Sku;
-                EditProductName = detail.Name;
-                EditImportPriceText = detail.ImportPrice.ToString();
-                EditSalePriceText = detail.SalePrice.ToString();
-                EditStockQuantityText = detail.StockQuantity.ToString();
-                EditDescription = detail.Description;
-                EditImagePath = string.Empty;
-
-                EditCategory = Categories.FirstOrDefault(c => c.Id == detail.CategoryId)
-                       ?? Categories.FirstOrDefault(c => c.Id != null)
-                ?? Categories.FirstOrDefault();
-
-                // Load existing images - convert relative URLs to absolute
-                EditProductImages.Clear();
-
-                var baseUrl = _serverConfig.Current.BaseUrl;
-
-                if (detail.ImagePaths != null)
-                {
-                    foreach (var imagePath in detail.ImagePaths)
-                    {
-                        var absoluteUrl = Helpers.UrlHelper.ToAbsoluteUrl(imagePath, baseUrl);
-                        System.Diagnostics.Debug.WriteLine($"[EditProduct] Adding image: {imagePath} -> {absoluteUrl}");
-                        EditProductImages.Add(new ProductImageItem
-                        {
-                            Url = absoluteUrl,
-                            PublicId = string.Empty // Không có publicId cho ảnh đã có sẵn
-                        });
-                    }
-                }
-
-                System.Diagnostics.Debug.WriteLine($"[EditProduct] EditProductImages count: {EditProductImages.Count}");
-
+                await Dialogs.EditVm.DoOpenAsync(product, EditCategory, _serverConfig.Current.BaseUrl);
                 IsEditDialogOpen = true;
             }
             catch (Exception ex)
@@ -983,93 +852,13 @@ namespace MyShopClient.ViewModels
         [RelayCommand]
         private void CancelEditDialog()
         {
-            IsEditDialogOpen = false;
-            EditProductImages.Clear();
+            Dialogs.EditVm.DoCancel();
         }
 
         [RelayCommand]
         private async Task ConfirmEditProductAsync()
         {
-            if (IsBusy) return;
-
-            EditDialogError = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(EditProductName))
-            {
-                EditDialogError = "Name is required.";
-                return;
-            }
-
-            if (!int.TryParse(EditImportPriceText, out var importPrice) || importPrice < 0)
-            {
-                EditDialogError = "Import price must be a non-negative integer.";
-                return;
-            }
-
-            if (!int.TryParse(EditSalePriceText, out var salePrice) || salePrice < 0)
-            {
-                EditDialogError = "Sale price must be a non-negative integer.";
-                return;
-            }
-
-            if (!int.TryParse(EditStockQuantityText, out var stock) || stock < 0)
-            {
-                EditDialogError = "Stock quantity must be a non-negative integer.";
-                return;
-            }
-
-            if (EditCategory == null || EditCategory.Id == null)
-            {
-                EditDialogError = "Please select category.";
-                return;
-            }
-
-            IsBusy = true;
-            bool updated = false;
-
-            try
-            {
-                var imagePaths = EditProductImages
-                  .Where(img => !string.IsNullOrWhiteSpace(img.Url) && img.Url != "Uploading...")
-                      .Select(img => img.Url)
-                .ToList();
-
-                var input = new ProductUpdateInput
-                {
-                    Name = EditProductName!,
-                    ImportPrice = importPrice,
-                    SalePrice = salePrice,
-                    StockQuantity = stock,
-                    Description = EditDescription,
-                    CategoryId = EditCategory.Id.Value,
-                    ImagePaths = imagePaths.Any() ? imagePaths : null
-                };
-
-                var result = await _productService.UpdateProductAsync(EditingProductId, input);
-                if (!result.Success)
-                {
-                    EditDialogError = result.Message ?? "Update product failed.";
-                    return;
-                }
-
-                updated = true;
-            }
-            catch (Exception ex)
-            {
-                EditDialogError = ex.Message;
-            }
-            finally
-            {
-                IsBusy = false;
-                OnPropertyChanged(nameof(HasEditDialogError));
-            }
-
-            if (updated)
-            {
-                IsEditDialogOpen = false;
-                EditProductImages.Clear();
-                await ReloadCurrentPageAsync();
-            }
+            await Dialogs.EditVm.DoConfirmAsync(EditCategory);
         }
 
         // ================= MANAGE CATEGORY DIALOG =================

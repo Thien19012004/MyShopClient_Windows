@@ -377,7 +377,7 @@ Opacity="0.6" />
         </Grid>
 
         <!-- ================= OVERLAY ADD PRODUCT ================= -->
-      <Grid x:Name="AddProductOverlay" Visibility="{Binding IsAddDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+      <Grid x:Name="AddProductOverlay" Visibility="{Binding Dialogs.AddVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
        <Grid.Background>
   <SolidColorBrush Color="Black" Opacity="0.6"/>
        </Grid.Background>
@@ -396,27 +396,27 @@ CornerRadius="16"
    Margin="0,0,0,8"/>
 
     <TextBox Header="SKU"
-   Text="{Binding NewProductSku, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+   Text="{Binding Dialogs.AddVm.Sku, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
       <TextBox Header="Name"
-                   Text="{Binding NewProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                   Text="{Binding Dialogs.AddVm.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
     <StackPanel Orientation="Horizontal" Spacing="8">
            <TextBox Width="250"
    Header="Import Price"
-             Text="{Binding NewProductImportPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+             Text="{Binding Dialogs.AddVm.ImportPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
     <TextBox Width="250"
        Header="Sale Price"
-           Text="{Binding NewProductSalePriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+           Text="{Binding Dialogs.AddVm.SalePriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
 
   <TextBox Header="Stock Quantity"
-         Text="{Binding NewProductStockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+         Text="{Binding Dialogs.AddVm.StockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
        <ComboBox Header="Category"
      ItemsSource="{Binding Categories}"
-        SelectedItem="{Binding NewProductCategory, Mode=TwoWay}">
+        SelectedItem="{Binding Dialogs.AddVm.Category, Mode=TwoWay}">
            <ComboBox.ItemTemplate>
     <DataTemplate>
  <TextBlock Text="{Binding Name}"/>
@@ -425,7 +425,7 @@ CornerRadius="16"
       </ComboBox>
 
           <TextBox Header="Description"
- Text="{Binding NewProductDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+ Text="{Binding Dialogs.AddVm.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
           TextWrapping="Wrap"
         AcceptsReturn="True"
        Height="80"/>
@@ -438,7 +438,7 @@ CornerRadius="16"
    <StackPanel Orientation="Horizontal" Spacing="8">
          <TextBox Width="300"
              PlaceholderText="Image URL"
-   Text="{Binding NewProductImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+   Text="{Binding Dialogs.AddVm.ImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
          <Button Content="Add URL"
   Command="{Binding AddImageUrlToNewProductCommand}" />
@@ -515,10 +515,10 @@ CornerRadius="16"
     </ItemsControl>
    </StackPanel>
 
-   <TextBlock Text="{Binding AddDialogError}"
+   <TextBlock Text="{Binding Dialogs.AddVm.Error}"
      Foreground="Red"
               TextWrapping="Wrap"
-               Visibility="{Binding HasAddDialogError,
+               Visibility="{Binding Dialogs.AddVm.HasError,
         Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
          <StackPanel Orientation="Horizontal"
@@ -537,7 +537,7 @@ CornerRadius="16"
         </Grid>
 
 <!-- ================= OVERLAY EDIT PRODUCT ================= -->
-        <Grid x:Name="EditProductOverlay" Visibility="{Binding IsEditDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Grid x:Name="EditProductOverlay" Visibility="{Binding Dialogs.EditVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
     <Grid.Background>
      <SolidColorBrush Color="Black" Opacity="0.6"/>
             </Grid.Background>
@@ -557,27 +557,27 @@ CornerRadius="16"
 
  <!-- SKU: cho xem nhưng không sửa -->
          <TextBox Header="SKU"
-    Text="{Binding EditProductSku}"
+    Text="{Binding Dialogs.EditVm.Sku}"
            IsReadOnly="True" />
 
             <TextBox Header="Name"
-Text="{Binding EditProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+Text="{Binding Dialogs.EditVm.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
       <StackPanel Orientation="Horizontal" Spacing="8">
            <TextBox Width="250"
      Header="Import Price"
-           Text="{Binding EditImportPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+           Text="{Binding Dialogs.EditVm.ImportPriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
            <TextBox Width="250"
              Header="Sale Price"
-            Text="{Binding EditSalePriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            Text="{Binding Dialogs.EditVm.SalePriceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
   </StackPanel>
 
            <TextBox Header="Stock Quantity"
-             Text="{Binding EditStockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+             Text="{Binding Dialogs.EditVm.StockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
           <ComboBox Header="Category"
           ItemsSource="{Binding Categories}"
-       SelectedItem="{Binding EditCategory, Mode=TwoWay}">
+       SelectedItem="{Binding Dialogs.EditVm.Category, Mode=TwoWay}">
     <ComboBox.ItemTemplate>
  <DataTemplate>
     <TextBlock Text="{Binding Name}"/>
@@ -586,7 +586,7 @@ Text="{Binding EditProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged
    </ComboBox>
 
    <TextBox Header="Description"
-   Text="{Binding EditDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+   Text="{Binding Dialogs.EditVm.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
          TextWrapping="Wrap"
           AcceptsReturn="True"
    Height="80"/>
@@ -599,7 +599,7 @@ Text="{Binding EditProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged
    <StackPanel Orientation="Horizontal" Spacing="8">
       <TextBox Width="350"
               PlaceholderText="Image URL"
-           Text="{Binding EditImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+           Text="{Binding Dialogs.EditVm.ImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
           
         <Button Content="Add URL"
       Command="{Binding AddImageUrlToEditProductCommand}" />
@@ -669,10 +669,10 @@ FontSize="11"
           </ItemsControl>
                 </StackPanel>
 
-    <TextBlock Text="{Binding EditDialogError}"
+    <TextBlock Text="{Binding Dialogs.EditVm.Error}"
        Foreground="Red"
            TextWrapping="Wrap"
-           Visibility="{Binding HasEditDialogError,
+           Visibility="{Binding Dialogs.EditVm.HasError,
       Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
                  <StackPanel Orientation="Horizontal"
