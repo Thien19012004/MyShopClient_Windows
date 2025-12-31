@@ -49,6 +49,7 @@ namespace MyShopClient.ViewModels
             CustomersPageSize = 10;
             PromotionsPageSize = 10;
             ReportsPageSize = 10;
+
         }
     }
 }
