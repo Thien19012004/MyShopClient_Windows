@@ -280,8 +280,8 @@ private void BuildProductChart(System.Collections.Generic.List<ProductSalesSerie
  if (seriesData == null || seriesData.Count ==0)
          {
        ProductSeries = Array.Empty<ISeries>();
-    ProductXAxes = Array.Empty<Axis>();
-     ProductYAxes = new[] { new Axis { Name = "Quantity" } };
+                ProductXAxes = new[] { new Axis { Labels = Array.Empty<string>() } };
+                ProductYAxes = new[] { new Axis { Name = "Quantity" } };
 Debug.WriteLine("[ReportViewModel] No product series, cleared chart.");
          return;
             }
@@ -364,12 +364,12 @@ GeometryStroke = new SolidColorPaint(colors[index % colors.Length]) { StrokeThic
 
      if (points == null || points.Count ==0)
             {
-      RevenueSeries = Array.Empty<ISeries>();
-  RevenueXAxes = Array.Empty<Axis>();
-            RevenueYAxes = new[] { new Axis { Name = "Amount" } };
-           RevenuePieSeries = Array.Empty<ISeries>();
-     Debug.WriteLine("[ReportViewModel] No revenue points, cleared chart.");
-        return;
+                RevenueSeries = Array.Empty<ISeries>();
+                RevenueXAxes = new[] { new Axis { Labels = Array.Empty<string>() } };
+                RevenueYAxes = new[] { new Axis { Name = "Amount" } };
+                RevenuePieSeries = Array.Empty<ISeries>();
+                Debug.WriteLine("[ReportViewModel] No revenue points, cleared chart.");
+                return;
 }
 
             // parse and order by date

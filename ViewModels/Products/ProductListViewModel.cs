@@ -12,6 +12,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MyShopClient.ViewModels
@@ -22,13 +23,17 @@ namespace MyShopClient.ViewModels
         public string Name { get; set; } = string.Empty;
     }
 
-    public partial class ProductListViewModel : ObservableObject
+    // Use common paging + selection base classes
+    public partial class ProductListViewModel : SelectableListViewModel<ProductItemDto>
     {
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
         private readonly IImageUploadService _imageUploadService;
         private readonly IServerConfigService _serverConfig;
         private readonly IAppSettingsService _appSettings;
+
+        private int _searchVersion;
+        private CancellationTokenSource? _loadCts;
 
         // Dialogs container
         public ProductDialogsViewModel Dialogs { get; }
@@ -39,9 +44,9 @@ namespace MyShopClient.ViewModels
         public ObservableCollection<ProductItemDto> Products { get; } = new();
         public ObservableCollection<CategoryOption> Categories { get; } = new();
         public ObservableCollection<string> SortOptions { get; } =
-       new(new[] { "Name (A-Z)", "Name (Z-A)", "Price (Low → High)", "Price (High → Low)" });
+            new(new[] { "Name (A-Z)", "Name (Z-A)", "Price (Low → High)", "Price (High → Low)" });
 
-        // list category cho dialog Manage Category
+        // list category cho dialog Manage Categor
         public ObservableCollection<CategoryItemDto> CategoryItems { get; } = new();
 
         // danh sách ảnh cho Add Product dialog
@@ -57,18 +62,34 @@ namespace MyShopClient.ViewModels
         [ObservableProperty] private string? maxPriceText;
         [ObservableProperty] private string selectedSortOption = "Name (A-Z)";
 
-        [ObservableProperty] private int currentPage = 1;
-        [ObservableProperty] private int pageSize = 10;
-        [ObservableProperty] private int totalPages = 1;
-        [ObservableProperty] private int totalItems = 0;
+        // search-as-you-type debounce handler (awaited + single-flight on UI context)
+        partial void OnSearchTextChanged(string? value)
+        {
+            _ = DebounceSearchAsync();
+        }
 
-        [ObservableProperty] private bool isBusy; // cho Add/Delete/Update/Category
-        [ObservableProperty] private string? errorMessage;
-        public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
+        private async Task DebounceSearchAsync()
+        {
+            var version = Interlocked.Increment(ref _searchVersion);
+
+            try
+            {
+                await Task.Delay(300);
+
+                // if a newer change happened, skip this run
+                if (version != _searchVersion) return;
+
+                await LoadPageAsync(1);
+            }
+            catch (Exception ex)
+            {
+                // surface unexpected errors instead of crashing
+                ErrorMessage = ex.Message;
+                OnPropertyChanged(nameof(HasError));
+            }
+        }
 
         // ====== Add Product dialog ======
-        [ObservableProperty] private bool isAddDialogOpen;
-
         [ObservableProperty] private string? addDialogError;
         public bool HasAddDialogError => !string.IsNullOrWhiteSpace(AddDialogError);
         partial void OnAddDialogErrorChanged(string? value) => OnPropertyChanged(nameof(HasAddDialogError));
@@ -83,8 +104,6 @@ namespace MyShopClient.ViewModels
         [ObservableProperty] private CategoryOption? newProductCategory;
 
         // ====== Edit Product dialog ======
-        [ObservableProperty] private bool isEditDialogOpen;
-
         [ObservableProperty] private string? editDialogError;
         public bool HasEditDialogError => !string.IsNullOrWhiteSpace(EditDialogError);
         partial void OnEditDialogErrorChanged(string? value) => OnPropertyChanged(nameof(HasEditDialogError));
@@ -126,11 +145,12 @@ namespace MyShopClient.ViewModels
         }
 
         public ProductListViewModel(
-      IProductService productService,
+            IProductService productService,
             ICategoryService categoryService,
-     IImageUploadService imageUploadService,
+            IImageUploadService imageUploadService,
             IServerConfigService serverConfig,
             IAppSettingsService appsettings)
+            : base(appsettings, s => s.ProductsPageSize)
         {
             _productService = productService;
             _categoryService = categoryService;
@@ -145,34 +165,11 @@ namespace MyShopClient.ViewModels
             var deleteVm = new ProductDeleteViewModel(_productService, reloadCallback);
             Dialogs = new ProductDialogsViewModel(addVm, editVm, deleteVm);
 
-            // apply persisted page size
-            PageSize = _appSettings.ProductsPageSize;
+            // attach selection tracker for Products collection
+            AttachSelectionTracker(Products);
+            SelectedItems.CollectionChanged += (s, e) => UpdateSelectionState();
 
             _ = InitializeAsync();
-
-            // Track selection changes on products
-            Products.CollectionChanged += (s, e) =>
-            {
-                if (e.NewItems != null)
-                {
-                    foreach (ProductItemDto it in e.NewItems)
-                        it.PropertyChanged += ProductItem_PropertyChanged;
-                }
-                if (e.OldItems != null)
-                {
-                    foreach (ProductItemDto it in e.OldItems)
-                        it.PropertyChanged -= ProductItem_PropertyChanged;
-                }
-                UpdateSelectionState();
-            };
-        }
-
-        private void ProductItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(ProductItemDto.IsSelected))
-            {
-                UpdateSelectionState();
-            }
         }
 
         [ObservableProperty]
@@ -182,63 +179,21 @@ namespace MyShopClient.ViewModels
         private int selectedProductsCount;
 
         [ObservableProperty]
-        private bool isBulkDeleteConfirmOpen;
-
-        [ObservableProperty]
         private string bulkDeleteConfirmMessage = string.Empty;
 
         private void UpdateSelectionState()
         {
-            SelectedProductsCount = Products.Count(p => p.IsSelected);
-            HasSelectedProducts = SelectedProductsCount >0;
-        }
-
-        [RelayCommand]
-        private void OpenBulkDeleteConfirm()
-        {
-            System.Diagnostics.Debug.WriteLine($"[BulkDelete] OpenBulkDeleteConfirm called. SelectedProductsCount={SelectedProductsCount}");
-            if (!HasSelectedProducts) return;
-            var ids = Products.Where(p => p.IsSelected).Select(p => p.ProductId).ToList();
-            BulkDeleteConfirmMessage = $"Are you sure you want to delete {ids.Count} product(s)?\n\nProducts: {string.Join(", ", ids.Select(id => $"#{id}"))}";
-            IsBulkDeleteConfirmOpen = true;
-        }
-
-        [RelayCommand]
-        private void CancelBulkDeleteConfirm()
-        {
-            IsBulkDeleteConfirmOpen = false;
-        }
-
-        [RelayCommand]
-        private async Task ConfirmBulkDeleteAsync()
-        {
-            IsBulkDeleteConfirmOpen = false;
-            if (IsBusy) return;
-            IsBusy = true;
-            ErrorMessage = string.Empty;
-
-            var selected = Products.Where(p => p.IsSelected).ToList();
-            var success =0;
-            foreach (var p in selected)
+            SelectedProductsCount = SelectedItems.Count;
+            HasSelectedProducts = SelectedItems.Count > 0;
+            if (SelectedItems.Count > 0)
             {
-                try
-                {
-                    var res = await _productService.DeleteProductAsync(p.ProductId);
-                    if (res.Success) success++;
-                }
-                catch { }
+                var ids = string.Join(", ", SelectedItems.OfType<ProductItemDto>().Select(p => $"#{p.ProductId}"));
+                BulkDeleteConfirmMessage = $"Are you sure you want to delete {SelectedItems.Count} product(s)?\n\nProducts: {ids}";
             }
-
-            if (success >0)
+            else
             {
-                System.Diagnostics.Debug.WriteLine($"[BulkDelete] Deleted {success} products");
-                // clear selection on items removed (reload will replace collection)
-                foreach (var p in Products) p.IsSelected = false;
-                await ReloadCurrentPageAsync();
+                BulkDeleteConfirmMessage = string.Empty;
             }
-
-            IsBusy = false;
-            UpdateSelectionState();
         }
 
         // Helper method để convert relative URL thành absolute URL
@@ -247,22 +202,19 @@ namespace MyShopClient.ViewModels
             if (string.IsNullOrWhiteSpace(url))
                 return url;
 
-            // Nếu đã là absolute URL thì return nguyên
             if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-             url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
-         url.StartsWith("ms-appx://", StringComparison.OrdinalIgnoreCase))
+                url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
+                url.StartsWith("ms-appx://", StringComparison.OrdinalIgnoreCase))
             {
                 return url;
             }
 
-            // Nếu là relative URL thì ghép với base URL
             if (url.StartsWith("/"))
             {
                 var baseUrl = _serverConfig.Current.BaseUrl;
                 if (string.IsNullOrWhiteSpace(baseUrl))
                     baseUrl = "http://localhost:5135";
 
-                // Đảm bảo baseUrl không có '/' ở cuối
                 baseUrl = baseUrl.TrimEnd('/');
 
                 return baseUrl + url;
@@ -346,17 +298,15 @@ namespace MyShopClient.ViewModels
             }
         }
 
-        // ================= CORE LOAD PRODUCTS =================
-
-        private async Task LoadPageAsync(int? page = null)
+        // ========== paging core ==========
+        protected override async Task LoadPageCoreAsync(int page, int pageSize)
         {
-            if (_isLoadingProducts) return;
-            _isLoadingProducts = true;
-
             ErrorMessage = string.Empty;
 
-            if (page.HasValue)
-                CurrentPage = page.Value;
+            // cancel previous load if any
+            _loadCts?.Cancel();
+            _loadCts = new CancellationTokenSource();
+            var token = _loadCts.Token;
 
             int? minPrice = int.TryParse(MinPriceText, out var min) ? min : null;
             int? maxPrice = int.TryParse(MaxPriceText, out var max) ? max : null;
@@ -365,8 +315,8 @@ namespace MyShopClient.ViewModels
 
             var options = new ProductQueryOptions
             {
-                Page = CurrentPage,
-                PageSize = PageSize,
+                Page = page,
+                PageSize = pageSize,
                 Search = SearchText,
                 CategoryId = SelectedCategory?.Id,
                 MinPrice = minPrice,
@@ -377,81 +327,80 @@ namespace MyShopClient.ViewModels
 
             try
             {
-                var result = await _productService.GetProductsAsync(options);
+                var result = await _productService.GetProductsAsync(options, token);
 
                 if (!result.Success || result.Data == null)
                 {
                     ErrorMessage = result.Message ?? "Cannot load products.";
                     Products.Clear();
-                    TotalItems = 0;
-                    TotalPages = 1;
+                    SetPageResult(1, pageSize, 0, 1);
                     return;
                 }
 
                 var pageData = result.Data;
 
                 Products.Clear();
+                SelectedItems.Clear();
                 foreach (var p in pageData.Items)
                 {
                     Products.Add(p);
                 }
 
-                CurrentPage = pageData.Page;
-                PageSize = pageData.PageSize;
-                TotalItems = pageData.TotalItems;
-                TotalPages = Math.Max(1, pageData.TotalPages);
+                SetPageResult(pageData.Page, pageData.PageSize, pageData.TotalItems, Math.Max(1, pageData.TotalPages));
 
-                // Lazy load images cho tất cả products
-                _ = LoadProductImagesAsync();
+                _ = LoadProductImagesAsync(token);
+            }
+            catch (OperationCanceledException)
+            {
+                // ignore cancelled load
             }
             catch (Exception ex)
             {
                 ErrorMessage = ex.Message;
                 Products.Clear();
-                TotalItems = 0;
-                TotalPages = 1;
+                SetPageResult(1, pageSize, 0, 1);
             }
             finally
             {
-                _isLoadingProducts = false;
                 OnPropertyChanged(nameof(HasError));
             }
         }
 
         // Lazy load images cho tất cả products trong list
-        private async Task LoadProductImagesAsync()
+        private async Task LoadProductImagesAsync(CancellationToken token)
         {
             var baseUrl = _serverConfig.Current.BaseUrl;
+            var snapshot = Products.ToList();
 
-            var tasks = Products
+            var tasks = snapshot
                 .Where(p => !p.ImagesLoaded)
-          .Select(async product =>
-              {
-                  try
-                  {
-                      var detail = await _productService.GetProductByIdAsync(product.ProductId);
-                      if (detail.Success && detail.Data != null && detail.Data.ImagePaths != null)
-                      {
-                          // Convert relative URLs thành absolute URLs
-                          var absoluteUrls = detail.Data.ImagePaths
-                  .Select(url => Helpers.UrlHelper.ToAbsoluteUrl(url, baseUrl))
-                 .ToList();
+                .Select(async product =>
+                {
+                    try
+                    {
+                        var detail = await _productService.GetProductByIdAsync(product.ProductId, token);
+                        if (detail.Success && detail.Data != null && detail.Data.ImagePaths != null)
+                        {
+                            var absoluteUrls = detail.Data.ImagePaths
+                                .Select(url => Helpers.UrlHelper.ToAbsoluteUrl(url, baseUrl))
+                                .ToList();
 
-                          // Set property để trigger PropertyChanged
-                          product.ImagePaths = absoluteUrls;
-                          product.ImagesLoaded = true;
-                      }
-                  }
-                  catch
-                  {
-                      // Silent fail - ảnh sẽ dùng placeholder
-                  }
-              });
+                            product.ImagePaths = absoluteUrls;
+                            product.ImagesLoaded = true;
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // ignore
+                    }
+                    catch
+                    {
+                        // Silent fail - ảnh sẽ dùng placeholder
+                    }
+                });
 
             await Task.WhenAll(tasks);
         }
-
-        private Task ReloadCurrentPageAsync() => LoadPageAsync(CurrentPage);
 
         private (ProductSortField field, bool asc) ParseSortOption(string option)
         {
@@ -465,31 +414,13 @@ namespace MyShopClient.ViewModels
             };
         }
 
-        // ================= COMMANDS FILTER / PAGING =================
-
         [RelayCommand]
         private Task ApplyFilterAsync() => LoadPageAsync(1);
 
         [RelayCommand]
         private Task SearchAsync() => LoadPageAsync(1);
 
-        [RelayCommand]
-        private Task NextPageAsync()
-        {
-            if (CurrentPage < TotalPages)
-                return LoadPageAsync(CurrentPage + 1);
-            return Task.CompletedTask;
-        }
-
-        [RelayCommand]
-        private Task PreviousPageAsync()
-        {
-            if (CurrentPage > 1)
-                return LoadPageAsync(CurrentPage - 1);
-            return Task.CompletedTask;
-        }
-
-        // ================= DELETE PRODUCT =================
+        // ================= DELETE PRODUCT (single) =================
 
         [RelayCommand]
         private async Task DeleteProductAsync(ProductItemDto? product)
@@ -627,7 +558,6 @@ namespace MyShopClient.ViewModels
         {
             if (image == null) return;
 
-            // Nếu ảnh đã upload (có publicId) thì xóa trên server
             if (!string.IsNullOrWhiteSpace(image.PublicId))
             {
                 image.IsDeleting = true;
@@ -637,7 +567,6 @@ namespace MyShopClient.ViewModels
                 }
                 catch
                 {
-                    // Log error nhưng vẫn xóa khỏi UI
                 }
                 finally
                 {
@@ -674,7 +603,6 @@ namespace MyShopClient.ViewModels
         {
             if (image == null) return;
 
-            // Nếu ảnh đã upload (có publicId) thì xóa trên server
             if (!string.IsNullOrWhiteSpace(image.PublicId))
             {
                 image.IsDeleting = true;
@@ -684,7 +612,6 @@ namespace MyShopClient.ViewModels
                 }
                 catch
                 {
-                    // Log error nhưng vẫn xóa khỏi UI
                 }
                 finally
                 {
@@ -807,7 +734,6 @@ namespace MyShopClient.ViewModels
 
             NewProductCategory = Categories.FirstOrDefault(c => c.Id != null);
 
-            // open dialogs.AddVm
             Dialogs.AddVm.DoOpen(NewProductImages, NewProductCategory);
         }
 
@@ -836,7 +762,6 @@ namespace MyShopClient.ViewModels
             try
             {
                 await Dialogs.EditVm.DoOpenAsync(product, EditCategory, _serverConfig.Current.BaseUrl);
-                IsEditDialogOpen = true;
             }
             catch (Exception ex)
             {
@@ -1015,8 +940,7 @@ namespace MyShopClient.ViewModels
                 }
                 else
                 {
-                    // Sau khi import xong → reload lại product list
-                    await LoadPageAsync(1);   // về page 1 cho dễ thấy
+                    await LoadPageAsync(1);
                 }
             }
             catch (Exception ex)
@@ -1030,6 +954,43 @@ namespace MyShopClient.ViewModels
             }
         }
 
-        // Keep all other existing methods unchanged
+        // ===== Bulk delete via common base =====
+        protected override async Task<bool> DeleteItemsAsync(ProductItemDto[] items)
+        {
+            if (items == null || items.Length == 0) return false;
+            var attempted = items.Length;
+            var success = 0;
+            var failedIds = new System.Collections.Generic.List<int>();
+
+            foreach (var p in items)
+            {
+                try
+                {
+                    var res = await _productService.DeleteProductAsync(p.ProductId);
+                    if (res.Success)
+                    {
+                        success++;
+                    }
+                    else
+                    {
+                        failedIds.Add(p.ProductId);
+                    }
+                }
+                catch
+                {
+                    failedIds.Add(p.ProductId);
+                }
+            }
+
+            if (failedIds.Count > 0)
+            {
+                ErrorMessage = failedIds.Count == attempted
+                    ? $"Failed to delete any of the selected {attempted} product(s)."
+                    : $"Deleted {success} product(s). Failed to delete {failedIds.Count} product(s). Failed IDs: {string.Join(",", failedIds)}";
+            }
+
+            OnPropertyChanged(nameof(HasError));
+            return success > 0;
+        }
     }
 }

@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace MyShopClient.ViewModels
 {
@@ -19,12 +20,38 @@ namespace MyShopClient.ViewModels
 
         public ObservableCollection<PromotionItemDto> Promotions { get; } = new();
 
+        // debounce version for search-as-you-type
+        private int _searchVersion;
+
         public ObservableCollection<PromotionScope> ScopeOptions { get; } = new(new[] { PromotionScope.Product, PromotionScope.Category, PromotionScope.Order });
 
         // For the filter dropdown we expose a display list including "All"
         public ObservableCollection<string> ScopeFilterOptions { get; } = new(new[] { "All", "Product", "Category", "Order" });
 
         [ObservableProperty] private string? searchText;
+
+        partial void OnSearchTextChanged(string? value)
+        {
+            _ = DebounceSearchAsync();
+        }
+
+        private async Task DebounceSearchAsync()
+        {
+            var version = Interlocked.Increment(ref _searchVersion);
+            try
+            {
+                await Task.Delay(300);
+                if (version != _searchVersion) return;
+
+                await LoadPageAsync(1);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+                OnPropertyChanged(nameof(HasError));
+            }
+        }
+
         [ObservableProperty] private bool onlyActive = false;
         // This nullable property is what the backend query uses
         [ObservableProperty] private PromotionScope? selectedScopeFilter;

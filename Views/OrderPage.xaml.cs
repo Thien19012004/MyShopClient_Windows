@@ -5,6 +5,8 @@ using MyShopClient.Models;
 using MyShopClient.ViewModels;
 using System.Linq;
 using System.ComponentModel;
+using MyShopClient.Services.Product;
+using System;
 
 namespace MyShopClient.Views
 {
@@ -111,6 +113,44 @@ namespace MyShopClient.Views
             {
                 ViewModel.AddVm.RemoveOrderItemRowCommand.Execute(item);
             }
+        }
+
+        private async void ProductAutoSuggest_TextChanged(object sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (!args.CheckCurrent()) return;
+            if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput) return;
+            if (sender is not AutoSuggestBox box) return;
+            await ViewModel.AddVm.SearchProductsAsync(box.Text);
+        }
+
+        private void ProductAutoSuggest_SuggestionChosen(object sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            if (sender is not AutoSuggestBox box) return;
+            if (box.DataContext is not OrderItemInputVM item) return;
+            if (args.SelectedItem is ProductItemDto p)
+            {
+                item.ProductId = p.ProductId;
+                item.ProductName = p.Name;
+                box.Text = p.Name;
+            }
+        }
+ 
+        private void FromDatePicker_DateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
+        {
+            ViewModel.FromDateText = args.NewDate.HasValue ? args.NewDate.Value.ToString("yyyy-MM-dd") : string.Empty;
+        }
+
+        private void ToDatePicker_DateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
+        {
+            ViewModel.ToDateText = args.NewDate.HasValue ? args.NewDate.Value.ToString("yyyy-MM-dd") : string.Empty;
+        }
+
+        private void ClearDates_Click(object sender, RoutedEventArgs e)
+        {
+            FromDatePicker.ClearValue(CalendarDatePicker.DateProperty);
+            ToDatePicker.ClearValue(CalendarDatePicker.DateProperty);
+            ViewModel.FromDateText = string.Empty;
+            ViewModel.ToDateText = string.Empty;
         }
     }
 }

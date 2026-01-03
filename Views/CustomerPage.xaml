@@ -64,7 +64,7 @@
 <TextBox Width="250"
         PlaceholderText="Name, phone, or email"
         VerticalAlignment="Center"
-Text="{Binding SearchText, Mode=TwoWay}"/>
+Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
        <Button VerticalAlignment="Center"
     Command="{Binding SearchCommand}">
             <StackPanel Orientation="Horizontal" Spacing="4">
@@ -79,20 +79,16 @@ Text="{Binding SearchText, Mode=TwoWay}"/>
 
       <!-- Bulk Delete Button -->
    <Button Grid.Column="2"
-       Margin="0,0,8,0"
-     VerticalAlignment="Center"
-   IsEnabled="{Binding HasSelectedCustomers}"
-        Command="{Binding OpenBulkDeleteConfirmCommand}">
-    <Button.Background>
-<SolidColorBrush Color="#FFF44336"/>
-   </Button.Background>
-<Button.Foreground>
-      <SolidColorBrush Color="White"/>
-  </Button.Foreground>
- <StackPanel Orientation="Horizontal" Spacing="4">
-   <FontIcon Glyph="&#xE74D;" FontSize="14" Foreground="White"/>
-             <TextBlock Text="Delete" Foreground="White"/>
-</StackPanel>
+           Margin="0,0,8,0"
+           VerticalAlignment="Center"
+           IsEnabled="{Binding HasSelectedCustomers}"
+           Command="{Binding OpenBulkDeleteConfirmCommand}"
+           Background="#FFF44336"
+           Foreground="White">
+     <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+       <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+       <TextBlock Text="Delete"/>
+     </StackPanel>
    </Button>
 
 <!-- Add Customer Button -->

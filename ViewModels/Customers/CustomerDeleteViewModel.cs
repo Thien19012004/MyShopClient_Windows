@@ -10,11 +10,19 @@ namespace MyShopClient.ViewModels
     // Delete and bulk-delete logic
     public partial class CustomerListViewModel
     {
+        private string _deleteConfirmMessage = string.Empty;
+        public string DeleteConfirmMessage
+        {
+            get => _deleteConfirmMessage;
+            private set => SetProperty(ref _deleteConfirmMessage, value);
+        }
+
         [RelayCommand]
         private void OpenDeleteConfirm(CustomerListItemDto? customer)
         {
             if (customer == null) return;
             CustomerToDelete = customer;
+            DeleteConfirmMessage = $"Are you sure you want to delete Customer #{customer.CustomerId}?";
             IsDeleteConfirmOpen = true;
         }
 
@@ -23,6 +31,7 @@ namespace MyShopClient.ViewModels
         {
             IsDeleteConfirmOpen = false;
             CustomerToDelete = null;
+            DeleteConfirmMessage = string.Empty;
         }
 
         [RelayCommand]
@@ -58,6 +67,7 @@ namespace MyShopClient.ViewModels
 
             IsDeleteConfirmOpen = false;
             CustomerToDelete = null;
+            DeleteConfirmMessage = string.Empty;
 
             if (deleted)
             {

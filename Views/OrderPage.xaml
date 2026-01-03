@@ -68,110 +68,117 @@
                 </StackPanel>
 
                 <!-- Filters + Bulk Actions -->
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <ScrollViewer HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <StackPanel Orientation="Vertical" Spacing="8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
-                    <!-- Status -->
-                    <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="0" Margin="0,0,16,0">
-                        <TextBlock Text="Status:" VerticalAlignment="Center" Width="50"/>
-                        <ComboBox ItemsSource="{Binding StatusOptions}"
- SelectedItem="{Binding SelectedStatus, Mode=TwoWay}"
- Width="140"
- VerticalAlignment="Center"/>
+                            <!-- Status -->
+                            <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="0" Margin="0,0,16,0">
+                                <TextBlock Text="Status:" VerticalAlignment="Center" Width="50"/>
+                                <ComboBox ItemsSource="{Binding StatusOptions}"
+                                          SelectedItem="{Binding SelectedStatus, Mode=TwoWay}"
+                                          Width="140"
+                                          VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <!-- Customer name search -->
+                            <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="1" Margin="0,0,16,0">
+                                <TextBlock Text="Customer:" VerticalAlignment="Center" Width="80"/>
+                                <TextBox Width="160"
+                                       VerticalAlignment="Center"
+                                       PlaceholderText="Customer name"
+                                       Text="{Binding CustomerNameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <!-- Sale name search -->
+                            <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="2" Margin="0,0,16,0">
+                                <TextBlock Text="Sale:" VerticalAlignment="Center" Width="50"/>
+                                <TextBox Width="160"
+                                       VerticalAlignment="Center"
+                                       PlaceholderText="Sale name"
+                                       Text="{Binding SaleNameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <!-- Date range -->
+                            <StackPanel x:Name="OrderDateRangePanel" Orientation="Horizontal" Spacing="8" Grid.Column="3" Margin="0,0,16,0">
+                                <TextBlock Text="Date:" VerticalAlignment="Center" Width="40"/>
+                                <CalendarDatePicker x:Name="FromDatePicker"
+                                            Width="140"
+                                            PlaceholderText="From"
+                                            DateChanged="FromDatePicker_DateChanged"/>
+                                <TextBlock Text="-" VerticalAlignment="Center"/>
+                                <CalendarDatePicker x:Name="ToDatePicker"
+                                            Width="140"
+                                            PlaceholderText="To"
+                                            DateChanged="ToDatePicker_DateChanged"/>
+                        <Button Content="Clear" Width="60" Click="ClearDates_Click"/>
+                     </StackPanel>
+
+                            <!-- Spacer -->
+                            <Border Grid.Column="4"/>
+
+                            <!-- Apply Button -->
+                            <Button Grid.Column="5"
+                                    Content="Apply"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding ApplyFilterCommand}"/>
+                        </Grid>
+
+                        <!-- Action buttons row -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                            <!-- Print Button (enabled when has selection) -->
+                            <Button Command="{Binding OpenPrintConfirmCommand}"
+                                    VerticalAlignment="Center"
+                                    IsEnabled="{Binding HasSelectedOrders}">
+                                <Button.Background>
+                                    <SolidColorBrush Color="#FF4CAF50"/>
+                                </Button.Background>
+                                <Button.Foreground>
+                                    <SolidColorBrush Color="White"/>
+                                </Button.Foreground>
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE2F6;" />
+                                    <TextBlock Text="Print" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Bulk Delete Button (enabled when has selection) -->
+                            <Button Command="{Binding OpenBulkDeleteConfirmCommand}"
+                                    VerticalAlignment="Center"
+                                    IsEnabled="{Binding HasSelectedOrders}">
+                                <Button.Background>
+                                    <SolidColorBrush Color="#FFF44336"/>
+                                </Button.Background>
+                                <Button.Foreground>
+                                    <SolidColorBrush Color="White"/>
+                                </Button.Foreground>
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE74D;" />
+                                    <TextBlock Text="Delete" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Add Order Button -->
+                            <Button x:Name="AddOrderButton" Content="+ Add Order" VerticalAlignment="Center" Command="{Binding AddVm.OpenCommand}">
+                                <Button.Background>
+                                    <SolidColorBrush Color="#FF5D5FEF"/>
+                                </Button.Background>
+                                <Button.Foreground>
+                                    <SolidColorBrush Color="White"/>
+                                </Button.Foreground>
+                            </Button>
+                        </StackPanel>
                     </StackPanel>
-
-                    <!-- CustomerId -->
-                    <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="1" Margin="0,0,16,0">
-                        <TextBlock Text="CustomerId:" VerticalAlignment="Center" Width="80"/>
-                        <TextBox Width="100"
- VerticalAlignment="Center"
- Text="{Binding CustomerIdText, Mode=TwoWay}"/>
-                    </StackPanel>
-
-                    <!-- SaleId -->
-                    <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="2" Margin="0,0,16,0">
-                        <TextBlock Text="SaleId:" VerticalAlignment="Center" Width="50"/>
-                        <TextBox Width="100"
- VerticalAlignment="Center"
- Text="{Binding SaleIdText, Mode=TwoWay}"/>
-                    </StackPanel>
-
-                    <!-- Date range -->
-                    <StackPanel x:Name="OrderDateRangePanel" Orientation="Horizontal" Spacing="8" Grid.Column="3" Margin="0,0,16,0">
-                        <TextBlock Text="Date:" VerticalAlignment="Center" Width="40"/>
-                        <TextBox Width="120"
- PlaceholderText="From yyyy-MM-dd"
- VerticalAlignment="Center"
- Text="{Binding FromDateText, Mode=TwoWay}"/>
-                        <TextBlock Text="-" VerticalAlignment="Center"/>
-                        <TextBox Width="120"
- PlaceholderText="To yyyy-MM-dd"
- VerticalAlignment="Center"
- Text="{Binding ToDateText, Mode=TwoWay}"/>
-                    </StackPanel>
-
-                    <!-- Spacer -->
-                    <Border Grid.Column="4"/>
-
-                    <!-- Apply Button -->
-                    <Button Grid.Column="5"
- Content="Apply"
- Margin="0,0,8,0"
- VerticalAlignment="Center"
- Command="{Binding ApplyFilterCommand}"/>
-
-                    <!-- Print Button (enabled when has selection) -->
-                    <Button Grid.Column="6"
- Content="🖨 Print"
- Margin="0,0,8,0"
- VerticalAlignment="Center"
- IsEnabled="{Binding HasSelectedOrders}"
- Command="{Binding OpenPrintConfirmCommand}">
-                        <Button.Background>
-                            <SolidColorBrush Color="#FF4CAF50"/>
-                        </Button.Background>
-                        <Button.Foreground>
-                            <SolidColorBrush Color="White"/>
-                        </Button.Foreground>
-                    </Button>
-
-                    <!-- Bulk Delete Button (enabled when has selection) -->
-                    <Button Grid.Column="7"
- Content="🗑 Delete"
- Margin="0,0,8,0"
- VerticalAlignment="Center"
- IsEnabled="{Binding HasSelectedOrders}"
- Command="{Binding OpenBulkDeleteConfirmCommand}">
-                        <Button.Background>
-                            <SolidColorBrush Color="#FFF44336"/>
-                        </Button.Background>
-                        <Button.Foreground>
-                            <SolidColorBrush Color="White"/>
-                        </Button.Foreground>
-                    </Button>
-
-                    <!-- Add Order Button -->
-                    <StackPanel Grid.Column="8" Orientation="Horizontal" Spacing="8">
-                        <Button x:Name="AddOrderButton" Content="+ Add Order" VerticalAlignment="Center" Command="{Binding AddVm.OpenCommand}">
-                            <Button.Background>
-                                <SolidColorBrush Color="#FF5D5FEF"/>
-                            </Button.Background>
-                            <Button.Foreground>
-                                <SolidColorBrush Color="White"/>
-                            </Button.Foreground>
-                        </Button>
-                    </StackPanel>
-                </Grid>
+                 </ScrollViewer>
             </StackPanel>
 
             <!-- List + error -->
@@ -343,12 +350,14 @@
  FontWeight="SemiBold"/>
 
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBox Header="Customer Id"
- Width="200"
- Text="{Binding AddVm.CustomerIdText, Mode=TwoWay}"/>
+                            <ComboBox Header="Customer"
+                                      Width="220"
+                                      ItemsSource="{Binding AddVm.CustomerOptions}"
+                                      DisplayMemberPath="Name"
+                                      SelectedItem="{Binding AddVm.SelectedCustomer, Mode=TwoWay}"/>
                             <TextBox Header="Sale Id"
- Width="200"
- Text="{Binding AddVm.SaleIdText, Mode=TwoWay}"/>
+                                     Width="200"
+                                     Text="{Binding AddVm.SaleIdText, Mode=TwoWay}"/>
                         </StackPanel>
 
                         <!-- Order promotion (ORDER scope) -->
@@ -381,15 +390,19 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="viewmodels:OrderItemInputVM">
                                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
-                                        <TextBox Header="Product Id"
- Width="120"
- Text="{x:Bind ProductId, Mode=TwoWay}"/>
+                                        <AutoSuggestBox Header="Product"
+                                                        Width="200"
+                                                        Text="{x:Bind ProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        ItemsSource="{Binding DataContext.AddVm.ProductSuggestions, ElementName=Root}"
+                                                        DisplayMemberPath="Name"
+                                                        TextChanged="ProductAutoSuggest_TextChanged"
+                                                        SuggestionChosen="ProductAutoSuggest_SuggestionChosen"/>
                                         <TextBox Header="Qty"
- Width="80"
- Text="{x:Bind Quantity, Mode=TwoWay}"/>
+                                                 Width="80"
+                                                 Text="{x:Bind Quantity, Mode=TwoWay}"/>
                                         <Button Content="−"
- Width="32" Height="32"
- Click="RemoveAddItemButton_Click"/>
+                                                Width="32" Height="32"
+                                                Click="RemoveAddItemButton_Click"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
