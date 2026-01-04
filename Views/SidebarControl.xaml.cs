@@ -122,6 +122,9 @@ namespace MyShopClient.Views
             var activeBrush = (SolidColorBrush)Resources["SidebarActiveBrush"];
             var inactiveBrush = (SolidColorBrush)Resources["SidebarInactiveBrush"];
 
+            var activeText = new SolidColorBrush(Colors.Black);
+            var inactiveText = (SolidColorBrush)Resources["SidebarIconColor"];
+
             DashboardButton.Background = (menu == SidebarMenu.Dashboard) ? activeBrush : inactiveBrush;
             ProductsButton.Background = (menu == SidebarMenu.Products) ? activeBrush : inactiveBrush;
             OrdersButton.Background = (menu == SidebarMenu.Orders) ? activeBrush : inactiveBrush;
@@ -131,33 +134,13 @@ namespace MyShopClient.Views
             SettingsButton.Background = (menu == SidebarMenu.Settings) ? activeBrush : inactiveBrush;
 
             // màu chữ: active thì trắng, inactive thì hơi mờ
-            DashboardButton.Foreground = (menu == SidebarMenu.Dashboard)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
-
-            ProductsButton.Foreground = (menu == SidebarMenu.Products)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
-
-            OrdersButton.Foreground = (menu == SidebarMenu.Orders)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
-
-            CustomersButton.Foreground = (menu == SidebarMenu.Customers)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
-
-            PromotionsButton.Foreground = (menu == SidebarMenu.Promotions)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
-
-            ReportsButton.Foreground = (menu == SidebarMenu.Reports)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
-
-            SettingsButton.Foreground = (menu == SidebarMenu.Settings)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
+            DashboardButton.Foreground = (menu == SidebarMenu.Dashboard) ? activeText : inactiveText;
+            ProductsButton.Foreground = (menu == SidebarMenu.Products) ? activeText : inactiveText;
+            OrdersButton.Foreground = (menu == SidebarMenu.Orders) ? activeText : inactiveText;
+            CustomersButton.Foreground = (menu == SidebarMenu.Customers) ? activeText : inactiveText;
+            PromotionsButton.Foreground = (menu == SidebarMenu.Promotions) ? activeText : inactiveText;
+            ReportsButton.Foreground = (menu == SidebarMenu.Reports) ? activeText : inactiveText;
+            SettingsButton.Foreground = (menu == SidebarMenu.Settings) ? activeText : inactiveText;
         }
     }
 }

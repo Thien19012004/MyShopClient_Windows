@@ -7,6 +7,7 @@ using System.Linq;
 using System.ComponentModel;
 using MyShopClient.Services.Product;
 using System;
+using MyShopClient.Controls;
 
 namespace MyShopClient.Views
 {
@@ -15,13 +16,59 @@ namespace MyShopClient.Views
         public OrderListViewModel ViewModel => (OrderListViewModel)DataContext;
         private bool _isUpdatingSelection = false;
 
+        private Grid _headerWideGrid;
+        private Grid _headerNarrowGrid;
+        private BlueCheckBox _selectAllWide;
+        private BlueCheckBox _selectAllNarrow;
+        private const double NarrowThreshold = 1100;
+
         public OrderPage()
         {
             this.InitializeComponent();
             DataContext = App.Services.GetService<OrderListViewModel>();
-            
+            CacheControls();
+
             // Subscribe to Orders collection changes
             ViewModel.Orders.CollectionChanged += Orders_CollectionChanged;
+
+            Loaded += OrderPage_Loaded;
+            SizeChanged += OrderPage_SizeChanged;
+        }
+
+        private void OrderPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            UpdateLayoutState(ActualWidth);
+        }
+
+        private void OrderPage_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateLayoutState(e.NewSize.Width);
+        }
+
+        private void CacheControls()
+        {
+            _headerWideGrid = (Grid)FindName("HeaderWideGrid");
+            _headerNarrowGrid = (Grid)FindName("HeaderNarrowGrid");
+            _selectAllWide = (BlueCheckBox)FindName("SelectAllCheckBoxWide");
+            _selectAllNarrow = (BlueCheckBox)FindName("SelectAllCheckBoxNarrow");
+        }
+
+        private void UpdateLayoutState(double width)
+        {
+            bool isNarrow = width < NarrowThreshold;
+
+            if (_headerWideGrid != null && _headerNarrowGrid != null)
+            {
+                _headerWideGrid.Visibility = isNarrow ? Visibility.Collapsed : Visibility.Visible;
+                _headerNarrowGrid.Visibility = isNarrow ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            OrderListView.ItemTemplate = (DataTemplate)Resources[isNarrow ? "OrderNarrowTemplate" : "OrderWideTemplate"];
+
+            if (_selectAllWide != null && _selectAllNarrow != null)
+            {
+                _selectAllWide.IsChecked = _selectAllNarrow.IsChecked;
+            }
         }
 
         private void Orders_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -61,25 +108,20 @@ namespace MyShopClient.Views
         {
             if (_isUpdatingSelection) return;
 
-            if (ViewModel.Orders.Count == 0)
-            {
-                SelectAllCheckBox.IsChecked = false;
-            }
-            else if (ViewModel.Orders.All(o => o.IsSelected))
-            {
-                SelectAllCheckBox.IsChecked = true;
-            }
-            else
-            {
-                SelectAllCheckBox.IsChecked = false;
-            }
+            bool allSelected = ViewModel.Orders.Count > 0 && ViewModel.Orders.All(o => o.IsSelected);
+
+            if (_selectAllWide != null) _selectAllWide.IsChecked = allSelected;
+            if (_selectAllNarrow != null) _selectAllNarrow.IsChecked = allSelected;
         }
 
         private void SelectAllCheckBox_Click(object sender, RoutedEventArgs e)
         {
             _isUpdatingSelection = true;
 
-            bool selectAll = SelectAllCheckBox.IsChecked;
+            bool selectAll = (sender as Controls.BlueCheckBox)?.IsChecked ?? false;
+
+            if (_selectAllWide != null) _selectAllWide.IsChecked = selectAll;
+            if (_selectAllNarrow != null) _selectAllNarrow.IsChecked = selectAll;
 
             // Set IsSelected on each item; the base viewmodel will track SelectedItems
             foreach (var order in ViewModel.Orders)

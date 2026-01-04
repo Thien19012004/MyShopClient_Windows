@@ -11,8 +11,91 @@
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=viewmodels:PromotionListViewModel}">
 
-    <!-- Main Grid -->
-    <Grid Background="#FFF5F5F7">
+    <Page.Resources>
+        <!-- Wide template -->
+        <DataTemplate x:Key="PromotionWideTemplate" x:DataType="models:PromotionItemDto">
+            <Grid Padding="16,8" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="160"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <controls:BlueCheckBox Grid.Column="0" IsChecked="{x:Bind IsSelected, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="1" Text="{x:Bind PromotionId}"/>
+                <TextBlock Grid.Column="2" Text="{x:Bind Name}" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="3" Text="{x:Bind Scope}" HorizontalAlignment="Center" TextAlignment="Center"/>
+                <TextBlock Grid.Column="4" HorizontalAlignment="Center" TextAlignment="Center">
+                    <Run Text="{x:Bind DiscountPercent}"/>
+                    <Run Text=" %"/>
+                </TextBlock>
+                <TextBlock Grid.Column="5" Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(StartDate)}" HorizontalAlignment="Center" TextAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="6" Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(EndDate)}" HorizontalAlignment="Center" TextAlignment="Center" TextTrimming="CharacterEllipsis"/>
+
+                <StackPanel Grid.Column="7" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                    <Button Width="32" Height="32" Padding="0"
+                            Command="{Binding DataContext.EditVm.OpenCommand, ElementName=PromotionListView}"
+                            CommandParameter="{Binding}">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14"/>
+                    </Button>
+                    <Button Width="32" Height="32" Padding="0"
+                            Command="{Binding DataContext.OpenDeleteConfirmCommand, ElementName=PromotionListView}"
+                            CommandParameter="{Binding}">
+                        <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Narrow template: stack dates, keep scope/discount -->
+        <DataTemplate x:Key="PromotionNarrowTemplate" x:DataType="models:PromotionItemDto">
+            <Grid Padding="12,8" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="2.4*"/>
+                    <ColumnDefinition Width="1.4*"/>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="160"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <controls:BlueCheckBox Grid.Column="0" IsChecked="{x:Bind IsSelected, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{x:Bind PromotionId}"/>
+                <TextBlock Grid.Column="2" Text="{x:Bind Name}" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="3" Text="{x:Bind Scope}" HorizontalAlignment="Center" TextAlignment="Center"/>
+                <TextBlock Grid.Column="4" HorizontalAlignment="Center" TextAlignment="Center">
+                    <Run Text="{x:Bind DiscountPercent}"/>
+                    <Run Text=" %"/>
+                </TextBlock>
+                <StackPanel Grid.Column="5" Spacing="2" HorizontalAlignment="Center">
+                    <TextBlock Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(StartDate)}" TextAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(EndDate)}" TextAlignment="Center" TextTrimming="CharacterEllipsis" Opacity="0.8"/>
+                </StackPanel>
+                <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                    <Button Width="32" Height="32" Padding="0"
+                            Command="{Binding DataContext.EditVm.OpenCommand, ElementName=PromotionListView}"
+                            CommandParameter="{Binding}">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14"/>
+                    </Button>
+                    <Button Width="32" Height="32" Padding="0"
+                            Command="{Binding DataContext.OpenDeleteConfirmCommand, ElementName=PromotionListView}"
+                            CommandParameter="{Binding}">
+                        <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+ 
+     <!-- Main Grid -->
+     <Grid Background="#FFF5F5F7">
 
         <!-- ================== MAIN CONTENT ================== -->
         <Grid Padding="24">
@@ -155,116 +238,75 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Header row -->
-                    <Grid Grid.Row="0"
+                    <!-- Header row (wide) -->
+                    <Grid x:Name="HeaderWideGrid" Grid.Row="0"
+         Background="#FFEDEEF2"
+        Padding="16,10"
+     CornerRadius="8,8,0,0">
+                         <Grid.ColumnDefinitions>
+                             <ColumnDefinition Width="40"/>
+                             <ColumnDefinition Width="80"/>
+                             <ColumnDefinition Width="3*"/>
+                             <ColumnDefinition Width="160"/>
+                             <ColumnDefinition Width="120"/>
+                             <ColumnDefinition Width="180"/>
+                             <ColumnDefinition Width="180"/>
+                             <ColumnDefinition Width="Auto"/>
+                         </Grid.ColumnDefinitions>
+
+                        <controls:BlueCheckBox x:Name="SelectAllPromotionCheckBoxWide" Grid.Column="0" Click="SelectAllPromotionCheckBox_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="ID" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Column="2" Text="Name" FontWeight="SemiBold" HorizontalAlignment="Left"/>
+                        <TextBlock Grid.Column="3" Text="Scope" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Column="4" Text="Discount %" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Column="5" Text="Start Date" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Column="6" Text="End Date" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Column="7" Text="Action" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
+                     </Grid>
+
+                    <!-- Header row (narrow) -->
+                    <Grid x:Name="HeaderNarrowGrid" Grid.Row="0"
         Background="#FFEDEEF2"
-       Padding="16,10"
-    CornerRadius="8,8,0,0">
+       Padding="12,10"
+    CornerRadius="8,8,0,0"
+        Visibility="Collapsed">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="140"/>
-                            <!-- Scope fixed to avoid squeeze -->
-                            <ColumnDefinition Width="120"/>
-                            <!-- Discount % fixed -->
-                            <ColumnDefinition Width="200"/>
-                            <!-- Start Date -->
-                            <ColumnDefinition Width="200"/>
-                            <!-- End Date -->
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="2.4*"/>
+                            <ColumnDefinition Width="1.4*"/>
+                            <ColumnDefinition Width="90"/>
+                            <ColumnDefinition Width="160"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <controls:BlueCheckBox x:Name="SelectAllPromotionCheckBox" Click="SelectAllPromotionCheckBox_Click"/>
+                        <controls:BlueCheckBox x:Name="SelectAllPromotionCheckBoxNarrow" Grid.Column="0" Click="SelectAllPromotionCheckBox_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="1" Text="ID" FontWeight="SemiBold"/>
-                        <TextBlock Grid.Column="2" Text="Name" FontWeight="SemiBold" Margin="6,0,0,0" HorizontalAlignment="Left"/>
-                        <StackPanel Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock Text="Scope" FontWeight="SemiBold" TextAlignment="Center"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock Text="Discount %" FontWeight="SemiBold" TextAlignment="Center"/>
-                        </StackPanel>
-                        <TextBlock Grid.Column="5" Text="Start Date" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="12,0,0,0"/>
-                        <TextBlock Grid.Column="6" Text="End Date" FontWeight="SemiBold" HorizontalAlignment="Left" Margin="12,0,0,0"/>
-                        <TextBlock Grid.Column="7" Text="Action" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Column="2" Text="Name" FontWeight="SemiBold" HorizontalAlignment="Left"/>
+                        <TextBlock Grid.Column="3" Text="Scope" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Column="4" Text="Discount %" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Column="5" Text="Dates" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Column="6" Text="Action" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
                     </Grid>
 
                     <!-- List -->
                     <ListView Grid.Row="1"
-      x:Name="PromotionListView"
-       ItemsSource="{Binding Promotions}"
-         Margin="0,-2,0,0"
-        Background="Transparent"
-           BorderThickness="0">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
+       x:Name="PromotionListView"
+        ItemsSource="{Binding Promotions}"
+          Margin="0,-2,0,0"
+         Background="Transparent"
+           BorderThickness="0"
+        ItemTemplate="{StaticResource PromotionWideTemplate}">
+                         <ListView.ItemContainerStyle>
+                             <Style TargetType="ListViewItem">
                                 <Setter Property="Padding" Value="0"/>
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                                 <Setter Property="Background" Value="White"/>
-                                <Setter Property="Margin" Value="0,1,0,0"/>
+                                <Setter Property="Margin" Value="0"/>
                             </Style>
-                        </ListView.ItemContainerStyle>
-
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="models:PromotionItemDto">
-                                <Grid Padding="16,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="40"/>
-                                        <ColumnDefinition Width="80"/>
-                                        <ColumnDefinition Width="3*"/>
-                                        <ColumnDefinition Width="140"/>
-                                        <ColumnDefinition Width="120"/>
-                                        <ColumnDefinition Width="200"/>
-                                        <ColumnDefinition Width="200"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <controls:BlueCheckBox IsChecked="{x:Bind IsSelected, Mode=TwoWay}"/>
-
-                                    <!-- ID -->
-                                    <TextBlock Grid.Column="1" Text="{x:Bind PromotionId}"/>
-
-                                    <!-- Name -->
-                                    <TextBlock Grid.Column="2" Text="{x:Bind Name}" Margin="6,0,0,0" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
-
-                                    <!-- Scope -->
-                                    <StackPanel Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <TextBlock Text="{x:Bind Scope}" TextAlignment="Center"/>
-                                    </StackPanel>
-
-                                    <!-- Discount % -->
-                                    <StackPanel Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <TextBlock TextAlignment="Center">
-          <Run Text="{x:Bind DiscountPercent}"/>
-     <Run Text=" %"/>
-                                        </TextBlock>
-                                    </StackPanel>
-
-                                    <!-- Start Date -->
-                                    <TextBlock Grid.Column="5" Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(StartDate)}" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left"/>
-
-                                    <!-- End Date -->
-                                    <TextBlock Grid.Column="6" Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(EndDate)}" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left"/>
-
-                                    <!-- Actions -->
-                                    <StackPanel Grid.Column="7"
-               Orientation="Horizontal"
-      HorizontalAlignment="Right"
-        Spacing="8">
-                                        <Button Content="✏"
-            Width="28" Height="28" Padding="0"
-           Command="{Binding DataContext.EditVm.OpenCommand, ElementName=PromotionListView}"
-         CommandParameter="{Binding}"/>
-                                        <Button Content="🗑"
-    Width="28" Height="28" Padding="0"
-    Command="{Binding DataContext.OpenDeleteConfirmCommand, ElementName=PromotionListView}"
-          CommandParameter="{Binding}"/>
-                                    </StackPanel>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </Grid>
+                         </ListView.ItemContainerStyle>
+                     </ListView>
+                 </Grid>
 
                 <!-- Pagination -->
                 <Grid Grid.Row="2" Margin="0,16,0,0">

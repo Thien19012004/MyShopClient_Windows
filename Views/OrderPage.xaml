@@ -12,7 +12,116 @@
  mc:Ignorable="d"
  d:DataContext="{d:DesignInstance Type=viewmodels:OrderListViewModel}">
 
-    <Grid Background="#FFF5F5F7">
+    <Page.Resources>
+        <!-- Wide template -->
+        <DataTemplate x:Key="OrderWideTemplate" x:DataType="models:OrderListItemDto">
+            <Grid Padding="16,12" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <controls:BlueCheckBox Grid.Column="0"
+                                       IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+
+                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="{x:Bind helpers:FormatHelpers.FormatOrderId(OrderId)}"/>
+                </StackPanel>
+
+                <TextBlock Grid.Column="2" Text="{x:Bind CustomerName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="{x:Bind SaleName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="4"
+                           Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(CreatedAt)}"
+                           VerticalAlignment="Center"/>
+
+                <Border Grid.Column="5"
+                        CornerRadius="12"
+                        Padding="8,4"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Background="#FFEFEFEF">
+                    <TextBlock Text="{x:Bind Status}"/>
+                </Border>
+
+                <TextBlock Grid.Column="6" VerticalAlignment="Center">
+                    <Run Text="{x:Bind TotalPrice}"/>
+                    <Run Text=" d"/>
+                </TextBlock>
+
+                <StackPanel Grid.Column="7" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                    <Button Width="32" Height="32" Padding="0" Click="EditButton_Click">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14" />
+                    </Button>
+                    <Button Width="32" Height="32" Padding="0" Click="DeleteButton_Click">
+                        <FontIcon Glyph="&#xE74D;" FontSize="14" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Narrow template: stack sale/date, keep status/total/action -->
+        <DataTemplate x:Key="OrderNarrowTemplate" x:DataType="models:OrderListItemDto">
+            <Grid Padding="12,10" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="2.2*"/>
+                    <ColumnDefinition Width="1.8*"/>
+                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <controls:BlueCheckBox Grid.Column="0"
+                                       IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+
+                <TextBlock Grid.Column="1" Text="{x:Bind helpers:FormatHelpers.FormatOrderId(OrderId)}" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="2" Text="{x:Bind CustomerName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="3" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="{x:Bind SaleName}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(CreatedAt)}" Opacity="0.8"/>
+                </StackPanel>
+
+                <Border Grid.Column="4"
+                        CornerRadius="12"
+                        Padding="8,4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="#FFEFEFEF">
+                    <TextBlock Text="{x:Bind Status}" TextAlignment="Center"/>
+                </Border>
+
+                <TextBlock Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center">
+                    <Run Text="{x:Bind TotalPrice}"/>
+                    <Run Text=" d"/>
+                </TextBlock>
+
+                <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                    <Button Width="32" Height="32" Padding="0" Click="EditButton_Click">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14" />
+                    </Button>
+                    <Button Width="32" Height="32" Padding="0" Click="DeleteButton_Click">
+                        <FontIcon Glyph="&#xE74D;" FontSize="14" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+ 
+     <Grid Background="#FFF5F5F7">
 
         <!-- ================== MAIN CONTENT ================== -->
         <Grid Padding="24">
@@ -203,8 +312,8 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Header row -->
-                    <Grid Grid.Row="0"
+                    <!-- Header row (wide) -->
+                    <Grid x:Name="HeaderWideGrid" Grid.Row="0"
  Background="#FFEDEEF2"
  Padding="16,12"
  Margin="0,0,0,0"
@@ -220,10 +329,10 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <controls:BlueCheckBox x:Name="SelectAllCheckBox"
+                        <controls:BlueCheckBox x:Name="SelectAllCheckBoxWide"
  Grid.Column="0"
  VerticalAlignment="Center"
- HorizontalAlignment="Left"
+ HorizontalAlignment="Center"
  Margin="0,0,0,0"
  Click="SelectAllCheckBox_Click"/>
 
@@ -233,8 +342,40 @@
                         <TextBlock Grid.Column="4" Text="Created" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="5" Text="Status" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="6" Text="Total" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="7" Text="Action" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="7" Text="Action" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
                     </Grid>
+
+                    <!-- Header row (narrow) -->
+                    <Grid x:Name="HeaderNarrowGrid" Grid.Row="0"
+ Background="#FFEDEEF2"
+ Padding="12,10"
+ Margin="0,0,0,0"
+ CornerRadius="8,8,0,0"
+ Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="2.2*"/>
+                            <ColumnDefinition Width="1.8*"/>
+                            <ColumnDefinition Width="110"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <controls:BlueCheckBox x:Name="SelectAllCheckBoxNarrow"
+ Grid.Column="0"
+ VerticalAlignment="Center"
+ HorizontalAlignment="Center"
+ Margin="0,0,0,0"
+ Click="SelectAllCheckBox_Click"/>
+
+                        <TextBlock Grid.Column="1" Text="Order" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="Customer" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="3" Text="Sale / Date" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="4" Text="Status" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Column="5" Text="Total" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Column="6" Text="Action" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                     </Grid>
 
                     <!-- List -->
                     <ListView Grid.Row="1"
@@ -244,68 +385,16 @@
  Margin="0,-2,0,0"
  Background="Transparent"
  BorderThickness="0"
- IsItemClickEnabled="False">
+ IsItemClickEnabled="False"
+ ItemTemplate="{StaticResource OrderWideTemplate}">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="Padding" Value="0"/>
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                                 <Setter Property="Background" Value="White"/>
-                                <Setter Property="Margin" Value="0,1,0,0"/>
+                                <Setter Property="Margin" Value="0"/>
                             </Style>
                         </ListView.ItemContainerStyle>
-
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="models:OrderListItemDto">
-                                <Grid Padding="16,12">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="40"/>
-                                        <ColumnDefinition Width="80"/>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="100"/>
-                                        <ColumnDefinition Width="120"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <controls:BlueCheckBox Grid.Column="0"
- IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
- VerticalAlignment="Center"
- HorizontalAlignment="Left"
- Margin="0,0,0,0"/>
-
-                                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
-                                        <TextBlock Text="{x:Bind helpers:FormatHelpers.FormatOrderId(OrderId)}"/>
-                                    </StackPanel>
-
-                                    <TextBlock Grid.Column="2" Text="{x:Bind CustomerName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-
-                                    <TextBlock Grid.Column="3" Text="{x:Bind SaleName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-
-                                    <TextBlock Grid.Column="4"
- Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(CreatedAt)}" VerticalAlignment="Center"/>
-
-                                    <Border Grid.Column="5"
- CornerRadius="12"
- Padding="8,4"
- HorizontalAlignment="Left"
- VerticalAlignment="Center"
- Background="#FFEFEFEF">
-                                        <TextBlock Text="{x:Bind Status}"/>
-                                    </Border>
-
-                                    <TextBlock Grid.Column="6" VerticalAlignment="Center">
- <Run Text="{x:Bind TotalPrice}"/>
- <Run Text=" d"/>
-                                    </TextBlock>
-
-                                    <StackPanel Grid.Column="7" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="8" Margin="8,0,0,0">
-                                        <Button Content="✏" Width="28" Height="28" Padding="0" Click="EditButton_Click" />
-                                        <Button Content="🗑" Width="28" Height="28" Padding="0" Click="DeleteButton_Click" />
-                                    </StackPanel>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
                     </ListView>
                 </Grid>
 

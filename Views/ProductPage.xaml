@@ -11,6 +11,159 @@
     mc:Ignorable="d"
     Background="#FFF5F5F7">
 
+    <Page.Resources>
+        <!-- Wide layout template -->
+        <DataTemplate x:Key="ProductWideTemplate" x:DataType="models:ProductItemDto">
+            <Grid Padding="16,8" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="90" />
+                    <ColumnDefinition Width="140" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <controls:BlueCheckBox Grid.Column="0" IsChecked="{x:Bind IsSelected, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+                <Border Grid.Column="1" Width="150" Height="44" HorizontalAlignment="Left">
+                    <Border.Clip>
+                        <RectangleGeometry Rect="0,0,150,44" />
+                    </Border.Clip>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Border Width="40" Height="40" CornerRadius="4" Background="#FFF0F0F0"
+                                Visibility="{Binding ImagePaths, Converter={StaticResource CollectionHasItemsConverter}, ConverterParameter=0}">
+                            <Image Stretch="UniformToFill">
+                                <Image.Source>
+                                    <BitmapImage UriSource="{Binding ImagePaths, Converter={StaticResource ImageAtIndexConverter}, ConverterParameter=0}" />
+                                </Image.Source>
+                            </Image>
+                        </Border>
+                        <Border Width="40" Height="40" CornerRadius="4" Background="#FFF0F0F0"
+                                Visibility="{Binding ImagePaths, Converter={StaticResource CollectionHasItemsConverter}, ConverterParameter=1}">
+                            <Image Stretch="UniformToFill">
+                                <Image.Source>
+                                    <BitmapImage UriSource="{Binding ImagePaths, Converter={StaticResource ImageAtIndexConverter}, ConverterParameter=1}" />
+                                </Image.Source>
+                            </Image>
+                        </Border>
+                        <Border Width="40" Height="40" CornerRadius="4" Background="#FFF0F0F0"
+                                Visibility="{Binding ImagePaths, Converter={StaticResource CollectionHasExactlyConverter}, ConverterParameter=3}">
+                            <Image Stretch="UniformToFill">
+                                <Image.Source>
+                                    <BitmapImage UriSource="{Binding ImagePaths, Converter={StaticResource ImageAtIndexConverter}, ConverterParameter=2}" />
+                                </Image.Source>
+                            </Image>
+                        </Border>
+                        <Border Width="40" Height="40" CornerRadius="4" Background="#FFE0E0E0"
+                                Visibility="{Binding ImagePaths, Converter={StaticResource HasMoreThanConverter}, ConverterParameter=3}">
+                            <TextBlock Text="..." FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF666666" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Grid.Column="2" Spacing="2">
+                    <TextBlock Text="{x:Bind Name}" />
+                    <TextBlock Text="{x:Bind Sku}" FontSize="11" Opacity="0.6" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="3" Text="{x:Bind CategoryName}" />
+                <TextBlock Grid.Column="4" Text="{x:Bind StockQuantity}" HorizontalAlignment="Center" TextAlignment="Center" />
+                <TextBlock Grid.Column="5" Text="{x:Bind SalePrice}" HorizontalAlignment="Center" TextAlignment="Center" />
+
+                <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                    <Button Width="32" Height="32" Padding="0"
+                            Command="{Binding DataContext.EditProductCommand, ElementName=ProductListView}"
+                            CommandParameter="{Binding}">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14"/>
+                    </Button>
+                    <Button Width="32" Height="32" Padding="0"
+                            Command="{Binding DataContext.OpenDeleteConfirmCommand, ElementName=ProductListView}"
+                            CommandParameter="{Binding}">
+                        <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Narrow layout template: stack stock/price, reduce image -->
+        <DataTemplate x:Key="ProductNarrowTemplate" x:DataType="models:ProductItemDto">
+            <Grid Padding="12,8" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="2.6*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="130" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <controls:BlueCheckBox Grid.Column="0" IsChecked="{x:Bind IsSelected, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+                <Border Grid.Column="1" Width="120" Height="44" HorizontalAlignment="Left">
+                    <Border.Clip>
+                        <RectangleGeometry Rect="0,0,120,44" />
+                    </Border.Clip>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Border Width="36" Height="36" CornerRadius="4" Background="#FFF0F0F0"
+                                Visibility="{Binding ImagePaths, Converter={StaticResource CollectionHasItemsConverter}, ConverterParameter=0}">
+                            <Image Stretch="UniformToFill">
+                                <Image.Source>
+                                    <BitmapImage UriSource="{Binding ImagePaths, Converter={StaticResource ImageAtIndexConverter}, ConverterParameter=0}" />
+                                </Image.Source>
+                            </Image>
+                        </Border>
+                        <Border Width="36" Height="36" CornerRadius="4" Background="#FFF0F0F0"
+                                Visibility="{Binding ImagePaths, Converter={StaticResource CollectionHasItemsConverter}, ConverterParameter=1}">
+                            <Image Stretch="UniformToFill">
+                                <Image.Source>
+                                    <BitmapImage UriSource="{Binding ImagePaths, Converter={StaticResource ImageAtIndexConverter}, ConverterParameter=1}" />
+                                </Image.Source>
+                            </Image>
+                        </Border>
+                        <Border Width="36" Height="36" CornerRadius="4" Background="#FFE0E0E0"
+                                Visibility="{Binding ImagePaths, Converter={StaticResource HasMoreThanConverter}, ConverterParameter=2}">
+                            <TextBlock Text="..." FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FF666666" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Grid.Column="2" Spacing="2">
+                    <TextBlock Text="{x:Bind Name}" />
+                    <TextBlock Text="{x:Bind Sku}" FontSize="11" Opacity="0.6" />
+                    <TextBlock Text="{x:Bind CategoryName}" FontSize="12" Opacity="0.8" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="3" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock>
+                        <Run Text="Stock: "/>
+                        <Run Text="{x:Bind StockQuantity}"/>
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="Price: "/>
+                        <Run Text="{x:Bind SalePrice}"/>
+                    </TextBlock>
+                </StackPanel>
+
+                <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" VerticalAlignment="Center">
+                    <Button Width="32" Height="32" Padding="0"
+                            Command="{Binding DataContext.EditProductCommand, ElementName=ProductListView}"
+                            CommandParameter="{Binding}">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14"/>
+                    </Button>
+                    <Button Width="32" Height="32" Padding="0"
+                            Command="{Binding DataContext.OpenDeleteConfirmCommand, ElementName=ProductListView}"
+                            CommandParameter="{Binding}">
+                        <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+                    </Button>
+                </StackPanel>
+
+                <TextBlock Grid.Column="5" Visibility="Collapsed" />
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
     <Grid Padding="24">
 
         <!-- ================= MAIN CONTENT ================= -->
@@ -39,44 +192,16 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Search box + Selected summary -->
-                <StackPanel Grid.Column="0" Spacing="8">
-                    <!-- Selected Count card (visible when any product selected) -->
-                    <Border Background="#FF5D5FEF" CornerRadius="12" Padding="12" Width="220"
-                        Visibility="{Binding HasSelectedProducts, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <StackPanel>
-                            <TextBlock Text="Selected" FontWeight="SemiBold" Foreground="White"/>
-                            <TextBlock Text="{Binding SelectedProductsCount}" FontSize="20" FontWeight="Bold" Foreground="White"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border
-                        Background="White"
-                        CornerRadius="20"
-                        Height="40"
-                        Padding="12,0">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock Text="🔍"
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,8,0" />
-
-                            <TextBox Grid.Column="1"
-                                 x:Name="SearchTextBox"
-                                 BorderThickness="0"
-                                 Background="Transparent"
-                                 PlaceholderText="Search product..."
-                                 Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                            <Button Grid.Column="2"
-                                Content="Search"
-                                Command="{Binding SearchCommand}" />
-                        </Grid>
-                    </Border>
+                <StackPanel Grid.Column="0" Spacing="8" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Search:" VerticalAlignment="Center" Width="60"/>
+                    <TextBox x:Name="SearchTextBox"
+                             Width="300"
+                             PlaceholderText="Search product..."
+                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalAlignment="Center"/>
+                    <Button Content="Search"
+                            Command="{Binding SearchCommand}"
+                            VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- Import (mock) -->
@@ -192,29 +317,53 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <!-- Header row -->
-                <Grid Grid.Row="0"
-            Background="#FFEDEEF2"
-       Padding="16,10"
-      CornerRadius="8,8,0,0">
+                <!-- Header row (wide) -->
+                <Grid x:Name="HeaderWideGrid" Grid.Row="0"
+             Background="#FFEDEEF2"
+        Padding="16,10"
+       CornerRadius="8,8,0,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="40" />
-                        <ColumnDefinition Width="150" />
-                        <ColumnDefinition Width="3*" />
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="40" /> <!-- Select -->
+                        <ColumnDefinition Width="150" /> <!-- Image -->
+                        <ColumnDefinition Width="3*" /> <!-- Name -->
+                        <ColumnDefinition Width="2*" /> <!-- Category -->
+                        <ColumnDefinition Width="90" /> <!-- Stock -->
+                        <ColumnDefinition Width="140" /> <!-- Price -->
+                        <ColumnDefinition Width="Auto" /> <!-- Actions -->
                     </Grid.ColumnDefinitions>
 
-                    <controls:BlueCheckBox x:Name="SelectAllProductCheckBox" Click="SelectAllProductCheckBox_Click"/>
+                    <controls:BlueCheckBox x:Name="SelectAllProductCheckBoxWide" Click="SelectAllProductCheckBox_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                     <TextBlock Grid.Column="1" Text="Image" FontWeight="SemiBold" />
                     <TextBlock Grid.Column="2" Text="Name" FontWeight="SemiBold" />
                     <TextBlock Grid.Column="3" Text="Category" FontWeight="SemiBold"  />
-                    <TextBlock Grid.Column="4" Text="Stock" FontWeight="SemiBold"  />
-                    <TextBlock Grid.Column="5" Text="Price" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="4" Text="Stock" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="5" Text="Price" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center"/>
                     <TextBlock Grid.Column="6" Text="Actions" FontWeight="SemiBold" />
+                </Grid>
+
+                <!-- Header row (narrow) -->
+                <Grid x:Name="HeaderNarrowGrid" Grid.Row="0"
+            Background="#FFEDEEF2"
+       Padding="12,10"
+      CornerRadius="8,8,0,0"
+      Visibility="Collapsed">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" /> <!-- Select -->
+                        <ColumnDefinition Width="120" /> <!-- Image -->
+                        <ColumnDefinition Width="2.6*" /> <!-- Name / Category -->
+                        <ColumnDefinition Width="2*" /> <!-- Stock / Price -->
+                        <ColumnDefinition Width="130" /> <!-- Actions -->
+                        <ColumnDefinition Width="Auto" /> <!-- Empty space for alignment -->
+                    </Grid.ColumnDefinitions>
+
+                    <controls:BlueCheckBox x:Name="SelectAllProductCheckBoxNarrow" Click="SelectAllProductCheckBox_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <TextBlock Grid.Column="1" Text="Image" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="2" Text="Name / Category" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="3" Text="Stock / Price" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="4" Text="Actions" FontWeight="SemiBold" HorizontalAlignment="Center" TextAlignment="Center" />
+                    <TextBlock Grid.Column="5" Text="" />
                 </Grid>
 
                 <!-- Items -->
@@ -222,125 +371,19 @@
     x:Name="ProductListView"
    ItemsSource="{Binding Products}"
    Margin="0,-2,0,0"
+   Padding="0"
  Background="Transparent"
         BorderThickness="0"
-     IsItemClickEnabled="False">
+     IsItemClickEnabled="False"
+     ItemTemplate="{StaticResource ProductWideTemplate}">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
                             <Setter Property="Padding" Value="0" />
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                             <Setter Property="Background" Value="White" />
-                            <Setter Property="Margin" Value="0,1,0,0" />
+                            <Setter Property="Margin" Value="0" />
                         </Style>
                     </ListView.ItemContainerStyle>
-
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="models:ProductItemDto">
-                            <Grid Padding="16,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="40" />
-                                    <ColumnDefinition Width="150" />
-                                    <ColumnDefinition Width="3*" />
-                                    <ColumnDefinition Width="2*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                <controls:BlueCheckBox IsChecked="{x:Bind IsSelected, Mode=TwoWay}"/>
-
-                                <!-- Multiple Product Images - Fixed Width with Clipping -->
-                                <Border Grid.Column="1" 
- Width="150"
-    Height="44"
- HorizontalAlignment="Left">
-                                    <Border.Clip>
-                                        <RectangleGeometry Rect="0,0,150,44" />
-                                    </Border.Clip>
-                                    <StackPanel Orientation="Horizontal" 
-  Spacing="4">
-                                        <!-- Image 1: Always show if exists -->
-                                        <Border Width="40" Height="40" 
-   CornerRadius="4"
-    Background="#FFF0F0F0"
-Visibility="{Binding ImagePaths, Converter={StaticResource CollectionHasItemsConverter}, ConverterParameter=0}">
-                                            <Image Stretch="UniformToFill">
-                                                <Image.Source>
-                                                    <BitmapImage UriSource="{Binding ImagePaths, Converter={StaticResource ImageAtIndexConverter}, ConverterParameter=0}" />
-                                                </Image.Source>
-                                            </Image>
-                                        </Border>
-
-                                        <!-- Image 2: Always show if exists -->
-                                        <Border Width="40" Height="40" 
- CornerRadius="4"
- Background="#FFF0F0F0"
-      Visibility="{Binding ImagePaths, Converter={StaticResource CollectionHasItemsConverter}, ConverterParameter=1}">
-                                            <Image Stretch="UniformToFill">
-                                                <Image.Source>
-                                                    <BitmapImage UriSource="{Binding ImagePaths, Converter={StaticResource ImageAtIndexConverter}, ConverterParameter=1}" />
-                                                </Image.Source>
-                                            </Image>
-                                        </Border>
-
-                                        <!-- Image 3: Only show if count is exactly 3 (NOT more than 3) -->
-                                        <Border Width="40" Height="40" 
-  CornerRadius="4"
-      Background="#FFF0F0F0"
-  Visibility="{Binding ImagePaths, Converter={StaticResource CollectionHasExactlyConverter}, ConverterParameter=3}">
-                                            <Image Stretch="UniformToFill">
-                                                <Image.Source>
-                                                    <BitmapImage UriSource="{Binding ImagePaths, Converter={StaticResource ImageAtIndexConverter}, ConverterParameter=2}" />
-                                                </Image.Source>
-                                            </Image>
-                                        </Border>
-
-                                        <!-- More indicator: Show when count > 3 -->
-                                        <Border Width="40" Height="40"
-   CornerRadius="4"
-        Background="#FFE0E0E0"
-    Visibility="{Binding ImagePaths, Converter={StaticResource HasMoreThanConverter}, ConverterParameter=3}">
-                                            <TextBlock Text="..."
-        FontSize="18"
-      FontWeight="Bold"
-     HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-     Foreground="#FF666666" />
-                                        </Border>
-                                    </StackPanel>
-                                </Border>
-
-                                <StackPanel Grid.Column="2" Spacing="2">
-                                    <TextBlock Text="{x:Bind Name}" />
-                                    <TextBlock Text="{x:Bind Sku}"
-  FontSize="11"
-Opacity="0.6" />
-                                </StackPanel>
-
-                                <TextBlock Grid.Column="3" Text="{x:Bind CategoryName}" />
-                                <TextBlock Grid.Column="4" Text="{x:Bind StockQuantity}" />
-                                <TextBlock Grid.Column="5" Text="{x:Bind SalePrice}" />
-
-                                <StackPanel Grid.Column="6"
-       Orientation="Horizontal"
-    HorizontalAlignment="Right"
-      Spacing="8">
-                                    <Button Content="👁"
-     Width="28" Height="28" Padding="0"
-          Command="{Binding DataContext.ViewProductCommand, ElementName=ProductListView}"
-        CommandParameter="{Binding}" />
-                                    <Button Content="✏"
- Width="28" Height="28" Padding="0"
-     Command="{Binding DataContext.EditProductCommand, ElementName=ProductListView}"
-      CommandParameter="{Binding}" />
-                                    <Button Content="🗑"
-   Width="28" Height="28" Padding="0"
-         Command="{Binding DataContext.OpenDeleteConfirmCommand, ElementName=ProductListView}"
- CommandParameter="{Binding}" />
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
                 </ListView>
             </Grid>
 
@@ -377,7 +420,7 @@ Opacity="0.6" />
         </Grid>
 
         <!-- ================= OVERLAY ADD PRODUCT ================= -->
-        <Grid x:Name="AddProductOverlay" Visibility="{Binding Dialogs.AddVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Grid x:Name="AddProductOverlay" Visibility="{Binding Dialogs.AddVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="-24">
             <Grid.Background>
                 <SolidColorBrush Color="Black" Opacity="0.6"/>
             </Grid.Background>
@@ -537,7 +580,7 @@ CornerRadius="16"
         </Grid>
 
         <!-- ================= OVERLAY EDIT PRODUCT ================= -->
-        <Grid x:Name="EditProductOverlay" Visibility="{Binding Dialogs.EditVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Grid x:Name="EditProductOverlay" Visibility="{Binding Dialogs.EditVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="-24">
             <Grid.Background>
                 <SolidColorBrush Color="Black" Opacity="0.6"/>
             </Grid.Background>
@@ -714,7 +757,8 @@ FontSize="11"
                            FontWeight="SemiBold" />
 
                         <TextBox PlaceholderText="Search category..."
-                         Text="{Binding CategorySearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                         Text="{Binding CategorySearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         TextChanged="CategorySearchTextBox_TextChanged" />
 
                         <Button Content="Search"
                         Margin="0,4,0,4"
