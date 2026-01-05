@@ -13,7 +13,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-   <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
 <!-- Header -->
@@ -46,8 +47,23 @@
   </StackPanel>
         </Grid>
 
+        <!-- Error message -->
+        <Border Grid.Row="1"
+                Margin="0,12,0,0"
+                Padding="12"
+                Background="#FFF8D7DA"
+                BorderBrush="#FFDC3545"
+                BorderThickness="1"
+                CornerRadius="8"
+                Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon Glyph="&#xEA39;" Foreground="#FFB02A37" />
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="#FFB02A37" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
         <!-- Summary cards -->
-        <Grid Grid.Row="1"
+        <Grid Grid.Row="2"
      Margin="0,20,0,0"
         HorizontalAlignment="Stretch"
               VerticalAlignment="Top">
@@ -110,7 +126,7 @@ Margin="0,4,0,0" />
 </Grid>
 
         <!-- Main content -->
-  <ScrollViewer Grid.Row="2" Margin="0,20,0,0" VerticalScrollBarVisibility="Auto">
+  <ScrollViewer Grid.Row="3" Margin="0,20,0,0" VerticalScrollBarVisibility="Auto">
 <Grid>
     <Grid.RowDefinitions>
        <RowDefinition Height="Auto" />
@@ -276,9 +292,9 @@ YAxes="{Binding DailyRevenueYAxes}" />
         </ScrollViewer>
 
  <!-- Loading overlay -->
-     <Grid Grid.RowSpan="3"
- Background="#80000000"
-     Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+     <Grid Grid.RowSpan="4"
+  Background="#80000000"
+      Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
      <ProgressRing IsActive="True"
     Width="60"
      Height="60" />
