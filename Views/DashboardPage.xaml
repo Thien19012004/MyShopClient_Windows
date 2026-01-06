@@ -25,6 +25,7 @@
                               PromotionsRequested="Sidebar_PromotionsRequested"
                               LogoutRequested="Sidebar_LogoutRequested"
                               ReportsRequested="Sidebar_ReportsRequested"
+                              KpiRequested="Sidebar_KpiRequested"
                               SettingsRequested="Sidebar_SettingsRequested"/>
 
         <Grid Grid.Column="1">

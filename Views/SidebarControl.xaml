@@ -144,6 +144,16 @@
                 </Grid>
             </Button>
 
+            <!-- KPI -->
+            <Button x:Name="KpiButton"
+                    Style="{StaticResource MenuButtonStyle}"
+                    Click="Kpi_Click">
+                <Grid Padding="{StaticResource MenuItemPadding}" ColumnDefinitions="Auto,10,*" VerticalAlignment="Center">
+                    <FontIcon Glyph="&#xE9D9;" FontSize="16" Foreground="{StaticResource SidebarIconColor}"/>
+                    <TextBlock Grid.Column="2" Text="KPI" x:Name="KpiText" Foreground="{StaticResource SidebarTextColor}" VerticalAlignment="Center"/>
+                </Grid>
+            </Button>
+
             <!-- Settings -->
             <Button x:Name="SettingsButton"
                     Style="{StaticResource MenuButtonStyle}"

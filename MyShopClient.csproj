@@ -19,6 +19,7 @@
     <None Remove="Views\CustomerPage.xaml" />
     <None Remove="Views\DashboardHomePage.xaml" />
     <None Remove="Views\DashboardPage.xaml" />
+    <None Remove="Views\KpiPage.xaml" />
     <None Remove="Views\LoginPage.xaml" />
     <None Remove="Views\OrderPage.xaml" />
     <None Remove="Views\ProductPage.xaml" />
@@ -64,6 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\OnboardingOverlay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\KpiPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <None Update="Views\SettingsPage.xaml">

@@ -54,7 +54,7 @@
 
                 <TextBlock Grid.Column="6" VerticalAlignment="Center">
                     <Run Text="{x:Bind TotalPrice}"/>
-                    <Run Text=" d"/>
+                    <Run Text=" VND"/>
                 </TextBlock>
 
                 <StackPanel Grid.Column="7" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
@@ -106,7 +106,7 @@
 
                 <TextBlock Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center">
                     <Run Text="{x:Bind TotalPrice}"/>
-                    <Run Text=" d"/>
+                    <Run Text=" VND"/>
                 </TextBlock>
 
                 <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
@@ -161,7 +161,7 @@
                             <TextBlock Text="Amount (page)" FontWeight="SemiBold"/>
                             <TextBlock>
  <Run Text="{Binding TotalAmountOnPage}"/>
- <Run Text=" đ"/>
+ <Run Text=" VND"/>
                             </TextBlock>
                         </StackPanel>
                     </Border>
@@ -565,7 +565,7 @@
                                                 <TextBlock Text=" — "/>
                                                 <TextBlock>
  <Run Text="{x:Bind UnitPrice}"/>
- <Run Text=" d"/>
+ <Run Text=" VND"/>
                                                 </TextBlock>
                                             </StackPanel>
                                         </DataTemplate>

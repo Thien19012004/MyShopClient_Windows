@@ -59,6 +59,10 @@ namespace MyShopClient.Views
                         Sidebar.SetActiveMenu(SidebarMenu.Reports);
                         ContentFrame.Navigate(typeof(ReportPage));
                         break;
+                    case nameof(KpiPage):
+                        Sidebar.SetActiveMenu(SidebarMenu.Kpi);
+                        ContentFrame.Navigate(typeof(KpiPage));
+                        break;
                     case nameof(SettingsPage):
                         Sidebar.SetActiveMenu(SidebarMenu.Settings);
                         ContentFrame.Navigate(typeof(SettingsPage));
@@ -134,6 +138,15 @@ namespace MyShopClient.Views
 
             if (ContentFrame.CurrentSourcePageType != typeof(ReportPage))
                 ContentFrame.Navigate(typeof(ReportPage));
+        }
+
+        private void Sidebar_KpiRequested(object sender, System.EventArgs e)
+        {
+            Sidebar.SetActiveMenu(SidebarMenu.Kpi);
+            _appSettings.LastVisitedPage = nameof(KpiPage);
+
+            if (ContentFrame.CurrentSourcePageType != typeof(KpiPage))
+                ContentFrame.Navigate(typeof(KpiPage));
         }
 
         private void Sidebar_SettingsRequested(object sender, System.EventArgs e)

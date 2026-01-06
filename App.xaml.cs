@@ -23,6 +23,8 @@ using MyShopClient.Services.Navigation;
 using MyShopClient.Services.AppSettings;
 using MyShopClient.Services.OnBoarding;
 using MyShopClient.Services.SecureStorage;
+using MyShopClient.Services.Kpi;
+using MyShopClient.ViewModels.Kpi;
 
 namespace MyShopClient;
 
@@ -128,6 +130,7 @@ public partial class App : Application
         services.AddSingleton<IImageUploadService, ImageUploadService>();
         services.AddSingleton<IPromotionService, PromotionService>();
         services.AddSingleton<IPdfExportService, PdfExportService>();
+        services.AddSingleton<IKpiService, KpiService>();
 
         // 4. ViewModels
         services.AddTransient<LoginViewModel>();
@@ -139,6 +142,7 @@ public partial class App : Application
         services.AddTransient<ReportViewModel>();
         services.AddTransient<PromotionListViewModel>();
         services.AddTransient<SettingsViewModel>();
+        services.AddTransient<KpiViewModel>();
 
         // Register OnboardingService so Dashboard can run onboarding tour on first launch and from Settings if needed.
         services.AddSingleton<IOnboardingService, OnboardingService>();
