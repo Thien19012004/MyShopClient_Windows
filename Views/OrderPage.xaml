@@ -444,9 +444,11 @@
                                       ItemsSource="{Binding AddVm.CustomerOptions}"
                                       DisplayMemberPath="Name"
                                       SelectedItem="{Binding AddVm.SelectedCustomer, Mode=TwoWay}"/>
-                            <TextBox Header="Sale Id"
-                                     Width="200"
-                                     Text="{Binding AddVm.SaleIdText, Mode=TwoWay}"/>
+                            <ComboBox Header="Sale"
+                                      Width="200"
+                                      ItemsSource="{Binding AddVm.SaleOptions}"
+                                      DisplayMemberPath="Name"
+                                      SelectedItem="{Binding AddVm.SelectedSale, Mode=TwoWay}"/>
                         </StackPanel>
 
                         <!-- Order promotion (ORDER scope) -->

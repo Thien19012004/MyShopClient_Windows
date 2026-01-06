@@ -83,6 +83,7 @@ namespace MyShopClient.ViewModels.Orders
             NewOrderItems.Add(new OrderItemInputVM { ProductId = 0, ProductName = string.Empty, Quantity = 1 });
             _ = LoadPromotionsAsync();
             _ = LoadCustomersAsync();
+            _ = LoadSalesListAsync();
             ProductSuggestions.Clear();
             SelectedOrderPromotion = OrderPromotionOptions.FirstOrDefault();
             UpdatePreview();
@@ -125,18 +126,145 @@ namespace MyShopClient.ViewModels.Orders
             {
                 var res = await _customerService.GetCustomersAsync(new CustomerQueryOptions { Page = 1, PageSize = 200 });
                 CustomerOptions.Clear();
-                SaleOptions.Clear();
 
                 if (res.Success && res.Data != null)
                 {
                     foreach (var c in res.Data.Items)
                     {
                         CustomerOptions.Add(c);
-                        SaleOptions.Add(c);
                     }
                 }
             }
             catch { }
+        }
+
+        private async Task LoadSalesListAsync()
+        {
+            try
+            {
+                SaleOptions.Clear();
+                // Resolve auth and kpi services from service provider
+                var auth = App.Services.GetService(typeof(Services.Auth.IAuthService)) as Services.Auth.IAuthService;
+                var kpi = App.Services.GetService(typeof(Services.Kpi.IKpiService)) as Services.Kpi.IKpiService;
+                var current = auth?.CurrentUser;
+
+                bool isAdmin = current != null && current.Roles.Any(r =>
+                !string.IsNullOrEmpty(r) && (
+                r.IndexOf("admin", StringComparison.OrdinalIgnoreCase) >=0 ||
+                r.IndexOf("mod", StringComparison.OrdinalIgnoreCase) >=0
+                ));
+
+                bool isSale = current != null && current.Roles.Any(r => r.Equals("Sale", StringComparison.OrdinalIgnoreCase));
+
+                // If user is a Sale (non-admin), only show their own entry
+                if (isSale && !isAdmin)
+                {
+                    SaleOptions.Add(new CustomerListItemDto { CustomerId = current!.UserId, Name = current.FullName ?? current.Username });
+                    SelectedSale = SaleOptions.FirstOrDefault();
+                    return;
+                }
+
+                // Admin/Moderator: load sales via KPI service
+                if (kpi != null)
+                {
+                    var res = await kpi.GetKpiCommissionsAsync(null, null, null, 1, 200);
+                    if (res.Success && res.Data != null)
+                    {
+                        var unique = res.Data.Items
+                        .GroupBy(i => i.SaleId)
+                        .Select(g => g.First())
+                        .ToList();
+
+                        foreach (var s in unique)
+                        {
+                            SaleOptions.Add(new CustomerListItemDto { CustomerId = s.SaleId, Name = s.SaleName });
+                        }
+                    }
+
+                    var targets = await kpi.GetSaleKpiTargetsAsync(null, null, null, 1, 200);
+                    if (targets.Success && targets.Data != null)
+                    {
+                        var existing = SaleOptions.Select(x => x.CustomerId).ToHashSet();
+                        var add = targets.Data.Items.Where(t => !existing.Contains(t.SaleId)).GroupBy(t => t.SaleId).Select(g => g.First());
+                        foreach (var s in add)
+                            SaleOptions.Add(new CustomerListItemDto { CustomerId = s.SaleId, Name = s.SaleName });
+                    }
+                }
+
+                // Additionally, if admin/moderator, fetch all users so moderators (e.g. StoreModerator) appear
+                if (isAdmin)
+                {
+                    try
+                    {
+                        var gql = App.Services.GetService(typeof(MyShopClient.Infrastructure.GraphQL.IGraphQLClient)) as MyShopClient.Infrastructure.GraphQL.IGraphQLClient;
+                        if (gql != null)
+                        {
+                            const string usersQuery = @"
+query($pagination: PaginationInput, $filter: UserFilterInput) {
+ users(pagination: $pagination, filter: $filter) {
+ statusCode
+ success
+ message
+ data {
+ page
+ pageSize
+ totalItems
+ totalPages
+ items {
+ userId
+ username
+ fullName
+ isActive
+ roles
+ }
+ }
+ }
+}";
+                           
+                            var variables = new { pagination = new { page =1, pageSize =500 }, filter = (object?)null };
+                           
+                            var usersRes = await gql.SendAsync<UsersRoot>(usersQuery, variables);
+                            var usersPage = usersRes?.Users?.Data;
+                            if (usersPage?.Items != null)
+                            {
+                                var existing = SaleOptions.Select(s => s.CustomerId).ToHashSet();
+                                foreach (var u in usersPage.Items)
+                                {
+                                    if (u == null) continue;
+                                    if (existing.Contains(u.UserId)) continue;
+                                    // include moderators and sales and admins
+                                    var roles = u.Roles ?? new List<string>();
+                                    bool isSaleUser = roles.Any(r => r != null && r.Equals("Sale", StringComparison.OrdinalIgnoreCase));
+                                    bool isModOrAdmin = roles.Any(r => !string.IsNullOrEmpty(r) && (r.IndexOf("mod", StringComparison.OrdinalIgnoreCase) >=0 || r.IndexOf("admin", StringComparison.OrdinalIgnoreCase) >=0));
+                                    if (isSaleUser || isModOrAdmin)
+                                    {
+                                        var name = u.FullName ?? u.Username ?? string.Format("User {0}", u.UserId);
+                                        SaleOptions.Add(new CustomerListItemDto { CustomerId = u.UserId, Name = name });
+                                        existing.Add(u.UserId);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[OrderAdd] LoadSalesListAsync users fetch error: {ex.Message}");
+                    }
+                }
+
+                // Ensure current user appears (even if admin)
+                if (current != null && !SaleOptions.Any(s => s.CustomerId == current.UserId))
+                {
+                    SaleOptions.Insert(0, new CustomerListItemDto { CustomerId = current.UserId, Name = current.FullName ?? current.Username });
+                }
+
+                SelectedSale = SaleOptions.FirstOrDefault(s => s.CustomerId == current?.UserId) ?? SaleOptions.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                // swallow, but log
+                System.Diagnostics.Debug.WriteLine($"[OrderAdd] LoadSalesListAsync error: {ex.Message}");
+            }
         }
 
         public async Task<bool> DoConfirmAsync()
@@ -257,5 +385,10 @@ namespace MyShopClient.ViewModels.Orders
                 // swallow to avoid breaking typing
             }
         }
+
+        // DTOs used when fetching users via GraphQL
+        private class UserItem { public int UserId { get; set; } public string? Username { get; set; } public string? FullName { get; set; } public bool IsActive { get; set; } public List<string>? Roles { get; set; } }
+        private class UserPage { public List<UserItem>? Items { get; set; } }
+        private class UsersRoot { public ApiResult<UserPage>? Users { get; set; } }
     }
 }

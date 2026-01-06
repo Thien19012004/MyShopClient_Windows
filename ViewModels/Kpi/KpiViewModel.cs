@@ -121,6 +121,7 @@ namespace MyShopClient.ViewModels.Kpi
                 if (SetProperty(ref _isAdmin, value))
                 {
                     OnPropertyChanged(nameof(IsSaleOnly));
+                    OnPropertyChanged(nameof(ShowSaleSelector));
                 }
             }
         }
@@ -134,9 +135,13 @@ namespace MyShopClient.ViewModels.Kpi
                 if (SetProperty(ref _isSale, value))
                 {
                     OnPropertyChanged(nameof(IsSaleOnly));
+                    OnPropertyChanged(nameof(ShowSaleSelector));
                 }
             }
         }
+
+        // Show sale selector when user is Admin or Sale
+        public bool ShowSaleSelector => IsAdmin || IsSale;
 
         public bool IsSaleOnly => IsSale && !IsAdmin;
 
@@ -339,63 +344,56 @@ namespace MyShopClient.ViewModels.Kpi
 
         public async Task LoadSalesAsync()
         {
-            if (!IsAdmin) return;
-
             try
             {
-                // Load sales from KPI targets or commissions
-                var result = await _kpiService.GetKpiCommissionsAsync(null, null, null, 1, 100);
-                if (result.Success && result.Data != null)
-                {
-                    Sales.Clear();
+                Sales.Clear();
 
-                    // Add current user first
+                // If user is a Sale (non-admin), only show their own entry
+                if (IsSale && !IsAdmin)
+                {
                     Sales.Add(new SaleOption
                     {
                         SaleId = CurrentUserId,
-                        DisplayName = $"{CurrentUserName} (Me)"
+                        DisplayName = CurrentUserName
                     });
 
-                    // Get unique sales from commissions
+                    SelectedSale = Sales.FirstOrDefault();
+                    return;
+                }
+
+                // For Admin/Moderator: load from commissions and targets
+                var result = await _kpiService.GetKpiCommissionsAsync(null, null, null,1,100);
+
+                if (result.Success && result.Data != null)
+                {
                     var uniqueSales = result.Data.Items
-              .Where(c => c.SaleId != CurrentUserId)
-                  .GroupBy(c => c.SaleId)
-                  .Select(g => g.First())
-                   .ToList();
+                    .Where(c => c.SaleId != CurrentUserId) // exclude current user even if admin
+                    .GroupBy(c => c.SaleId)
+                    .Select(g => g.First())
+                    .ToList();
 
                     foreach (var sale in uniqueSales)
                     {
-                        Sales.Add(new SaleOption
-                        {
-                            SaleId = sale.SaleId,
-                            DisplayName = sale.SaleName
-                        });
+                        Sales.Add(new SaleOption { SaleId = sale.SaleId, DisplayName = sale.SaleName });
                     }
-
-                    // Also try to get from targets
-                    var targetsResult = await _kpiService.GetSaleKpiTargetsAsync(null, null, null, 1, 100);
-                    if (targetsResult.Success && targetsResult.Data != null)
-                    {
-                        var existingIds = Sales.Select(s => s.SaleId).ToHashSet();
-                        var additionalSales = targetsResult.Data.Items
-                         .Where(t => !existingIds.Contains(t.SaleId))
-                        .GroupBy(t => t.SaleId)
-                         .Select(g => g.First())
-                                         .ToList();
-
-                        foreach (var sale in additionalSales)
-                        {
-                            Sales.Add(new SaleOption
-                            {
-                                SaleId = sale.SaleId,
-                                DisplayName = sale.SaleName
-                            });
-                        }
-                    }
-
-                    // Select current user by default
-                    SelectedSale = Sales.FirstOrDefault(s => s.SaleId == CurrentUserId);
                 }
+
+                var targetsResult = await _kpiService.GetSaleKpiTargetsAsync(null, null, null,1,100);
+                if (targetsResult.Success && targetsResult.Data != null)
+                {
+                    var existing = Sales.Select(s => s.SaleId).ToHashSet();
+                    var additional = targetsResult.Data.Items
+                    .Where(t => !existing.Contains(t.SaleId))
+                    .GroupBy(t => t.SaleId)
+                    .Select(g => g.First())
+                    .ToList();
+
+                    foreach (var sale in additional)
+                    Sales.Add(new SaleOption { SaleId = sale.SaleId, DisplayName = sale.SaleName });
+                }
+
+                // Select first sale by default
+                SelectedSale = Sales.FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -752,9 +750,14 @@ namespace MyShopClient.ViewModels.Kpi
         {
             UpdateUserInfo();
 
-            if (IsAdmin)
+            // Load sales selector for Admins and Sales (sales see only themselves)
+            if (IsAdmin || IsSale)
             {
                 await LoadSalesAsync();
+            }
+
+            if (IsAdmin)
+            {
                 await LoadTiersAsync();
             }
 

@@ -25,12 +25,12 @@
              
   <!-- Controls wrap -->
  <StackPanel Orientation="Horizontal" Spacing="12">
-       <!-- Sale Selector (Admin only) -->
+       <!-- Sale Selector (Admin or Sale) -->
        <ComboBox ItemsSource="{Binding Sales}" 
     SelectedItem="{Binding SelectedSale, Mode=TwoWay}"
   MinWidth="150" VerticalAlignment="Center"
      PlaceholderText="Select Sale"
-        Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        Visibility="{Binding ShowSaleSelector, Converter={StaticResource BooleanToVisibilityConverter}}"/>
       
     <ComboBox ItemsSource="{Binding Years}" 
       SelectedItem="{Binding SelectedYear, Mode=TwoWay}"
@@ -327,11 +327,14 @@ TextTrimming="CharacterEllipsis"/>
         <TextBlock Text="➕ Set Monthly Target" FontWeight="SemiBold" FontSize="15"/>
       <StackPanel Orientation="Horizontal" Spacing="16">
         <StackPanel Spacing="4">
-     <TextBlock Text="Sale ID" FontSize="12" Opacity="0.7"/>
-<NumberBox Value="{Binding TargetSaleId, Mode=TwoWay}" 
-     Minimum="1" SpinButtonPlacementMode="Hidden" 
-   Width="100" PlaceholderText="ID"/>
-  </StackPanel>
+     <TextBlock Text="Sale" FontSize="12" Opacity="0.7"/>
+     <ComboBox ItemsSource="{Binding Sales}"
+    SelectedValuePath="SaleId"
+    SelectedValue="{Binding TargetSaleId, Mode=TwoWay}"
+    MinWidth="150"
+    PlaceholderText="Select Sale"
+    DisplayMemberPath="DisplayName"/>
+     </StackPanel>
 <StackPanel Spacing="4">
    <TextBlock Text="Target Revenue (VND)" FontSize="12" Opacity="0.7"/>
         <NumberBox Value="{Binding TargetRevenueInput, Mode=TwoWay}" 
