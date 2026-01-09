@@ -76,7 +76,13 @@ namespace MyShopClient.Infrastructure.GraphQL
                 {
                     var client = _httpFactory.CreateClient("Api");
                     var url = _config.GraphQlEndpoint;
+
+                    // T?i ?u hóa cho multipart upload: không có timeout quá s?m
+                    // Timeout m?c ??nh là t?t, nh?ng có th? ?i?u ch?nh t?i HttpClientFactory
+
                     using var response = await client.PostAsync(url, content, ct);
+
+                    // ??c response content m?t cách hi?u qu?
                     var responseContent = await response.Content.ReadAsStringAsync(ct);
 
                     if (!response.IsSuccessStatusCode)
@@ -98,6 +104,10 @@ namespace MyShopClient.Infrastructure.GraphQL
                     lastException = ex;
                     Debug.WriteLine($"[GraphQL] Transient error on attempt {attempt + 1}: {ex.Message}. Retrying...");
                     await Task.Delay(RetryDelays[attempt], ct);
+
+                    // Dispose content n?u retry ?? tránh rò r? resource
+                    content?.Dispose();
+                    content = new MultipartFormDataContent();
                 }
             }
 

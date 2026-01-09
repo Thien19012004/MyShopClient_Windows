@@ -641,7 +641,7 @@
                         </Border>
 
                         <ComboBox Header="Status"
- ItemsSource="{Binding StatusOptions}"
+ ItemsSource="{Binding EditVm.StatusOptions}"
  SelectedItem="{Binding EditVm.EditStatusText, Mode=TwoWay}"
  IsEnabled="{Binding EditVm.EditOriginallyPaid, Converter={StaticResource InverseBooleanConverter}}"/>
 

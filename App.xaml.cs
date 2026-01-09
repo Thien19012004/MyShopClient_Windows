@@ -181,8 +181,16 @@ public partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        var window = new MainWindow();
-        MainWindow = window;
-        window.Activate();
+        try
+        {
+            var window = new MainWindow();
+            MainWindow = window;
+            window.Activate();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine("[FATAL] OnLaunched exception: " + ex.ToString());
+            System.Diagnostics.Debugger.Break();
+        }
     }
 }

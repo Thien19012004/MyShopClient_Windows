@@ -462,7 +462,7 @@ CornerRadius="16"
          Text="{Binding Dialogs.AddVm.StockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <ComboBox Header="Category"
-     ItemsSource="{Binding Categories}"
+     ItemsSource="{Binding DialogCategories}"
         SelectedItem="{Binding Dialogs.AddVm.Category, Mode=TwoWay}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -623,7 +623,7 @@ Text="{Binding Dialogs.EditVm.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyCha
              Text="{Binding Dialogs.EditVm.StockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <ComboBox Header="Category"
-          ItemsSource="{Binding Categories}"
+          ItemsSource="{Binding DialogCategories}"
        SelectedItem="{Binding Dialogs.EditVm.Category, Mode=TwoWay}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>

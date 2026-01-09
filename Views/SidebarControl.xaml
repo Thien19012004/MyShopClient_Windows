@@ -109,7 +109,7 @@
                     Style="{StaticResource MenuButtonStyle}"
                     Click="Orders_Click">
                 <Grid Padding="{StaticResource MenuItemPadding}" ColumnDefinitions="Auto,10,*" VerticalAlignment="Center">
-                    <FontIcon Glyph="&#xE14C;" FontSize="16" Foreground="{StaticResource SidebarIconColor}"/>
+                    <FontIcon Glyph="&#xE7BF;" FontSize="16" Foreground="{StaticResource SidebarIconColor}"/>
                     <TextBlock Grid.Column="2" Text="Orders" x:Name="OrdersText" Foreground="{StaticResource SidebarTextColor}" VerticalAlignment="Center"/>
                 </Grid>
             </Button>
@@ -177,7 +177,7 @@
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Center"
                         Spacing="8">
-                <FontIcon Glyph="&#xE700;" FontSize="16"/>
+                <FontIcon Glyph="&#xF3B1;" FontSize="16"/>
                 <TextBlock x:Name="LogoutText"
                            Text="Log out"/>
             </StackPanel>

@@ -43,6 +43,8 @@ namespace MyShopClient.ViewModels
 
         public ObservableCollection<ProductItemDto> Products { get; } = new();
         public ObservableCollection<CategoryOption> Categories { get; } = new();
+        // Categories used specifically for Add/Edit dialogs (exclude "All")
+        public ObservableCollection<CategoryOption> DialogCategories { get; } = new();
         public ObservableCollection<string> SortOptions { get; } =
             new(new[] { "Name (A-Z)", "Name (Z-A)", "Price (Low → High)", "Price (High → Low)" });
 
@@ -234,6 +236,7 @@ namespace MyShopClient.ViewModels
         {
             Categories.Clear();
             Categories.Add(new CategoryOption { Id = null, Name = "All" });
+            DialogCategories.Clear();
 
             try
             {
@@ -242,11 +245,14 @@ namespace MyShopClient.ViewModels
                 {
                     foreach (var c in result.Data.Items)
                     {
-                        Categories.Add(new CategoryOption
+                        var opt = new CategoryOption
                         {
                             Id = c.CategoryId,
                             Name = c.Name
-                        });
+                        };
+                        Categories.Add(opt);
+                        // also add to dialog-only list (exclude the "All" option)
+                        DialogCategories.Add(opt);
                     }
                 }
             }
@@ -260,8 +266,8 @@ namespace MyShopClient.ViewModels
             }
 
             SelectedCategory ??= Categories.FirstOrDefault();
-            NewProductCategory ??= Categories.FirstOrDefault(c => c.Id != null);
-            EditCategory ??= Categories.FirstOrDefault(c => c.Id != null);
+            NewProductCategory ??= DialogCategories.FirstOrDefault();
+            EditCategory ??= DialogCategories.FirstOrDefault();
         }
 
         // ========== LOAD CATEGORY list cho dialog Manage ==========

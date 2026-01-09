@@ -55,8 +55,13 @@ namespace MyShopClient.ViewModels
 
         public ObservableCollection<OrderListItemDto> Orders { get; } = new();
 
+        // Status options cho list page (có "All" để filter)
         public ObservableCollection<string> StatusOptions { get; } =
             new(new[] { "All", "Created", "Paid", "Cancelled" });
+
+        // Status options cho edit dialog (không có "All")
+        public ObservableCollection<string> EditStatusOptions { get; } =
+            new(new[] { "Created", "Paid", "Cancelled" });
 
         [ObservableProperty] private string selectedStatus = "All";
         [ObservableProperty] private string? customerNameText;

@@ -1,8 +1,8 @@
 namespace MyShopClient.Infrastructure.GraphQL
 {
- public static class ImageUploadQueries
- {
- public const string UploadImageMutation = @"
+    public static class ImageUploadQueries
+    {
+        public const string UploadImageMutation = @"
 mutation UploadProductAsset($file: Upload!) {
  uploadProductAsset(file: $file) {
  statusCode
@@ -15,7 +15,7 @@ mutation UploadProductAsset($file: Upload!) {
  }
 }";
 
- public const string DeleteImageMutation = @"
+        public const string DeleteImageMutation = @"
 mutation DeleteAsset($publicId: String!) {
  deleteUploadedAsset(publicId: $publicId) {
  statusCode
@@ -24,5 +24,5 @@ mutation DeleteAsset($publicId: String!) {
  data
  }
 }";
- }
+    }
 }
