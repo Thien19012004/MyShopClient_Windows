@@ -86,6 +86,7 @@ public partial class App : Application
                 baseUrl += "/";
 
             client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
+            // Đặt timeout mặc định là 5 phút cho regular requests, multipart sẽ tự set timeout riêng
             client.Timeout = TimeSpan.FromMinutes(5);
 
             client.DefaultRequestHeaders.ConnectionClose = false;
@@ -93,17 +94,21 @@ public partial class App : Application
         })
         .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
         {
+            // Connection pooling settings
             PooledConnectionLifetime = TimeSpan.FromMinutes(10),
             PooledConnectionIdleTimeout = TimeSpan.FromMinutes(5),
             MaxConnectionsPerServer = 20,
             EnableMultipleHttp2Connections = true,
 
+            // Keep-alive settings để tránh bị đóng connection
             KeepAlivePingDelay = TimeSpan.FromSeconds(30),
             KeepAlivePingTimeout = TimeSpan.FromSeconds(15),
             KeepAlivePingPolicy = System.Net.Http.HttpKeepAlivePingPolicy.Always,
 
+            // Response handling - important để tránh hanging
             ResponseDrainTimeout = TimeSpan.FromSeconds(10),
             ConnectTimeout = TimeSpan.FromSeconds(30),
+
             AutomaticDecompression = System.Net.DecompressionMethods.All
         })
         .AddHttpMessageHandler(sp => sp.GetRequiredService<MyShopClient.Infrastructure.Http.RetryHandler>())
