@@ -337,41 +337,41 @@ if (failedIds.Count >0 && success ==0)
 
         // Commands for selectors
         [RelayCommand]
-        private async Task OpenProductSelector()
-    {
-         await ProductSelectorVm.LoadProductsAsync();
-            AddVm.IsProductSelectorOpen = true;
-        }
-
-        [RelayCommand]
-        private void CloseProductSelector()
-        {
-     // Transfer selected items from ProductSelectorVm to AddVm
- AddVm.SelectedProducts.Clear();
-      foreach (var p in ProductSelectorVm.Products.Where(p => p.IsSelected))
+private async Task OpenProductSelector()
      {
-         AddVm.SelectedProducts.Add(p);
-            }
-    AddVm.IsProductSelectorOpen = false;
-        }
-
-        [RelayCommand]
-private async Task OpenCategorySelector()
-        {
-            await CategorySelectorVm.LoadCategoriesAsync();
-       AddVm.IsCategorySelectorOpen = true;
+            await ProductSelectorVm.LoadProductsAsync();
+          
+      // Restore selected state from AddVm
+            AddVm.ApplySelectedStatesToProducts(ProductSelectorVm.Products);
+            
+        AddVm.IsProductSelectorOpen = true;
         }
 
    [RelayCommand]
-     private void CloseCategorySelector()
-   {
-  // Transfer selected items from CategorySelectorVm to AddVm
-AddVm.SelectedCategories.Clear();
-            foreach (var c in CategorySelectorVm.Categories.Where(c => c.IsSelected))
-            {
- AddVm.SelectedCategories.Add(c);
-            }
-      AddVm.IsCategorySelectorOpen = false;
+        private void CloseProductSelector()
+        {
+     // Sync selected items from ProductSelectorVm to AddVm
+    AddVm.SyncSelectedProducts(ProductSelectorVm.Products);
+      AddVm.IsProductSelectorOpen = false;
+        }
+
+        [RelayCommand]
+        private async Task OpenCategorySelector()
+        {
+        await CategorySelectorVm.LoadCategoriesAsync();
+   
+         // Restore selected state from AddVm
+     AddVm.ApplySelectedStatesToCategories(CategorySelectorVm.Categories);
+
+  AddVm.IsCategorySelectorOpen = true;
+        }
+
+        [RelayCommand]
+        private void CloseCategorySelector()
+     {
+   // Sync selected items from CategorySelectorVm to AddVm
+  AddVm.SyncSelectedCategories(CategorySelectorVm.Categories);
+    AddVm.IsCategorySelectorOpen = false;
         }
   }
 }

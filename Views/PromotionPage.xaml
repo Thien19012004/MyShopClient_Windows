@@ -243,16 +243,16 @@
          Background="#FFEDEEF2"
         Padding="16,10"
      CornerRadius="8,8,0,0">
-                         <Grid.ColumnDefinitions>
-                             <ColumnDefinition Width="40"/>
-                             <ColumnDefinition Width="80"/>
-                             <ColumnDefinition Width="3*"/>
-                             <ColumnDefinition Width="160"/>
-                             <ColumnDefinition Width="120"/>
-                             <ColumnDefinition Width="180"/>
-                             <ColumnDefinition Width="180"/>
-                             <ColumnDefinition Width="Auto"/>
-                         </Grid.ColumnDefinitions>
+          <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="40"/>
+              <ColumnDefinition Width="80"/>
+      <ColumnDefinition Width="3*"/>
+    <ColumnDefinition Width="160"/>
+   <ColumnDefinition Width="120"/>
+          <ColumnDefinition Width="180"/>
+   <ColumnDefinition Width="180"/>
+        <ColumnDefinition Width="Auto"/>
+             </Grid.ColumnDefinitions>
 
                         <controls:BlueCheckBox x:Name="SelectAllPromotionCheckBoxWide" Grid.Column="0" Click="SelectAllPromotionCheckBox_Click" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="1" Text="ID" FontWeight="SemiBold"/>
@@ -395,14 +395,16 @@ Padding="20"
    <ColumnDefinition Width="*"/>
    <ColumnDefinition Width="Auto"/>
    </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" Spacing="2">
+      <StackPanel Grid.Column="0" Spacing="2">
            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
         <TextBlock Text="{Binding ProductId}" Opacity="0.7" FontSize="12"/>
      </StackPanel>
     <Button Grid.Column="1" Content="✕" 
-          Padding="8"
+      Padding="8"
      Width="32" Height="32"
-       HorizontalAlignment="Right"/>
+       HorizontalAlignment="Right"
+       Command="{Binding DataContext.AddVm.RemoveProductCommand, ElementName=PromotionListView}"
+    CommandParameter="{Binding}"/>
          </Grid>
       </Border>
          </DataTemplate>
@@ -435,14 +437,16 @@ Padding="20"
         <ColumnDefinition Width="*"/>
           <ColumnDefinition Width="Auto"/>
      </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" Spacing="2">
-        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+     <StackPanel Grid.Column="0" Spacing="2">
+     <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
   <TextBlock Text="{Binding CategoryId}" Opacity="0.7" FontSize="12"/>
    </StackPanel>
  <Button Grid.Column="1" Content="✕" 
   Padding="8"
        Width="32" Height="32"
-     HorizontalAlignment="Right"/>
+     HorizontalAlignment="Right"
+     Command="{Binding DataContext.AddVm.RemoveCategoryCommand, ElementName=PromotionListView}"
+  CommandParameter="{Binding}"/>
 </Grid>
     </Border>
      </DataTemplate>
