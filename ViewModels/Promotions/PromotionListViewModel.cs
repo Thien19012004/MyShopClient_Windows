@@ -77,7 +77,7 @@ public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
         private ViewModels.Promotions.CategorySelectorViewModel? _categorySelectorVm;
 
         public ViewModels.Promotions.PromotionAddViewModel AddVm => _addVm ??= new ViewModels.Promotions.PromotionAddViewModel(_promotionService, async () => await LoadPageAsync(CurrentPage));
-        public ViewModels.Promotions.PromotionEditViewModel EditVm => _editVm ??= new ViewModels.Promotions.PromotionEditViewModel(_promotionService, async () => await LoadPageAsync(CurrentPage));
+        public ViewModels.Promotions.PromotionEditViewModel EditVm => _editVm ??= new ViewModels.Promotions.PromotionEditViewModel(_promotionService, async () => await LoadPageAsync(CurrentPage), _productService, _categoryService);
  public ViewModels.Promotions.ProductSelectorViewModel ProductSelectorVm => _productSelectorVm ??= new ViewModels.Promotions.ProductSelectorViewModel(_productService);
         public ViewModels.Promotions.CategorySelectorViewModel CategorySelectorVm => _categorySelectorVm ??= new ViewModels.Promotions.CategorySelectorViewModel(_categoryService);
 
@@ -372,6 +372,44 @@ private async Task OpenProductSelector()
    // Sync selected items from CategorySelectorVm to AddVm
   AddVm.SyncSelectedCategories(CategorySelectorVm.Categories);
     AddVm.IsCategorySelectorOpen = false;
+        }
+
+    [RelayCommand]
+private async Task OpenEditProductSelector()
+{
+            await ProductSelectorVm.LoadProductsAsync();
+       
+      // Restore selected state from EditVm
+  EditVm.ApplySelectedStatesToProducts(ProductSelectorVm.Products);
+            
+ EditVm.IsProductSelectorOpen = true;
+   }
+
+        [RelayCommand]
+        private void CloseEditProductSelector()
+        {
+            // Sync selected items from ProductSelectorVm to EditVm
+   EditVm.SyncSelectedProducts(ProductSelectorVm.Products);
+     EditVm.IsProductSelectorOpen = false;
+        }
+
+  [RelayCommand]
+        private async Task OpenEditCategorySelector()
+        {
+   await CategorySelectorVm.LoadCategoriesAsync();
+     
+     // Restore selected state from EditVm
+            EditVm.ApplySelectedStatesToCategories(CategorySelectorVm.Categories);
+
+        EditVm.IsCategorySelectorOpen = true;
+        }
+
+        [RelayCommand]
+        private void CloseEditCategorySelector()
+        {
+ // Sync selected items from CategorySelectorVm to EditVm
+        EditVm.SyncSelectedCategories(CategorySelectorVm.Categories);
+    EditVm.IsCategorySelectorOpen = false;
         }
   }
 }
