@@ -3,12 +3,15 @@ using MyShopClient.Models;
 using MyShopClient.Services.Category;
 using System;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MyShopClient.ViewModels.Promotions
 {
     /// <summary>
-    /// Reusable Category Selector dialog - shows category list with checkboxes
+    /// Category Selector dialog - shows category list with checkboxes
+    /// Selection state is managed by the caller (AddVm/EditVm via SelectedCategories)
     /// </summary>
   public partial class CategorySelectorViewModel : ObservableObject
     {
@@ -18,13 +21,14 @@ namespace MyShopClient.ViewModels.Promotions
 
    [ObservableProperty] private string? errorMessage;
     [ObservableProperty] private bool isBusy;
+        [ObservableProperty] private int selectedCount = 0;
 
-        public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
+   public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
         public CategorySelectorViewModel(ICategoryService categoryService)
     {
    _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
-        }
+  }
 
    public async Task LoadCategoriesAsync()
    {
@@ -33,8 +37,8 @@ namespace MyShopClient.ViewModels.Promotions
        IsBusy = true;
        ErrorMessage = string.Empty;
 
-           try
-        {
+      try
+  {
      // Load all categories (no pagination needed for category selector)
   var result = await _categoryService.GetCategoriesAsync(null, 1, 1000);
 
@@ -43,23 +47,48 @@ namespace MyShopClient.ViewModels.Promotions
  ErrorMessage = result.Message ?? "Cannot load categories.";
      Categories.Clear();
         return;
-      }
+  }
 
  Categories.Clear();
-      foreach (var c in result.Data.Items)
+    foreach (var c in result.Data.Items)
    {
+    // Subscribe to IsSelected changes for real-time count update
+         c.PropertyChanged += (s, e) =>
+ {
+    if (e.PropertyName == nameof(CategoryItemDto.IsSelected))
+         {
+      RecalculateSelectedCount();
+      }
+   };
       Categories.Add(c);
-          }
-     }
+  }
+   
+RecalculateSelectedCount();
+   }
    catch (Exception ex)
-    {
-        ErrorMessage = ex.Message;
+ {
+     ErrorMessage = ex.Message;
        Categories.Clear();
    }
     finally
-           {
-          IsBusy = false;
+  {
+ IsBusy = false;
        }
-      }
+  }
+
+    public void UpdateSelectedCount(int count)
+      {
+   SelectedCount = count;
+  }
+
+      public void ResetSelectedCount()
+{
+      SelectedCount = 0;
     }
+
+    public void RecalculateSelectedCount()
+      {
+      SelectedCount = Categories.Count(c => c.IsSelected);
+      }
+  }
 }

@@ -15,44 +15,40 @@ namespace MyShopClient.ViewModels.Promotions
         private readonly IPromotionService _promotionService;
         private readonly Func<Task> _reloadCallback;
 
-        // Track selected IDs to preserve selection state across dialog opens
-        private readonly HashSet<int> _selectedProductIds = new();
-        private readonly HashSet<int> _selectedCategoryIds = new();
-
         public PromotionAddViewModel(IPromotionService promotionService, Func<Task> reloadCallback)
         {
-            _promotionService = promotionService ?? throw new ArgumentNullException(nameof(promotionService));
+      _promotionService = promotionService ?? throw new ArgumentNullException(nameof(promotionService));
             _reloadCallback = reloadCallback ?? throw new ArgumentNullException(nameof(reloadCallback));
-            
-            SelectedProducts = new ObservableCollection<ProductItemDto>();
-            SelectedCategories = new ObservableCollection<CategoryItemDto>();
+          
+      SelectedProducts = new ObservableCollection<ProductItemDto>();
+SelectedCategories = new ObservableCollection<CategoryItemDto>();
         }
 
         private bool _isOpen;
         public bool IsOpen { get => _isOpen; set => SetProperty(ref _isOpen, value); }
 
-        private string? _error;
+   private string? _error;
         public string? Error { get => _error; set { SetProperty(ref _error, value); OnPropertyChanged(nameof(HasError)); } }
-        public bool HasError => !string.IsNullOrWhiteSpace(Error);
+   public bool HasError => !string.IsNullOrWhiteSpace(Error);
 
-        private string? _newName;
-        public string? NewName { get => _newName; set => SetProperty(ref _newName, value); }
+    private string? _newName;
+     public string? NewName { get => _newName; set => SetProperty(ref _newName, value); }
 
-        private string? _newDiscountPercentText = "10";
+     private string? _newDiscountPercentText = "10";
         public string? NewDiscountPercentText { get => _newDiscountPercentText; set => SetProperty(ref _newDiscountPercentText, value); }
 
         private DateTimeOffset _newStartDate = DateTimeOffset.Now;
         public DateTimeOffset NewStartDate { get => _newStartDate; set => SetProperty(ref _newStartDate, value); }
 
         private DateTimeOffset _newEndDate = DateTimeOffset.Now.AddDays(7);
-        public DateTimeOffset NewEndDate { get => _newEndDate; set => SetProperty(ref _newEndDate, value); }
+     public DateTimeOffset NewEndDate { get => _newEndDate; set => SetProperty(ref _newEndDate, value); }
 
         private PromotionScope _newScope = PromotionScope.Order;
         public PromotionScope NewScope 
      { 
-        get => _newScope; 
-            set 
-        { 
+  get => _newScope; 
+          set 
+  { 
             SetProperty(ref _newScope, value);
            OnPropertyChanged(nameof(CanSelectProducts));
       OnPropertyChanged(nameof(CanSelectCategories));
@@ -61,36 +57,36 @@ namespace MyShopClient.ViewModels.Promotions
 
         // Collections to display selected items
         public ObservableCollection<ProductItemDto> SelectedProducts { get; }
-        public ObservableCollection<CategoryItemDto> SelectedCategories { get; }
+     public ObservableCollection<CategoryItemDto> SelectedCategories { get; }
 
         // Track dialogs
         private bool _isProductSelectorOpen;
         public bool IsProductSelectorOpen { get => _isProductSelectorOpen; set => SetProperty(ref _isProductSelectorOpen, value); }
 
-        private bool _isCategorySelectorOpen;
+     private bool _isCategorySelectorOpen;
         public bool IsCategorySelectorOpen { get => _isCategorySelectorOpen; set => SetProperty(ref _isCategorySelectorOpen, value); }
 
         // Lock states based on scope
-        public bool CanSelectProducts => NewScope == PromotionScope.Product;
-        public bool CanSelectCategories => NewScope == PromotionScope.Category;
+     public bool CanSelectProducts => NewScope == PromotionScope.Product;
+     public bool CanSelectCategories => NewScope == PromotionScope.Category;
 
-        public void DoOpen()
+   public void DoOpen()
         {
       Error = string.Empty;
    NewName = string.Empty;
 NewDiscountPercentText = "10";
    NewStartDate = DateTimeOffset.Now;
-            NewEndDate = DateTimeOffset.Now.AddDays(7);
+NewEndDate = DateTimeOffset.Now.AddDays(7);
             NewScope = PromotionScope.Order;
      
             // Don't clear selected items - preserve them
-            // SelectedProducts and SelectedCategories keep their previous state
-            
-            IsOpen = true;
+      // SelectedProducts and SelectedCategories keep their previous state
+     
+       IsOpen = true;
  OnPropertyChanged(nameof(HasError));
         }
 
-        public void DoCancel()
+    public void DoCancel()
         {
             IsOpen = false;
  Error = string.Empty;
@@ -100,124 +96,194 @@ NewDiscountPercentText = "10";
         [RelayCommand]
     private void OpenProductSelector()
         {
-        IsProductSelectorOpen = true;
-        }
+    IsProductSelectorOpen = true;
+    }
 
       [RelayCommand]
     private void CloseProductSelector()
         {
-            IsProductSelectorOpen = false;
+         IsProductSelectorOpen = false;
         }
 
         [RelayCommand]
         private void OpenCategorySelector()
-        {
+    {
  IsCategorySelectorOpen = true;
         }
 
         [RelayCommand]
         private void CloseCategorySelector()
-        {
-            IsCategorySelectorOpen = false;
+  {
+  IsCategorySelectorOpen = false;
   }
 
         [RelayCommand]
    private void RemoveProduct(ProductItemDto? product)
         {
-            if (product == null) return;
+     if (product == null) return;
   
          SelectedProducts.Remove(product);
-            _selectedProductIds.Remove(product.ProductId);
-        }
+     product.IsSelected = false;
+ }
 
         [RelayCommand]
         private void RemoveCategory(CategoryItemDto? category)
-        {
+      {
          if (category == null) return;
     
   SelectedCategories.Remove(category);
-            _selectedCategoryIds.Remove(category.CategoryId);
+            category.IsSelected = false;
         }
 
-        /// <summary>
-        /// Syncs the ProductSelectorVm's IsSelected state with our SelectedProducts collection
-        /// and tracks selected IDs for preservation across dialog opens
- /// </summary>
-        public void SyncSelectedProducts(IEnumerable<ProductItemDto> productsFromSelector)
+   /// <summary>
+        /// Sync checked items from ProductSelectorVm to SelectedProducts
+        /// This is called when user closes the selector dialog
+   /// IMPORTANT: This MERGES with existing selections, not REPLACES
+        /// Only items visible in current page are synced (added/removed)
+    /// Items not in current page are PRESERVED in SelectedProducts
+    /// </summary>
+        public void SyncSelectedProducts(IEnumerable<ProductItemDto> allProductsFromSelector)
         {
- var selectedFromSelector = productsFromSelector.Where(p => p.IsSelected).ToList();
-   
-  // Add newly selected items
-            foreach (var product in selectedFromSelector)
-       {
-   if (!_selectedProductIds.Contains(product.ProductId))
-              {
-      SelectedProducts.Add(product);
-      _selectedProductIds.Add(product.ProductId);
-          }
-            }
-            
-     // Remove unselected items
-            var toRemove = SelectedProducts.Where(p => !selectedFromSelector.Any(s => s.ProductId == p.ProductId)).ToList();
-   foreach (var product in toRemove)
+   if (allProductsFromSelector == null) return;
+
+   // Get all checked items from current page/search
+ var checkedItems = allProductsFromSelector.Where(p => p.IsSelected).ToList();
+   var allItemsInSelector = allProductsFromSelector.ToList();
+
+         // Add newly checked items to SelectedProducts
+            foreach (var product in checkedItems)
+ {
+  if (!SelectedProducts.Any(sp => sp.ProductId == product.ProductId))
      {
-SelectedProducts.Remove(product);
-       _selectedProductIds.Remove(product.ProductId);
-  }
-   }
+           SelectedProducts.Add(product);
+}
+    }
 
-        /// <summary>
-        /// Syncs the CategorySelectorVm's IsSelected state with our SelectedCategories collection
-        /// and tracks selected IDs for preservation across dialog opens
-        /// </summary>
-    public void SyncSelectedCategories(IEnumerable<CategoryItemDto> categoriesFromSelector)
+   // Remove ONLY items that are visible in selector AND unchecked
+            // Items NOT in selector (e.g., from different search) are PRESERVED
+     var toRemove = SelectedProducts
+            .Where(sp => allItemsInSelector.Any(p => p.ProductId == sp.ProductId) && !sp.IsSelected)
+ .ToList();
+      foreach (var product in toRemove)
+ {
+           SelectedProducts.Remove(product);
+          }
+    }
+
+     /// <summary>
+   /// Sync checked items from CategorySelectorVm to SelectedCategories
+        /// This is called when user closes the selector dialog
+     /// IMPORTANT: This MERGES with existing selections, not REPLACES
+    /// </summary>
+        public void SyncSelectedCategories(IEnumerable<CategoryItemDto> allCategoriesFromSelector)
         {
-            var selectedFromSelector = categoriesFromSelector.Where(c => c.IsSelected).ToList();
- 
-            // Add newly selected items
-            foreach (var category in selectedFromSelector)
-    {
-     if (!_selectedCategoryIds.Contains(category.CategoryId))
-              {
-    SelectedCategories.Add(category);
-     _selectedCategoryIds.Add(category.CategoryId);
-     }
-       }
-            
-      // Remove unselected items
-      var toRemove = SelectedCategories.Where(c => !selectedFromSelector.Any(s => s.CategoryId == c.CategoryId)).ToList();
-            foreach (var category in toRemove)
+ if (allCategoriesFromSelector == null) return;
+
+  // Get all checked items from selector
+          var checkedItems = allCategoriesFromSelector.Where(c => c.IsSelected).ToList();
+            var allItemsInSelector = allCategoriesFromSelector.ToList();
+
+   // Add newly checked items to SelectedCategories
+     foreach (var category in checkedItems)
    {
-              SelectedCategories.Remove(category);
-                _selectedCategoryIds.Remove(category.CategoryId);
+if (!SelectedCategories.Any(sc => sc.CategoryId == category.CategoryId))
+      {
+  SelectedCategories.Add(category);
+  }
+      }
+
+   // Remove ONLY items that are visible in selector AND unchecked
+  // Items NOT in selector are PRESERVED
+ var toRemove = SelectedCategories
+         .Where(sc => allItemsInSelector.Any(c => c.CategoryId == sc.CategoryId) && !sc.IsSelected)
+  .ToList();
+      foreach (var category in toRemove)
+   {
+    SelectedCategories.Remove(category);
+   }
+ }
+
+    /// <summary>
+    /// Real-time sync when user toggles checkbox in ProductSelectorVm
+    /// Call this whenever a product's IsSelected changes
+    /// </summary>
+    public void OnProductSelectionChanged(ProductItemDto product)
+   {
+        if (product == null) return;
+
+   if (product.IsSelected)
+        {
+  // Add to selected if not already there
+            if (!SelectedProducts.Any(sp => sp.ProductId == product.ProductId))
+          {
+        SelectedProducts.Add(product);
+            }
+   }
+        else
+   {
+            // Remove from selected if unchecked
+          var existing = SelectedProducts.FirstOrDefault(sp => sp.ProductId == product.ProductId);
+          if (existing != null)
+     {
+     SelectedProducts.Remove(existing);
+    }
+     }
+    }
+
+    /// <summary>
+    /// Real-time sync when user toggles checkbox in CategorySelectorVm
+    /// Call this whenever a category's IsSelected changes
+    /// </summary>
+    public void OnCategorySelectionChanged(CategoryItemDto category)
+    {
+        if (category == null) return;
+
+   if (category.IsSelected)
+        {
+    // Add to selected if not already there
+            if (!SelectedCategories.Any(sc => sc.CategoryId == category.CategoryId))
+            {
+        SelectedCategories.Add(category);
    }
         }
+        else
+        {
+      // Remove from selected if unchecked
+        var existing = SelectedCategories.FirstOrDefault(sc => sc.CategoryId == category.CategoryId);
+     if (existing != null)
+         {
+     SelectedCategories.Remove(existing);
+       }
+      }
+    }
 
         /// <summary>
-        /// Marks products in the selector as selected if they're in our SelectedProducts collection
-     /// </summary>
-        public void ApplySelectedStatesToProducts(IEnumerable<ProductItemDto> productsFromSelector)
+   /// Apply selected state to items in selector based on SelectedProducts
+      /// Called when opening selector dialog to restore checkboxes
+        /// </summary>
+  public void ApplySelectedStatesToProducts(IEnumerable<ProductItemDto> productsFromSelector)
         {
          foreach (var product in productsFromSelector)
    {
-         product.IsSelected = _selectedProductIds.Contains(product.ProductId);
-            }
-        }
+       product.IsSelected = SelectedProducts.Any(sp => sp.ProductId == product.ProductId);
+    }
+  }
 
         /// <summary>
-        /// Marks categories in the selector as selected if they're in our SelectedCategories collection
-   /// </summary>
-        public void ApplySelectedStatesToCategories(IEnumerable<CategoryItemDto> categoriesFromSelector)
+/// Apply selected state to items in selector based on SelectedCategories
+  /// Called when opening selector dialog to restore checkboxes
+        /// </summary>
+  public void ApplySelectedStatesToCategories(IEnumerable<CategoryItemDto> categoriesFromSelector)
         {
             foreach (var category in categoriesFromSelector)
   {
-          category.IsSelected = _selectedCategoryIds.Contains(category.CategoryId);
+        category.IsSelected = SelectedCategories.Any(sc => sc.CategoryId == category.CategoryId);
   }
-        }
+    }
 
         private static DateTimeOffset BuildLocalDateTimeOffset(DateTimeOffset selectedDate)
         {
-            var selectedDateOnly = selectedDate.Date;
+   var selectedDateOnly = selectedDate.Date;
      var now = DateTime.Now;
             if (selectedDateOnly.Date == now.Date)
  {
@@ -228,7 +294,7 @@ SelectedProducts.Remove(product);
   {
        var localMidnight = DateTime.SpecifyKind(selectedDateOnly.Date, DateTimeKind.Local);
      return new DateTimeOffset(localMidnight);
-            }
+    }
         }
 
         public async Task<bool> DoConfirmAsync()
@@ -248,30 +314,30 @@ SelectedProducts.Remove(product);
        Error = "Discount must be between 0 and 100.";
          OnPropertyChanged(nameof(HasError));
        return false;
-        }
+    }
 
             if (NewStartDate.Date < DateTimeOffset.Now.Date)
-         {
+    {
       Error = "Start date cannot be in the past.";
        OnPropertyChanged(nameof(HasError));
-             return false;
+           return false;
       }
 
    if (NewEndDate <= NewStartDate)
-            {
+   {
     Error = "End date must be after start date.";
-        OnPropertyChanged(nameof(HasError));
-         return false;
+ OnPropertyChanged(nameof(HasError));
+ return false;
       }
 
-      // Use selected collections
+      // Use selected collections - they are the source of truth
         var productIds = SelectedProducts.Select(p => p.ProductId).ToList();
-            var categoryIds = SelectedCategories.Select(c => c.CategoryId).ToList();
+          var categoryIds = SelectedCategories.Select(c => c.CategoryId).ToList();
 
-            if (!ValidateScope(NewScope, productIds, categoryIds, out var scopeError))
+     if (!ValidateScope(NewScope, productIds, categoryIds, out var scopeError))
 {
-                Error = scopeError;
-     OnPropertyChanged(nameof(HasError));
+    Error = scopeError;
+   OnPropertyChanged(nameof(HasError));
        return false;
   }
 
@@ -281,64 +347,62 @@ SelectedProducts.Remove(product);
     var input = new CreatePromotionInput
     {
             Name = NewName,
-          DiscountPercent = (int)discount,
+     DiscountPercent = (int)discount,
            StartDate = startLocalDto.UtcDateTime,
       EndDate = endLocalDto.UtcDateTime,
            Scope = NewScope,
        ProductIds = NewScope == PromotionScope.Product ? productIds : null,
          CategoryIds = NewScope == PromotionScope.Category ? categoryIds : null
-            };
+          };
 
      try
             {
-                var result = await _promotionService.CreatePromotionAsync(input);
+         var result = await _promotionService.CreatePromotionAsync(input);
          if (!result.Success)
      {
-      Error = result.Message ?? "Create promotion failed.";
+    Error = result.Message ?? "Create promotion failed.";
      OnPropertyChanged(nameof(HasError));
        return false;
-                }
+           }
 
-                // Clear selections after successful creation
+        // Clear selections after successful creation
      IsOpen = false;
              SelectedProducts.Clear();
      SelectedCategories.Clear();
-     _selectedProductIds.Clear();
-   _selectedCategoryIds.Clear();
-                
+         
        await _reloadCallback();
-             return true;
-            }
+      return true;
+   }
     catch (Exception ex)
-            {
+         {
           Error = ex.Message;
-      OnPropertyChanged(nameof(HasError));
-                return false;
+    OnPropertyChanged(nameof(HasError));
+          return false;
  }
         }
 
         private static bool ValidateScope(PromotionScope scope, List<int> productIds, List<int> categoryIds, out string error)
         {
-            error = string.Empty;
+    error = string.Empty;
  switch (scope)
          {
-      case PromotionScope.Product:
+  case PromotionScope.Product:
     if (productIds.Count == 0) { error = "PRODUCT scope requires at least 1 product selected."; return false; }
-                    return true;
+             return true;
 case PromotionScope.Category:
    if (categoryIds.Count == 0) { error = "CATEGORY scope requires at least 1 category selected."; return false; }
           return true;
       case PromotionScope.Order:
    return true;
  default:
-          error = "Invalid scope.";
+  error = "Invalid scope.";
      return false;
-            }
+       }
         }
 
-        // Commands for XAML
-        [RelayCommand] private void Open() => DoOpen();
-        [RelayCommand] private void Cancel() => DoCancel();
+     // Commands for XAML
+      [RelayCommand] private void Open() => DoOpen();
+ [RelayCommand] private void Cancel() => DoCancel();
   [RelayCommand] private async Task Confirm() => await DoConfirmAsync();
     }
 }

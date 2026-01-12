@@ -73,7 +73,7 @@ public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
  // child VMs
   private ViewModels.Promotions.PromotionAddViewModel? _addVm;
         private ViewModels.Promotions.PromotionEditViewModel? _editVm;
-        private ViewModels.Promotions.ProductSelectorViewModel? _productSelectorVm;
+   private ViewModels.Promotions.ProductSelectorViewModel? _productSelectorVm;
         private ViewModels.Promotions.CategorySelectorViewModel? _categorySelectorVm;
 
         public ViewModels.Promotions.PromotionAddViewModel AddVm => _addVm ??= new ViewModels.Promotions.PromotionAddViewModel(_promotionService, async () => await LoadPageAsync(CurrentPage));
@@ -336,80 +336,93 @@ if (failedIds.Count >0 && success ==0)
         }
 
         // Commands for selectors
-        [RelayCommand]
+   [RelayCommand]
 private async Task OpenProductSelector()
      {
-        await ProductSelectorVm.LoadProductsAsync();
-          
-      // Restore selected state from AddVm
-      AddVm.ApplySelectedStatesToProducts(ProductSelectorVm.Products);
-        
+     // Reset search state for fresh dialog
+     ProductSelectorVm.SearchText = string.Empty;
+     ProductSelectorVm.CurrentPage = 1;
+   
+  // Set callback to apply selected states when search results load - for ADD
+  ProductSelectorVm.OnProductsLoaded = (products) => AddVm.ApplySelectedStatesToProducts(products);
+     
+     // Load products
+     await ProductSelectorVm.LoadProductsAsync();
+ 
  AddVm.IsProductSelectorOpen = true;
-        }
+  }
 
-   [RelayCommand]
-        private void CloseProductSelector()
-        {
-     // Sync selected items from ProductSelectorVm to AddVm
-    AddVm.SyncSelectedProducts(ProductSelectorVm.Products);
+ [RelayCommand]
+ private void CloseProductSelector()
+ {
+    // No need to sync here - DispatcherQueue in ProductCheckBox_Tapped already syncs real-time
+    // Just close the dialog
       AddVm.IsProductSelectorOpen = false;
-        }
+ }
 
     [RelayCommand]
-        private async Task OpenCategorySelector()
-        {
-        await CategorySelectorVm.LoadCategoriesAsync();
+ private async Task OpenCategorySelector()
+  {
+    // Reset and load categories FIRST
+    CategorySelectorVm.ResetSelectedCount();
+ await CategorySelectorVm.LoadCategoriesAsync();
    
-         // Restore selected state from AddVm
- AddVm.ApplySelectedStatesToCategories(CategorySelectorVm.Categories);
+    // THEN apply current selected state to categories in selector (after they're loaded)
+  AddVm.ApplySelectedStatesToCategories(CategorySelectorVm.Categories);
 
   AddVm.IsCategorySelectorOpen = true;
-        }
+    }
 
-        [RelayCommand]
-     private void CloseCategorySelector()
-     {
-   // Sync selected items from CategorySelectorVm to AddVm
+   [RelayCommand]
+  private void CloseCategorySelector()
+ {
+   // Sync checked items from selector to AddVm.SelectedCategories
   AddVm.SyncSelectedCategories(CategorySelectorVm.Categories);
     AddVm.IsCategorySelectorOpen = false;
-        }
+  }
 
     [RelayCommand]
 private async Task OpenEditProductSelector()
 {
-            await ProductSelectorVm.LoadProductsAsync();
-       
-      // Restore selected state from EditVm
-  EditVm.ApplySelectedStatesToProducts(ProductSelectorVm.Products);
-            
+   // Reset search state for fresh dialog
+ProductSelectorVm.SearchText = string.Empty;
+   ProductSelectorVm.CurrentPage = 1;
+   
+// Set callback to apply selected states when search results load - for EDIT
+ProductSelectorVm.OnProductsLoaded = (products) => EditVm.ApplySelectedStatesToProducts(products);
+   
+   // Load products
+   await ProductSelectorVm.LoadProductsAsync();
+  
  EditVm.IsProductSelectorOpen = true;
    }
 
-        [RelayCommand]
+    [RelayCommand]
       private void CloseEditProductSelector()
-        {
-  // Sync selected items from ProductSelectorVm to EditVm
-   EditVm.SyncSelectedProducts(ProductSelectorVm.Products);
-     EditVm.IsProductSelectorOpen = false;
+   {
+// No need to sync here - DispatcherQueue in ProductCheckBox_Tapped already syncs real-time
+// Just close the dialog
+  EditVm.IsProductSelectorOpen = false;
  }
-
   [RelayCommand]
-        private async Task OpenEditCategorySelector()
-        {
-   await CategorySelectorVm.LoadCategoriesAsync();
-     
-     // Restore selected state from EditVm
+      private async Task OpenEditCategorySelector()
+ {
+   // Reset and load categories FIRST
+CategorySelectorVm.ResetSelectedCount();
+     await CategorySelectorVm.LoadCategoriesAsync();
+   
+   // THEN apply current selected state to categories in selector (after they're loaded)
     EditVm.ApplySelectedStatesToCategories(CategorySelectorVm.Categories);
 
-        EditVm.IsCategorySelectorOpen = true;
-        }
+  EditVm.IsCategorySelectorOpen = true;
+      }
 
-        [RelayCommand]
-        private void CloseEditCategorySelector()
+  [RelayCommand]
+ private void CloseEditCategorySelector()
   {
- // Sync selected items from CategorySelectorVm to EditVm
-        EditVm.SyncSelectedCategories(CategorySelectorVm.Categories);
-    EditVm.IsCategorySelectorOpen = false;
-        }
-  }
+// Sync checked items from selector to EditVm.SelectedCategories
+  EditVm.SyncSelectedCategories(CategorySelectorVm.Categories);
+ EditVm.IsCategorySelectorOpen = false;
+}
+    }
 }

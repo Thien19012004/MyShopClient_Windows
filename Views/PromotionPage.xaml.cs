@@ -3,6 +3,7 @@ using MyShopClient.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using MyShopClient.Controls;
+using System.Linq;
 
 namespace MyShopClient.Views
 {
@@ -76,6 +77,61 @@ namespace MyShopClient.Views
             {
                 p.IsSelected = isChecked;
             }
+        }
+
+        /// <summary>
+        /// Handle product checkbox changes in selector dialogs (real-time sync)
+        /// Selections are stored in AddVm.SelectedProducts / EditVm.SelectedProducts (local cache)
+        /// which persists across search/reload of ProductSelectorVm.Products
+        /// </summary>
+        private void ProductCheckBox_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            if (sender is not BlueCheckBox checkbox) return;
+            if (checkbox.DataContext is not MyShopClient.Models.ProductItemDto product) return;
+
+            // Use DispatcherQueue to run AFTER the binding updates
+            // This ensures checkbox.IsChecked and product.IsSelected are already synced by binding
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                // Now product.IsSelected has the correct value from binding
+                bool isSelected = product.IsSelected;
+
+                // Determine if we're in ADD or EDIT dialog based on context
+                if (ViewModel.AddVm.IsProductSelectorOpen)
+                {
+                    // Sync to AddVm.SelectedProducts (local cache)
+                    if (isSelected)
+                    {
+                        if (!ViewModel.AddVm.SelectedProducts.Any(p => p.ProductId == product.ProductId))
+                        {
+                            ViewModel.AddVm.SelectedProducts.Add(product);
+                        }
+                    }
+                    else
+                    {
+                        var existing = ViewModel.AddVm.SelectedProducts.FirstOrDefault(p => p.ProductId == product.ProductId);
+                        if (existing != null)
+                            ViewModel.AddVm.SelectedProducts.Remove(existing);
+                    }
+                }
+                else if (ViewModel.EditVm.IsProductSelectorOpen)
+                {
+                    // Sync to EditVm.SelectedProducts (local cache)
+                    if (isSelected)
+                    {
+                        if (!ViewModel.EditVm.SelectedProducts.Any(p => p.ProductId == product.ProductId))
+                        {
+                            ViewModel.EditVm.SelectedProducts.Add(product);
+                        }
+                    }
+                    else
+                    {
+                        var existing = ViewModel.EditVm.SelectedProducts.FirstOrDefault(p => p.ProductId == product.ProductId);
+                        if (existing != null)
+                            ViewModel.EditVm.SelectedProducts.Remove(existing);
+                    }
+                }
+            });
         }
     }
 }
