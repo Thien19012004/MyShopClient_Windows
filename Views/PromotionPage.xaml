@@ -374,18 +374,18 @@ Padding="20"
                    <StackPanel Visibility="{Binding AddVm.CanSelectProducts, Converter={StaticResource BooleanToVisibilityConverter}}" Spacing="6">
 <TextBlock Text="Products *" FontWeight="SemiBold"/>
   <Button Content="+ Select Products" 
-      Command="{Binding DataContext.OpenEditProductSelectorCommand, ElementName=PromotionListView}"
-     HorizontalAlignment="Stretch"
-             Height="36">
+      Command="{Binding OpenProductSelectorCommand}"
+  HorizontalAlignment="Stretch"
+Height="36">
      <Button.Background>
            <SolidColorBrush Color="#FF5D5FEF"/>
-      </Button.Background>
+    </Button.Background>
        <Button.Foreground>
         <SolidColorBrush Color="White"/>
      </Button.Foreground>
   </Button>
-            
-    <!-- Display selected products -->
+         
+  <!-- Display selected products -->
      <ItemsControl ItemsSource="{Binding AddVm.SelectedProducts}">
     <ItemsControl.ItemTemplate>
   <DataTemplate>
@@ -396,13 +396,13 @@ Padding="20"
    <ColumnDefinition Width="Auto"/>
    </Grid.ColumnDefinitions>
       <StackPanel Grid.Column="0" Spacing="2">
-           <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
-        <TextBlock Text="{Binding ProductId}" Opacity="0.7" FontSize="12"/>
+    <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+     <TextBlock Text="{Binding ProductId}" Opacity="0.7" FontSize="12"/>
      </StackPanel>
     <Button Grid.Column="1" Content="✕" 
       Padding="8"
      Width="32" Height="32"
-       HorizontalAlignment="Right"
+  HorizontalAlignment="Right"
        Command="{Binding DataContext.AddVm.RemoveProductCommand, ElementName=PromotionListView}"
     CommandParameter="{Binding}"/>
          </Grid>
@@ -413,34 +413,34 @@ Padding="20"
   </StackPanel>
 
       <!-- Categories Section - Only for CATEGORY scope -->
-          <StackPanel Visibility="{Binding AddVm.CanSelectCategories, Converter={StaticResource BooleanToVisibilityConverter}}" Spacing="6">
+       <StackPanel Visibility="{Binding AddVm.CanSelectCategories, Converter={StaticResource BooleanToVisibilityConverter}}" Spacing="6">
  <TextBlock Text="Categories *" FontWeight="SemiBold"/>
   <Button Content="+ Select Categories" 
-      Command="{Binding DataContext.OpenEditCategorySelectorCommand, ElementName=PromotionListView}"
+      Command="{Binding OpenCategorySelectorCommand}"
           HorizontalAlignment="Stretch"
-         Height="36">
+     Height="36">
  <Button.Background>
           <SolidColorBrush Color="#FF5D5FEF"/>
           </Button.Background>
    <Button.Foreground>
    <SolidColorBrush Color="White"/>
     </Button.Foreground>
-        </Button>
+    </Button>
       
-              <!-- Display selected categories -->
+       <!-- Display selected categories -->
            <ItemsControl ItemsSource="{Binding AddVm.SelectedCategories}">
        <ItemsControl.ItemTemplate>
-    <DataTemplate>
+  <DataTemplate>
   <Border Background="#FFF5F5F7" Padding="12,8" CornerRadius="6" Margin="0,4,0,0">
        <Grid>
     <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*"/>
+  <ColumnDefinition Width="*"/>
           <ColumnDefinition Width="Auto"/>
      </Grid.ColumnDefinitions>
      <StackPanel Grid.Column="0" Spacing="2">
      <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
   <TextBlock Text="{Binding CategoryId}" Opacity="0.7" FontSize="12"/>
-   </StackPanel>
+ </StackPanel>
  <Button Grid.Column="1" Content="✕" 
   Padding="8"
        Width="32" Height="32"
@@ -448,9 +448,9 @@ Padding="20"
      Command="{Binding DataContext.AddVm.RemoveCategoryCommand, ElementName=PromotionListView}"
   CommandParameter="{Binding}"/>
 </Grid>
-    </Border>
+  </Border>
      </DataTemplate>
-           </ItemsControl.ItemTemplate>
+       </ItemsControl.ItemTemplate>
        </ItemsControl>
       </StackPanel>
 
@@ -707,194 +707,196 @@ HorizontalAlignment="Center"
             </Border>
         </Grid>
 
-        <!-- ================== EDIT PRODUCT SELECTOR DIALOG ================== -->
-      <Grid Background="#99000000"
-  Visibility="{Binding EditVm.IsProductSelectorOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
-  <Border Width="700"
-  Background="White"
-CornerRadius="16"
-      Padding="20"
-    HorizontalAlignment="Center"
-  VerticalAlignment="Center">
-     <Grid>
-    <Grid.RowDefinitions>
-   <RowDefinition Height="Auto"/>
-  <RowDefinition Height="Auto"/>
-    <RowDefinition Height="*"/>
-   <RowDefinition Height="Auto"/>
-    </Grid.RowDefinitions>
 
-  <!-- Header -->
-       <TextBlock Grid.Row="0" 
-        Text="Select Products" 
-   FontSize="20" 
-    FontWeight="SemiBold"
-  Margin="0,0,0,16"/>
 
-   <!-- Search -->
-      <StackPanel Grid.Row="1" Spacing="8" Margin="0,0,0,16">
+      <!-- ================== ADD PRODUCT SELECTOR DIALOG ================== -->
+     <Grid Background="#99000000"
+     Visibility="{Binding AddVm.IsProductSelectorOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+       <Border Width="700"
+        Background="White"
+     CornerRadius="16"
+ Padding="20"
+                HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+             <Grid>
+            <Grid.RowDefinitions>
+ <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
+             <RowDefinition Height="*"/>
+         <RowDefinition Height="Auto"/>
+  </Grid.RowDefinitions>
+
+       <!-- Header -->
+      <TextBlock Grid.Row="0" 
+   Text="Select Products" 
+     FontSize="20" 
+            FontWeight="SemiBold"
+      Margin="0,0,0,16"/>
+
+            <!-- Search -->
+     <StackPanel Grid.Row="1" Spacing="8" Margin="0,0,0,16">
   <TextBlock Text="Search:" FontWeight="SemiBold"/>
-  <TextBox PlaceholderText="Product name..."
-        Text="{Binding ProductSelectorVm.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-        Height="36"/>
-    </StackPanel>
-
-        <!-- Product List -->
-   <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" MaxHeight="400">
-    <ItemsControl ItemsSource="{Binding ProductSelectorVm.Products}">
-  <ItemsControl.ItemTemplate>
-  <DataTemplate x:DataType="models:ProductItemDto">
-    <Border Padding="12,8" Background="White" BorderBrush="#FFEEEEEE" BorderThickness="0,0,0,1">
- <Grid>
- <Grid.ColumnDefinitions>
-    <ColumnDefinition Width="40"/>
-           <ColumnDefinition Width="*"/>
-         <ColumnDefinition Width="Auto"/>
-    </Grid.ColumnDefinitions>
-
-<!-- Checkbox -->
-   <controls:BlueCheckBox Grid.Column="0" 
- IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
- VerticalAlignment="Center"/>
-
-  <!-- Product Info -->
-    <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2">
-       <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold"/>
-   <StackPanel Orientation="Horizontal" Spacing="12">
-  <TextBlock FontSize="12" Opacity="0.7">
-      <Run Text="ID: "/>
-      <Run Text="{x:Bind ProductId}"/>
-  </TextBlock>
-     <TextBlock FontSize="12" Opacity="0.7">
-   <Run Text="Price: "/>
-    <Run Text="{x:Bind SalePrice}"/>
-    <Run Text="đ"/>
-  </TextBlock>
-  <TextBlock FontSize="12" Opacity="0.7">
-      <Run Text="Stock: "/>
-  <Run Text="{x:Bind StockQuantity}"/>
-  </TextBlock>
-</StackPanel>
-   </StackPanel>
-
- <!-- Category -->
- <TextBlock Grid.Column="2" 
- Text="{x:Bind CategoryName}" 
- Opacity="0.7" 
-    VerticalAlignment="Center"
-    Margin="0,0,16,0"/>
-       </Grid>
- </Border>
-  </DataTemplate>
-       </ItemsControl.ItemTemplate>
-     </ItemsControl>
-   </ScrollViewer>
-
-     <!-- Pagination & Buttons -->
-        <Grid Grid.Row="3" Margin="0,16,0,0">
-    <Grid.ColumnDefinitions>
-    <ColumnDefinition Width="*"/>
- <ColumnDefinition Width="Auto"/>
-     <ColumnDefinition Width="Auto"/>
-    </Grid.ColumnDefinitions>
-
- <!-- Pagination -->
-    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-     <Button Content="Previous" Command="{Binding ProductSelectorVm.PreviousPageCommand}"/>
-    <TextBlock Text="{Binding ProductSelectorVm.CurrentPage}" VerticalAlignment="Center"/>
-       <TextBlock Text="/" VerticalAlignment="Center"/>
-     <TextBlock Text="{Binding ProductSelectorVm.TotalPages}" VerticalAlignment="Center"/>
-     <Button Content="Next" Command="{Binding ProductSelectorVm.NextPageCommand}"/>
+       <TextBox PlaceholderText="Product name..."
+      Text="{Binding ProductSelectorVm.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+           Height="36"/>
       </StackPanel>
 
- <!-- Action Buttons -->
-     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-   <Button Content="Cancel" Command="{Binding CloseEditProductSelectorCommand}"/>
-       <Button Content="Save" Command="{Binding CloseEditProductSelectorCommand}">
-    <Button.Background>
- <SolidColorBrush Color="#FF5D5FEF"/>
-        </Button.Background>
-    <Button.Foreground>
-       <SolidColorBrush Color="White"/>
- </Button.Foreground>
-</Button>
-     </StackPanel>
-      </Grid>
- </Grid>
-         </Border>
-</Grid>
+    <!-- Product List -->
+      <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" MaxHeight="400">
+     <ItemsControl ItemsSource="{Binding ProductSelectorVm.Products}">
+    <ItemsControl.ItemTemplate>
+    <DataTemplate x:DataType="models:ProductItemDto">
+        <Border Padding="12,8" Background="White" BorderBrush="#FFEEEEEE" BorderThickness="0,0,0,1">
+       <Grid>
+  <Grid.ColumnDefinitions>
+       <ColumnDefinition Width="40"/>
+    <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
 
- <!-- ================== EDIT CATEGORY SELECTOR DIALOG ================== -->
-   <Grid Background="#99000000"
-    Visibility="{Binding EditVm.IsCategorySelectorOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
-  <Border Width="500"
-    Background="White"
-    CornerRadius="16"
-  Padding="20"
-   HorizontalAlignment="Center"
-      VerticalAlignment="Center">
- <Grid>
-     <Grid.RowDefinitions>
-<RowDefinition Height="Auto"/>
-       <RowDefinition Height="*"/>
-   <RowDefinition Height="Auto"/>
-         </Grid.RowDefinitions>
+      <!-- Checkbox -->
+     <controls:BlueCheckBox Grid.Column="0" 
+  IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+    VerticalAlignment="Center"/>
 
-<!-- Header -->
-    <TextBlock Grid.Row="0" 
-  Text="Select Categories" 
-        FontSize="20" 
-       FontWeight="SemiBold"
-     Margin="0,0,0,16"/>
+         <!-- Product Info -->
+         <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="2">
+       <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold"/>
+       <StackPanel Orientation="Horizontal" Spacing="12">
+         <TextBlock FontSize="12" Opacity="0.7">
+         <Run Text="ID: "/>
+      <Run Text="{x:Bind ProductId}"/>
+   </TextBlock>
+      <TextBlock FontSize="12" Opacity="0.7">
+             <Run Text="Price: "/>
+        <Run Text="{x:Bind SalePrice}"/>
+<Run Text="đ"/>
+          </TextBlock>
+           <TextBlock FontSize="12" Opacity="0.7">
+      <Run Text="Stock: "/>
+           <Run Text="{x:Bind StockQuantity}"/>
+           </TextBlock>
+    </StackPanel>
+        </StackPanel>
 
- <!-- Category List -->
-  <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="400">
-   <ItemsControl ItemsSource="{Binding CategorySelectorVm.Categories}">
-   <ItemsControl.ItemTemplate>
-       <DataTemplate x:DataType="models:CategoryItemDto">
-  <Border Padding="12,12" Background="White" BorderBrush="#FFEEEEEE" BorderThickness="0,0,0,1">
-  <Grid>
- <Grid.ColumnDefinitions>
-     <ColumnDefinition Width="40"/>
-       <ColumnDefinition Width="*"/>
- </Grid.ColumnDefinitions>
+  <!-- Category -->
+   <TextBlock Grid.Column="2" 
+       Text="{x:Bind CategoryName}" 
+       Opacity="0.7" 
+ VerticalAlignment="Center"
+            Margin="0,0,16,0"/>
+          </Grid>
+      </Border>
+     </DataTemplate>
+    </ItemsControl.ItemTemplate>
+    </ItemsControl>
+             </ScrollViewer>
 
-  <!-- Checkbox -->
-   <controls:BlueCheckBox Grid.Column="0" 
-   IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
-      VerticalAlignment="Center"/>
+  <!-- Pagination & Buttons -->
+<Grid Grid.Row="3" Margin="0,16,0,0">
+       <Grid.ColumnDefinitions>
+     <ColumnDefinition Width="*"/>
+  <ColumnDefinition Width="Auto"/>
+           <ColumnDefinition Width="Auto"/>
+         </Grid.ColumnDefinitions>
 
-    <!-- Category Info -->
-  <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="4">
- <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold"/>
- <TextBlock Text="{x:Bind Description}" FontSize="12" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
-        <TextBlock FontSize="11" Opacity="0.6">
-       <Run Text="Products: "/>
-<Run Text="{x:Bind ProductCount}"/>
-  </TextBlock>
-   </StackPanel>
-  </Grid>
-   </Border>
-   </DataTemplate>
-   </ItemsControl.ItemTemplate>
-     </ItemsControl>
- </ScrollViewer>
+ <!-- Pagination -->
+       <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+     <Button Content="Previous" Command="{Binding ProductSelectorVm.PreviousPageCommand}"/>
+   <TextBlock Text="{Binding ProductSelectorVm.CurrentPage}" VerticalAlignment="Center"/>
+      <TextBlock Text="/" VerticalAlignment="Center"/>
+              <TextBlock Text="{Binding ProductSelectorVm.TotalPages}" VerticalAlignment="Center"/>
+ <Button Content="Next" Command="{Binding ProductSelectorVm.NextPageCommand}"/>
+            </StackPanel>
 
         <!-- Action Buttons -->
-<StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,16,0,0">
-        <Button Content="Cancel" Command="{Binding CloseEditCategorySelectorCommand}"/>
-  <Button Content="Save" Command="{Binding CloseEditCategorySelectorCommand}">
-<Button.Background>
-      <SolidColorBrush Color="#FF5D5FEF"/>
-     </Button.Background>
-  <Button.Foreground>
-     <SolidColorBrush Color="White"/>
-      </Button.Foreground>
-   </Button>
-        </StackPanel>
-   </Grid>
-  </Border>
+  <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+ <Button Content="Cancel" Command="{Binding CloseProductSelectorCommand}"/>
+      <Button Content="Save" Command="{Binding CloseProductSelectorCommand}">
+       <Button.Background>
+         <SolidColorBrush Color="#FF5D5FEF"/>
+               </Button.Background>
+         <Button.Foreground>
+         <SolidColorBrush Color="White"/>
+                </Button.Foreground>
+       </Button>
+    </StackPanel>
         </Grid>
+       </Grid>
+            </Border>
+        </Grid>
+
+      <!-- ================== ADD CATEGORY SELECTOR DIALOG ================== -->
+        <Grid Background="#99000000"
+            Visibility="{Binding AddVm.IsCategorySelectorOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="500"
+       Background="White"
+             CornerRadius="16"
+     Padding="20"
+    HorizontalAlignment="Center"
+           VerticalAlignment="Center">
+      <Grid>
+            <Grid.RowDefinitions>
+   <RowDefinition Height="Auto"/>
+    <RowDefinition Height="*"/>
+              <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+    <!-- Header -->
+       <TextBlock Grid.Row="0" 
+    Text="Select Categories" 
+            FontSize="20" 
+              FontWeight="SemiBold"
+     Margin="0,0,0,16"/>
+
+              <!-- Category List -->
+       <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="400">
+              <ItemsControl ItemsSource="{Binding CategorySelectorVm.Categories}">
+         <ItemsControl.ItemTemplate>
+ <DataTemplate x:DataType="models:CategoryItemDto">
+       <Border Padding="12,12" Background="White" BorderBrush="#FFEEEEEE" BorderThickness="0,0,0,1">
+  <Grid>
+         <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="40"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+          <!-- Checkbox -->
+   <controls:BlueCheckBox Grid.Column="0" 
+       IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+         VerticalAlignment="Center"/>
+
+                <!-- Category Info -->
+      <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="4">
+     <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold"/>
+    <TextBlock Text="{x:Bind Description}" FontSize="12" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
+ <TextBlock FontSize="11" Opacity="0.6">
+        <Run Text="Products: "/>
+        <Run Text="{x:Bind ProductCount}"/>
+         </TextBlock>
+            </StackPanel>
+        </Grid>
+   </Border>
+          </DataTemplate>
+             </ItemsControl.ItemTemplate>
+            </ItemsControl>
+              </ScrollViewer>
+
+        <!-- Action Buttons -->
+      <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,16,0,0">
+      <Button Content="Cancel" Command="{Binding CloseCategorySelectorCommand}"/>
+      <Button Content="Save" Command="{Binding CloseCategorySelectorCommand}">
+                 <Button.Background>
+        <SolidColorBrush Color="#FF5D5FEF"/>
+          </Button.Background>
+           <Button.Foreground>
+<SolidColorBrush Color="White"/>
+         </Button.Foreground>
+   </Button>
+             </StackPanel>
+      </Grid>
+  </Border>
+    </Grid>
 
     </Grid>
 </Page>

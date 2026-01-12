@@ -339,12 +339,12 @@ if (failedIds.Count >0 && success ==0)
         [RelayCommand]
 private async Task OpenProductSelector()
      {
-            await ProductSelectorVm.LoadProductsAsync();
+        await ProductSelectorVm.LoadProductsAsync();
           
       // Restore selected state from AddVm
-            AddVm.ApplySelectedStatesToProducts(ProductSelectorVm.Products);
-            
-        AddVm.IsProductSelectorOpen = true;
+      AddVm.ApplySelectedStatesToProducts(ProductSelectorVm.Products);
+        
+ AddVm.IsProductSelectorOpen = true;
         }
 
    [RelayCommand]
@@ -355,19 +355,19 @@ private async Task OpenProductSelector()
       AddVm.IsProductSelectorOpen = false;
         }
 
-        [RelayCommand]
+    [RelayCommand]
         private async Task OpenCategorySelector()
         {
         await CategorySelectorVm.LoadCategoriesAsync();
    
          // Restore selected state from AddVm
-     AddVm.ApplySelectedStatesToCategories(CategorySelectorVm.Categories);
+ AddVm.ApplySelectedStatesToCategories(CategorySelectorVm.Categories);
 
   AddVm.IsCategorySelectorOpen = true;
         }
 
         [RelayCommand]
-        private void CloseCategorySelector()
+     private void CloseCategorySelector()
      {
    // Sync selected items from CategorySelectorVm to AddVm
   AddVm.SyncSelectedCategories(CategorySelectorVm.Categories);
@@ -386,12 +386,12 @@ private async Task OpenEditProductSelector()
    }
 
         [RelayCommand]
-        private void CloseEditProductSelector()
+      private void CloseEditProductSelector()
         {
-            // Sync selected items from ProductSelectorVm to EditVm
+  // Sync selected items from ProductSelectorVm to EditVm
    EditVm.SyncSelectedProducts(ProductSelectorVm.Products);
      EditVm.IsProductSelectorOpen = false;
-        }
+ }
 
   [RelayCommand]
         private async Task OpenEditCategorySelector()
@@ -399,14 +399,14 @@ private async Task OpenEditProductSelector()
    await CategorySelectorVm.LoadCategoriesAsync();
      
      // Restore selected state from EditVm
-            EditVm.ApplySelectedStatesToCategories(CategorySelectorVm.Categories);
+    EditVm.ApplySelectedStatesToCategories(CategorySelectorVm.Categories);
 
         EditVm.IsCategorySelectorOpen = true;
         }
 
         [RelayCommand]
         private void CloseEditCategorySelector()
-        {
+  {
  // Sync selected items from CategorySelectorVm to EditVm
         EditVm.SyncSelectedCategories(CategorySelectorVm.Categories);
     EditVm.IsCategorySelectorOpen = false;
