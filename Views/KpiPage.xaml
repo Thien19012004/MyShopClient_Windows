@@ -67,12 +67,12 @@
         </StackPanel>
 
         <!-- Main Content with Tabs -->
-        <Pivot Grid.Row="2" Margin="0,8,0,0">
+    <Pivot Grid.Row="2" Margin="0,8,0,0">
  
   <!-- ==================== Tab 1: Dashboard ==================== -->
         <PivotItem Header="📊 Dashboard">
      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,16,0,0">
-        <StackPanel Spacing="16">
+  <StackPanel Spacing="16">
     
   <!-- User Info -->
         <TextBlock FontSize="15" Opacity="0.7">
@@ -83,19 +83,19 @@
    <!-- Summary Cards - Responsive Grid -->
        <ItemsControl>
       <ItemsControl.ItemsPanel>
-         <ItemsPanelTemplate>
-          <VariableSizedWrapGrid Orientation="Horizontal" 
+  <ItemsPanelTemplate>
+    <VariableSizedWrapGrid Orientation="Horizontal" 
           ItemWidth="260" ItemHeight="95" 
-          MaximumRowsOrColumns="4"/>
+   MaximumRowsOrColumns="4"/>
      </ItemsPanelTemplate>
              </ItemsControl.ItemsPanel>
-            <ItemsControl.Items>
-                 <!-- Target Card -->
-           <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
+   <ItemsControl.Items>
+            <!-- Target Card -->
+         <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
       <StackPanel>
-              <TextBlock Text="🎯 Target" Opacity="0.6" FontSize="12"/>
-         <TextBlock FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0">
-      <Run Text="{Binding TargetRevenue}"/><Run Text=" VND"/>
+            <TextBlock Text="🎯 Target" Opacity="0.6" FontSize="12"/>
+   <TextBlock FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0">
+      <Run Text="{Binding TargetRevenue, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
        </TextBlock>
      </StackPanel>
         </Border>
@@ -103,35 +103,35 @@
       <!-- Actual Card -->
    <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
      <StackPanel>
-          <TextBlock Text="💰 Actual Revenue" Opacity="0.6" FontSize="12"/>
+ <TextBlock Text="💰 Actual Revenue" Opacity="0.6" FontSize="12"/>
     <TextBlock FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0" Foreground="#FF13B16A">
-      <Run Text="{Binding ActualRevenue}"/><Run Text=" VND"/>
+      <Run Text="{Binding ActualRevenue, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
       </TextBlock>
  </StackPanel>
         </Border>
-           
+      
        <!-- Progress Card -->
          <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
            <StackPanel>
       <TextBlock Text="📈 Progress" Opacity="0.6" FontSize="12"/>
   <TextBlock FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0">
     <Run Text="{Binding ProgressPercent}"/><Run Text="%"/>
-               </TextBlock>
+     </TextBlock>
   </StackPanel>
-               </Border>
+   </Border>
    
      <!-- Current Tier Card -->
         <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
   <StackPanel>
    <TextBlock Text="🏆 Current Tier" Opacity="0.6" FontSize="12"/>
-          <TextBlock Text="{Binding CurrentTierName}" FontSize="18" FontWeight="SemiBold" 
-       Foreground="#FF5D5FEF" Margin="0,6,0,0"/>
-            </StackPanel>
+ <TextBlock Text="{Binding CurrentTierName}" FontSize="18" FontWeight="SemiBold" 
+   Foreground="#FF5D5FEF" Margin="0,6,0,0"/>
+          </StackPanel>
      </Border>
            </ItemsControl.Items>
             </ItemsControl>
 
-           <!-- Orders Card - Responsive -->
+    <!-- Orders Card - Responsive -->
          <Border Padding="20" CornerRadius="12" Background="White">
         <StackPanel Spacing="12">
         <TextBlock Text="📦 Orders This Month" FontSize="15" FontWeight="SemiBold"/>
@@ -149,34 +149,34 @@
             </Border>
 
    <!-- Commission Estimate Card - Responsive -->
-                <Border Padding="20" CornerRadius="12" Background="White">
+  <Border Padding="20" CornerRadius="12" Background="White">
       <StackPanel Spacing="16">
-             <TextBlock Text="💵 Estimated Commission" FontSize="16" FontWeight="SemiBold"/>
-          
-             <!-- Wrap grid for smaller screens -->
-              <VariableSizedWrapGrid Orientation="Horizontal" ItemWidth="200" ItemHeight="70" MaximumRowsOrColumns="3">
+    <TextBlock Text="💵 Estimated Commission" FontSize="16" FontWeight="SemiBold"/>
+ 
+        <!-- Wrap grid for smaller screens -->
+      <VariableSizedWrapGrid Orientation="Horizontal" ItemWidth="200" ItemHeight="70" MaximumRowsOrColumns="3">
           <StackPanel Margin="0,0,24,8">
-          <TextBlock Text="Base (10%)" Opacity="0.6" FontSize="12"/>
-             <TextBlock FontSize="20" FontWeight="SemiBold" Margin="0,4,0,0" FontFamily="Consolas">
-    <Run Text="{Binding EstimatedBaseCommission}"/><Run Text=" VND"/>
+        <TextBlock Text="Base (10%)" Opacity="0.6" FontSize="12"/>
+      <TextBlock FontSize="20" FontWeight="SemiBold" Margin="0,4,0,0" FontFamily="Consolas">
+    <Run Text="{Binding EstimatedBaseCommission, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
            </TextBlock>
           </StackPanel>
 
      <StackPanel Margin="0,0,24,8">
           <TextBlock Text="Bonus (Tier)" Opacity="0.6" FontSize="12"/>
-            <TextBlock FontSize="20" FontWeight="SemiBold" Margin="0,4,0,0" Foreground="#FFFFC107" FontFamily="Consolas">
-        <Run Text="+"/><Run Text="{Binding EstimatedBonusCommission}"/><Run Text=" VND"/>
+    <TextBlock FontSize="20" FontWeight="SemiBold" Margin="0,4,0,0" Foreground="#FFFFC107" FontFamily="Consolas">
+   <Run Text="+"/><Run Text="{Binding EstimatedBonusCommission, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
    </TextBlock>
-              </StackPanel>
+      </StackPanel>
 
-            <StackPanel Margin="0,0,0,8">
-             <TextBlock Text="Total" Opacity="0.6" FontSize="12"/>
-               <TextBlock FontSize="24" FontWeight="Bold" Margin="0,4,0,0" Foreground="#FF13B16A" FontFamily="Consolas">
-<Run Text="{Binding EstimatedTotalCommission}"/><Run Text=" VND"/>
-             </TextBlock>
+          <StackPanel Margin="0,0,0,8">
+  <TextBlock Text="Total" Opacity="0.6" FontSize="12"/>
+ <TextBlock FontSize="24" FontWeight="Bold" Margin="0,4,0,0" Foreground="#FF13B16A" FontFamily="Consolas">
+<Run Text="{Binding EstimatedTotalCommission, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
+     </TextBlock>
        </StackPanel>
            </VariableSizedWrapGrid>
-           </StackPanel>
+      </StackPanel>
  </Border>
 
   <!-- Available Tiers Card -->
@@ -213,7 +213,7 @@
  </ScrollViewer>
             </PivotItem>
 
-            <!-- ==================== Tab 2: History ==================== -->
+          <!-- ==================== Tab 2: History ==================== -->
             <PivotItem Header="📜 History">
       <Grid Padding="0,16,0,0">
       <Grid.RowDefinitions>
@@ -288,19 +288,19 @@ TextTrimming="CharacterEllipsis"/>
       </Border>
        <TextBlock Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" 
             FontFamily="Consolas" FontSize="14">
-  <Run Text="{Binding TotalRevenue}"/><Run Text=" VND"/>
+  <Run Text="{Binding TotalRevenue, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
        </TextBlock>
             <TextBlock Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center" 
      FontFamily="Consolas" FontSize="14">
-        <Run Text="{Binding BaseCommission}"/><Run Text=" VND"/>
+        <Run Text="{Binding BaseCommission, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
               </TextBlock>
         <TextBlock Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" 
      Foreground="#FFFFC107" FontWeight="SemiBold" FontFamily="Consolas" FontSize="14">
-  <Run Text="{Binding BonusCommission}"/><Run Text=" VND"/>
+  <Run Text="{Binding BonusCommission, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
           </TextBlock>
      <TextBlock Grid.Column="6" HorizontalAlignment="Right" VerticalAlignment="Center"
      FontWeight="Bold" Foreground="#FF13B16A" FontSize="15" FontFamily="Consolas">
-     <Run Text="{Binding TotalCommission}"/><Run Text=" VND"/>
+     <Run Text="{Binding TotalCommission, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
      </TextBlock>
   </Grid>
    </Border>
@@ -404,10 +404,10 @@ TextTrimming="CharacterEllipsis"/>
       <Run Text="{Binding Month}"/><Run Text="/"/><Run Text="{Binding Year}"/>
     </TextBlock>
    <TextBlock Grid.Column="2" HorizontalAlignment="Right" FontFamily="Consolas" FontSize="14">
-   <Run Text="{Binding TargetRevenue}"/><Run Text=" VND"/>
+   <Run Text="{Binding TargetRevenue, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
     </TextBlock>
   <TextBlock Grid.Column="3" HorizontalAlignment="Right" FontFamily="Consolas" FontSize="14" Foreground="#FF13B16A">
-<Run Text="{Binding ActualRevenue}"/><Run Text=" VND"/>
+<Run Text="{Binding ActualRevenue, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
      </TextBlock>
      <TextBlock Grid.Column="4" HorizontalAlignment="Right" FontWeight="SemiBold" FontSize="14">
    <Run Text="{Binding Progress}"/><Run Text="%"/>
