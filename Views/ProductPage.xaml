@@ -71,7 +71,7 @@
                 <TextBlock Grid.Column="3" Text="{x:Bind CategoryName}" />
                 <TextBlock Grid.Column="4" Text="{x:Bind StockQuantity}" HorizontalAlignment="Center" TextAlignment="Center" />
                 <TextBlock Grid.Column="5" HorizontalAlignment="Center" TextAlignment="Center">
-                    <Run Text="{x:Bind SalePrice}"/>
+                    <Run Text="{Binding SalePrice, Converter={StaticResource NumberFormatConverter}}"/>
                     <Run Text=" VND"/>
                 </TextBlock>
 
@@ -145,7 +145,7 @@
                     </TextBlock>
                     <TextBlock>
                         <Run Text="Price: "/>
-                        <Run Text="{x:Bind SalePrice}"/>
+                        <Run Text="{Binding SalePrice, Converter={StaticResource NumberFormatConverter}}"/>
                         <Run Text=" VND"/>
                     </TextBlock>
                 </StackPanel>
