@@ -767,7 +767,10 @@ namespace MyShopClient.ViewModels
 
             try
             {
-                await Dialogs.EditVm.DoOpenAsync(product, EditCategory, _serverConfig.Current.BaseUrl);
+                // Find the correct category option matching product's category
+                var productCategoryOption = DialogCategories.FirstOrDefault(c => c.Id == product.CategoryId);
+
+                await Dialogs.EditVm.DoOpenAsync(product, productCategoryOption, DialogCategories, _serverConfig.Current.BaseUrl);
             }
             catch (Exception ex)
             {
@@ -789,7 +792,8 @@ namespace MyShopClient.ViewModels
         [RelayCommand]
         private async Task ConfirmEditProductAsync()
         {
-            await Dialogs.EditVm.DoConfirmAsync(EditCategory);
+            // Use the category selected in the dialog, not EditCategory from parent
+            await Dialogs.EditVm.DoConfirmAsync();
         }
 
         // ================= MANAGE CATEGORY DIALOG =================

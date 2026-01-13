@@ -623,8 +623,8 @@ Text="{Binding Dialogs.EditVm.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyCha
              Text="{Binding Dialogs.EditVm.StockQuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <ComboBox Header="Category"
-          ItemsSource="{Binding DialogCategories}"
-       SelectedItem="{Binding Dialogs.EditVm.Category, Mode=TwoWay}">
+          ItemsSource="{Binding Dialogs.EditVm.AvailableCategories}"
+     SelectedItem="{Binding Dialogs.EditVm.Category, Mode=TwoWay}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Name}"/>
