@@ -163,7 +163,7 @@ namespace MyShopClient.Services.Report
             }
         }
 
-        public async Task<ApiResult<List<LowStockProductDto>>> GetLowStockProductsAsync(int threshold =5, int take =5)
+        public async Task<ApiResult<List<LowStockProductDto>>> GetLowStockProductsAsync(int threshold = 5, int take = 5)
         {
             try
             {
@@ -191,7 +191,7 @@ namespace MyShopClient.Services.Report
             }
         }
 
-        public async Task<ApiResult<List<TopSellingProductDto>>> GetTopSellingProductsAsync(string fromDate, string toDate, int take =5)
+        public async Task<ApiResult<List<TopSellingProductDto>>> GetTopSellingProductsAsync(string fromDate, string toDate, int take = 5)
         {
             try
             {
@@ -219,7 +219,7 @@ namespace MyShopClient.Services.Report
             }
         }
 
-        public async Task<ApiResult<List<RecentOrderDto>>> GetRecentOrdersAsync(int take =3)
+        public async Task<ApiResult<List<RecentOrderDto>>> GetRecentOrdersAsync(int take = 3)
         {
             try
             {
