@@ -7,6 +7,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace MyShopClient.ViewModels
 {
@@ -17,8 +18,33 @@ namespace MyShopClient.ViewModels
 
         public ObservableCollection<CustomerListItemDto> Customers { get; } = new();
 
+        // debounce version for search-as-you-type
+        private int _searchVersion;
+
         // Filter
         [ObservableProperty] private string? searchText;
+
+        partial void OnSearchTextChanged(string? value)
+        {
+            _ = DebounceSearchAsync();
+        }
+
+        private async Task DebounceSearchAsync()
+        {
+            var version = Interlocked.Increment(ref _searchVersion);
+            try
+            {
+                await Task.Delay(300);
+                if (version != _searchVersion) return;
+
+                await LoadPageAsync(1);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+                OnPropertyChanged(nameof(HasError));
+            }
+        }
 
         // Summary
         public int TotalCustomersOnPage => Customers.Count;

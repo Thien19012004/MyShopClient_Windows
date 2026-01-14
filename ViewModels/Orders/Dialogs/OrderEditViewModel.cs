@@ -34,6 +34,10 @@ namespace MyShopClient.ViewModels.Orders
         public ObservableCollection<string> ProductPromotionLines { get; } = new ObservableCollection<string>();
         public ObservableCollection<string> CategoryPromotionLines { get; } = new ObservableCollection<string>();
 
+        // Status options cho edit dialog (không có "All")
+        public ObservableCollection<string> StatusOptions { get; } =
+   new(new[] { "Created", "Paid", "Cancelled" });
+
         [ObservableProperty]
         private bool _isOpen;
 

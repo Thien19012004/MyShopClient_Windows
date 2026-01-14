@@ -2,6 +2,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MyShopClient.Models;
 using MyShopClient.Services.Promotion;
+using MyShopClient.Services.Product;
+using MyShopClient.Services.Category;
 using System.Threading.Tasks;
 
 namespace MyShopClient.ViewModels
@@ -12,7 +14,7 @@ namespace MyShopClient.ViewModels
         private ViewModels.Promotions.PromotionEditViewModel? _dialogs_editVm;
 
         public ViewModels.Promotions.PromotionAddViewModel Dialogs_AddVm => _dialogs_addVm ??= new ViewModels.Promotions.PromotionAddViewModel(_promotionService, async () => await LoadPageAsync(CurrentPage));
-        public ViewModels.Promotions.PromotionEditViewModel Dialogs_EditVm => _dialogs_editVm ??= new ViewModels.Promotions.PromotionEditViewModel(_promotionService, async () => await LoadPageAsync(CurrentPage));
+        public ViewModels.Promotions.PromotionEditViewModel Dialogs_EditVm => _dialogs_editVm ??= new ViewModels.Promotions.PromotionEditViewModel(_promotionService, async () => await LoadPageAsync(CurrentPage), _productService, _categoryService);
 
         [RelayCommand]
         private void OpenAddDialog_Command() => Dialogs_AddVm.DoOpen();

@@ -12,7 +12,116 @@
  mc:Ignorable="d"
  d:DataContext="{d:DesignInstance Type=viewmodels:OrderListViewModel}">
 
-    <Grid Background="#FFF5F5F7">
+    <Page.Resources>
+        <!-- Wide template -->
+        <DataTemplate x:Key="OrderWideTemplate" x:DataType="models:OrderListItemDto">
+            <Grid Padding="16,12" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <controls:BlueCheckBox Grid.Column="0"
+                                       IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+
+                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="{x:Bind helpers:FormatHelpers.FormatOrderId(OrderId)}"/>
+                </StackPanel>
+
+                <TextBlock Grid.Column="2" Text="{x:Bind CustomerName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="{x:Bind SaleName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="4"
+                           Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(CreatedAt)}"
+                           VerticalAlignment="Center"/>
+
+                <Border Grid.Column="5"
+                        CornerRadius="12"
+                        Padding="8,4"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Background="#FFEFEFEF">
+                    <TextBlock Text="{x:Bind Status}"/>
+                </Border>
+
+                <TextBlock Grid.Column="6" VerticalAlignment="Center">
+                    <Run Text="{x:Bind TotalPrice}"/>
+                    <Run Text=" VND"/>
+                </TextBlock>
+
+                <StackPanel Grid.Column="7" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                    <Button Width="32" Height="32" Padding="0" Click="EditButton_Click">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14" />
+                    </Button>
+                    <Button Width="32" Height="32" Padding="0" Click="DeleteButton_Click">
+                        <FontIcon Glyph="&#xE74D;" FontSize="14" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Narrow template: stack sale/date, keep status/total/action -->
+        <DataTemplate x:Key="OrderNarrowTemplate" x:DataType="models:OrderListItemDto">
+            <Grid Padding="12,10" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="2.2*"/>
+                    <ColumnDefinition Width="1.8*"/>
+                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <controls:BlueCheckBox Grid.Column="0"
+                                       IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+
+                <TextBlock Grid.Column="1" Text="{x:Bind helpers:FormatHelpers.FormatOrderId(OrderId)}" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="2" Text="{x:Bind CustomerName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="3" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="{x:Bind SaleName}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(CreatedAt)}" Opacity="0.8"/>
+                </StackPanel>
+
+                <Border Grid.Column="4"
+                        CornerRadius="12"
+                        Padding="8,4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="#FFEFEFEF">
+                    <TextBlock Text="{x:Bind Status}" TextAlignment="Center"/>
+                </Border>
+
+                <TextBlock Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center">
+                    <Run Text="{x:Bind TotalPrice}"/>
+                    <Run Text=" VND"/>
+                </TextBlock>
+
+                <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                    <Button Width="32" Height="32" Padding="0" Click="EditButton_Click">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14" />
+                    </Button>
+                    <Button Width="32" Height="32" Padding="0" Click="DeleteButton_Click">
+                        <FontIcon Glyph="&#xE74D;" FontSize="14" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+ 
+     <Grid Background="#FFF5F5F7">
 
         <!-- ================== MAIN CONTENT ================== -->
         <Grid Padding="24">
@@ -52,7 +161,7 @@
                             <TextBlock Text="Amount (page)" FontWeight="SemiBold"/>
                             <TextBlock>
  <Run Text="{Binding TotalAmountOnPage}"/>
- <Run Text=" đ"/>
+ <Run Text=" VND"/>
                             </TextBlock>
                         </StackPanel>
                     </Border>
@@ -68,110 +177,117 @@
                 </StackPanel>
 
                 <!-- Filters + Bulk Actions -->
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <ScrollViewer HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <StackPanel Orientation="Vertical" Spacing="8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
-                    <!-- Status -->
-                    <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="0" Margin="0,0,16,0">
-                        <TextBlock Text="Status:" VerticalAlignment="Center" Width="50"/>
-                        <ComboBox ItemsSource="{Binding StatusOptions}"
- SelectedItem="{Binding SelectedStatus, Mode=TwoWay}"
- Width="140"
- VerticalAlignment="Center"/>
+                            <!-- Status -->
+                            <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="0" Margin="0,0,16,0">
+                                <TextBlock Text="Status:" VerticalAlignment="Center" Width="50"/>
+                                <ComboBox ItemsSource="{Binding StatusOptions}"
+                                          SelectedItem="{Binding SelectedStatus, Mode=TwoWay}"
+                                          Width="140"
+                                          VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <!-- Customer name search -->
+                            <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="1" Margin="0,0,16,0">
+                                <TextBlock Text="Customer:" VerticalAlignment="Center" Width="80"/>
+                                <TextBox Width="160"
+                                       VerticalAlignment="Center"
+                                       PlaceholderText="Customer name"
+                                       Text="{Binding CustomerNameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <!-- Sale name search -->
+                            <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="2" Margin="0,0,16,0">
+                                <TextBlock Text="Sale:" VerticalAlignment="Center" Width="50"/>
+                                <TextBox Width="160"
+                                       VerticalAlignment="Center"
+                                       PlaceholderText="Sale name"
+                                       Text="{Binding SaleNameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <!-- Date range -->
+                            <StackPanel x:Name="OrderDateRangePanel" Orientation="Horizontal" Spacing="8" Grid.Column="3" Margin="0,0,16,0">
+                                <TextBlock Text="Date:" VerticalAlignment="Center" Width="40"/>
+                                <CalendarDatePicker x:Name="FromDatePicker"
+                                            Width="140"
+                                            PlaceholderText="From"
+                                            DateChanged="FromDatePicker_DateChanged"/>
+                                <TextBlock Text="-" VerticalAlignment="Center"/>
+                                <CalendarDatePicker x:Name="ToDatePicker"
+                                            Width="140"
+                                            PlaceholderText="To"
+                                            DateChanged="ToDatePicker_DateChanged"/>
+                        <Button Content="Clear" Width="60" Click="ClearDates_Click"/>
+                     </StackPanel>
+
+                            <!-- Spacer -->
+                            <Border Grid.Column="4"/>
+
+                            <!-- Apply Button -->
+                            <Button Grid.Column="5"
+                                    Content="Apply"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding ApplyFilterCommand}"/>
+                        </Grid>
+
+                        <!-- Action buttons row -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                            <!-- Print Button (enabled when has selection) -->
+                            <Button Command="{Binding OpenPrintConfirmCommand}"
+                                    VerticalAlignment="Center"
+                                    IsEnabled="{Binding HasSelectedOrders}">
+                                <Button.Background>
+                                    <SolidColorBrush Color="#FF4CAF50"/>
+                                </Button.Background>
+                                <Button.Foreground>
+                                    <SolidColorBrush Color="White"/>
+                                </Button.Foreground>
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE2F6;" />
+                                    <TextBlock Text="Print" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Bulk Delete Button (enabled when has selection) -->
+                            <Button Command="{Binding OpenBulkDeleteConfirmCommand}"
+                                    VerticalAlignment="Center"
+                                    IsEnabled="{Binding HasSelectedOrders}">
+                                <Button.Background>
+                                    <SolidColorBrush Color="#FFF44336"/>
+                                </Button.Background>
+                                <Button.Foreground>
+                                    <SolidColorBrush Color="White"/>
+                                </Button.Foreground>
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE74D;" />
+                                    <TextBlock Text="Delete" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Add Order Button -->
+                            <Button x:Name="AddOrderButton" Content="+ Add Order" VerticalAlignment="Center" Command="{Binding AddVm.OpenCommand}">
+                                <Button.Background>
+                                    <SolidColorBrush Color="#FF5D5FEF"/>
+                                </Button.Background>
+                                <Button.Foreground>
+                                    <SolidColorBrush Color="White"/>
+                                </Button.Foreground>
+                            </Button>
+                        </StackPanel>
                     </StackPanel>
-
-                    <!-- CustomerId -->
-                    <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="1" Margin="0,0,16,0">
-                        <TextBlock Text="CustomerId:" VerticalAlignment="Center" Width="80"/>
-                        <TextBox Width="100"
- VerticalAlignment="Center"
- Text="{Binding CustomerIdText, Mode=TwoWay}"/>
-                    </StackPanel>
-
-                    <!-- SaleId -->
-                    <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="2" Margin="0,0,16,0">
-                        <TextBlock Text="SaleId:" VerticalAlignment="Center" Width="50"/>
-                        <TextBox Width="100"
- VerticalAlignment="Center"
- Text="{Binding SaleIdText, Mode=TwoWay}"/>
-                    </StackPanel>
-
-                    <!-- Date range -->
-                    <StackPanel x:Name="OrderDateRangePanel" Orientation="Horizontal" Spacing="8" Grid.Column="3" Margin="0,0,16,0">
-                        <TextBlock Text="Date:" VerticalAlignment="Center" Width="40"/>
-                        <TextBox Width="120"
- PlaceholderText="From yyyy-MM-dd"
- VerticalAlignment="Center"
- Text="{Binding FromDateText, Mode=TwoWay}"/>
-                        <TextBlock Text="-" VerticalAlignment="Center"/>
-                        <TextBox Width="120"
- PlaceholderText="To yyyy-MM-dd"
- VerticalAlignment="Center"
- Text="{Binding ToDateText, Mode=TwoWay}"/>
-                    </StackPanel>
-
-                    <!-- Spacer -->
-                    <Border Grid.Column="4"/>
-
-                    <!-- Apply Button -->
-                    <Button Grid.Column="5"
- Content="Apply"
- Margin="0,0,8,0"
- VerticalAlignment="Center"
- Command="{Binding ApplyFilterCommand}"/>
-
-                    <!-- Print Button (enabled when has selection) -->
-                    <Button Grid.Column="6"
- Content="🖨 Print"
- Margin="0,0,8,0"
- VerticalAlignment="Center"
- IsEnabled="{Binding HasSelectedOrders}"
- Command="{Binding OpenPrintConfirmCommand}">
-                        <Button.Background>
-                            <SolidColorBrush Color="#FF4CAF50"/>
-                        </Button.Background>
-                        <Button.Foreground>
-                            <SolidColorBrush Color="White"/>
-                        </Button.Foreground>
-                    </Button>
-
-                    <!-- Bulk Delete Button (enabled when has selection) -->
-                    <Button Grid.Column="7"
- Content="🗑 Delete"
- Margin="0,0,8,0"
- VerticalAlignment="Center"
- IsEnabled="{Binding HasSelectedOrders}"
- Command="{Binding OpenBulkDeleteConfirmCommand}">
-                        <Button.Background>
-                            <SolidColorBrush Color="#FFF44336"/>
-                        </Button.Background>
-                        <Button.Foreground>
-                            <SolidColorBrush Color="White"/>
-                        </Button.Foreground>
-                    </Button>
-
-                    <!-- Add Order Button -->
-                    <StackPanel Grid.Column="8" Orientation="Horizontal" Spacing="8">
-                        <Button x:Name="AddOrderButton" Content="+ Add Order" VerticalAlignment="Center" Command="{Binding AddVm.OpenCommand}">
-                            <Button.Background>
-                                <SolidColorBrush Color="#FF5D5FEF"/>
-                            </Button.Background>
-                            <Button.Foreground>
-                                <SolidColorBrush Color="White"/>
-                            </Button.Foreground>
-                        </Button>
-                    </StackPanel>
-                </Grid>
+                 </ScrollViewer>
             </StackPanel>
 
             <!-- List + error -->
@@ -196,8 +312,8 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Header row -->
-                    <Grid Grid.Row="0"
+                    <!-- Header row (wide) -->
+                    <Grid x:Name="HeaderWideGrid" Grid.Row="0"
  Background="#FFEDEEF2"
  Padding="16,12"
  Margin="0,0,0,0"
@@ -213,10 +329,10 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <controls:BlueCheckBox x:Name="SelectAllCheckBox"
+                        <controls:BlueCheckBox x:Name="SelectAllCheckBoxWide"
  Grid.Column="0"
  VerticalAlignment="Center"
- HorizontalAlignment="Left"
+ HorizontalAlignment="Center"
  Margin="0,0,0,0"
  Click="SelectAllCheckBox_Click"/>
 
@@ -226,8 +342,40 @@
                         <TextBlock Grid.Column="4" Text="Created" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="5" Text="Status" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="6" Text="Total" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="7" Text="Action" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="7" Text="Action" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
                     </Grid>
+
+                    <!-- Header row (narrow) -->
+                    <Grid x:Name="HeaderNarrowGrid" Grid.Row="0"
+ Background="#FFEDEEF2"
+ Padding="12,10"
+ Margin="0,0,0,0"
+ CornerRadius="8,8,0,0"
+ Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="2.2*"/>
+                            <ColumnDefinition Width="1.8*"/>
+                            <ColumnDefinition Width="110"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <controls:BlueCheckBox x:Name="SelectAllCheckBoxNarrow"
+ Grid.Column="0"
+ VerticalAlignment="Center"
+ HorizontalAlignment="Center"
+ Margin="0,0,0,0"
+ Click="SelectAllCheckBox_Click"/>
+
+                        <TextBlock Grid.Column="1" Text="Order" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="Customer" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="3" Text="Sale / Date" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="4" Text="Status" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Column="5" Text="Total" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Column="6" Text="Action" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                     </Grid>
 
                     <!-- List -->
                     <ListView Grid.Row="1"
@@ -237,68 +385,16 @@
  Margin="0,-2,0,0"
  Background="Transparent"
  BorderThickness="0"
- IsItemClickEnabled="False">
+ IsItemClickEnabled="False"
+ ItemTemplate="{StaticResource OrderWideTemplate}">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="Padding" Value="0"/>
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                                 <Setter Property="Background" Value="White"/>
-                                <Setter Property="Margin" Value="0,1,0,0"/>
+                                <Setter Property="Margin" Value="0"/>
                             </Style>
                         </ListView.ItemContainerStyle>
-
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="models:OrderListItemDto">
-                                <Grid Padding="16,12">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="40"/>
-                                        <ColumnDefinition Width="80"/>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="100"/>
-                                        <ColumnDefinition Width="120"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <controls:BlueCheckBox Grid.Column="0"
- IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
- VerticalAlignment="Center"
- HorizontalAlignment="Left"
- Margin="0,0,0,0"/>
-
-                                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
-                                        <TextBlock Text="{x:Bind helpers:FormatHelpers.FormatOrderId(OrderId)}"/>
-                                    </StackPanel>
-
-                                    <TextBlock Grid.Column="2" Text="{x:Bind CustomerName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-
-                                    <TextBlock Grid.Column="3" Text="{x:Bind SaleName}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-
-                                    <TextBlock Grid.Column="4"
- Text="{x:Bind helpers:FormatHelpers.FormatOrderDate(CreatedAt)}" VerticalAlignment="Center"/>
-
-                                    <Border Grid.Column="5"
- CornerRadius="12"
- Padding="8,4"
- HorizontalAlignment="Left"
- VerticalAlignment="Center"
- Background="#FFEFEFEF">
-                                        <TextBlock Text="{x:Bind Status}"/>
-                                    </Border>
-
-                                    <TextBlock Grid.Column="6" VerticalAlignment="Center">
- <Run Text="{x:Bind TotalPrice}"/>
- <Run Text=" d"/>
-                                    </TextBlock>
-
-                                    <StackPanel Grid.Column="7" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="8" Margin="8,0,0,0">
-                                        <Button Content="✏" Width="28" Height="28" Padding="0" Click="EditButton_Click" />
-                                        <Button Content="🗑" Width="28" Height="28" Padding="0" Click="DeleteButton_Click" />
-                                    </StackPanel>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
                     </ListView>
                 </Grid>
 
@@ -343,12 +439,16 @@
  FontWeight="SemiBold"/>
 
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBox Header="Customer Id"
- Width="200"
- Text="{Binding AddVm.CustomerIdText, Mode=TwoWay}"/>
-                            <TextBox Header="Sale Id"
- Width="200"
- Text="{Binding AddVm.SaleIdText, Mode=TwoWay}"/>
+                            <ComboBox Header="Customer"
+                                      Width="220"
+                                      ItemsSource="{Binding AddVm.CustomerOptions}"
+                                      DisplayMemberPath="Name"
+                                      SelectedItem="{Binding AddVm.SelectedCustomer, Mode=TwoWay}"/>
+                            <ComboBox Header="Sale"
+                                      Width="200"
+                                      ItemsSource="{Binding AddVm.SaleOptions}"
+                                      DisplayMemberPath="Name"
+                                      SelectedItem="{Binding AddVm.SelectedSale, Mode=TwoWay}"/>
                         </StackPanel>
 
                         <!-- Order promotion (ORDER scope) -->
@@ -381,15 +481,19 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="viewmodels:OrderItemInputVM">
                                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
-                                        <TextBox Header="Product Id"
- Width="120"
- Text="{x:Bind ProductId, Mode=TwoWay}"/>
+                                        <AutoSuggestBox Header="Product"
+                                                        Width="200"
+                                                        Text="{x:Bind ProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        ItemsSource="{Binding DataContext.AddVm.ProductSuggestions, ElementName=Root}"
+                                                        DisplayMemberPath="Name"
+                                                        TextChanged="ProductAutoSuggest_TextChanged"
+                                                        SuggestionChosen="ProductAutoSuggest_SuggestionChosen"/>
                                         <TextBox Header="Qty"
- Width="80"
- Text="{x:Bind Quantity, Mode=TwoWay}"/>
+                                                 Width="80"
+                                                 Text="{x:Bind Quantity, Mode=TwoWay}"/>
                                         <Button Content="−"
- Width="32" Height="32"
- Click="RemoveAddItemButton_Click"/>
+                                                Width="32" Height="32"
+                                                Click="RemoveAddItemButton_Click"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -463,7 +567,7 @@
                                                 <TextBlock Text=" — "/>
                                                 <TextBlock>
  <Run Text="{x:Bind UnitPrice}"/>
- <Run Text=" d"/>
+ <Run Text=" VND"/>
                                                 </TextBlock>
                                             </StackPanel>
                                         </DataTemplate>
@@ -537,7 +641,7 @@
                         </Border>
 
                         <ComboBox Header="Status"
- ItemsSource="{Binding StatusOptions}"
+ ItemsSource="{Binding EditVm.StatusOptions}"
  SelectedItem="{Binding EditVm.EditStatusText, Mode=TwoWay}"
  IsEnabled="{Binding EditVm.EditOriginallyPaid, Converter={StaticResource InverseBooleanConverter}}"/>
 

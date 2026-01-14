@@ -14,6 +14,7 @@ namespace MyShopClient.Views
         Customers,
         Promotions,
         Reports,
+        Kpi,
         Settings,
     }
 
@@ -37,6 +38,7 @@ namespace MyShopClient.Views
         public event EventHandler? CustomersRequested;
         public event EventHandler? PromotionsRequested;
         public event EventHandler? ReportsRequested;
+        public event EventHandler? KpiRequested;
         public event EventHandler? SettingsRequested;
 
         private void Dashboard_Click(object sender, RoutedEventArgs e)
@@ -80,6 +82,12 @@ namespace MyShopClient.Views
             ReportsRequested?.Invoke(this, EventArgs.Empty);
         }
 
+        private void Kpi_Click(object sender, RoutedEventArgs e)
+        {
+            SetActiveMenu(SidebarMenu.Kpi);
+            KpiRequested?.Invoke(this, EventArgs.Empty);
+        }
+
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
             SetActiveMenu(SidebarMenu.Settings);
@@ -109,6 +117,7 @@ namespace MyShopClient.Views
             CustomersText.Visibility = visibility;
             PromotionsText.Visibility = visibility;
             ReportsText.Visibility = visibility;
+            KpiText.Visibility = visibility;
             SettingsText.Visibility = visibility;
             LogoutText.Visibility = visibility;
         }
@@ -122,42 +131,27 @@ namespace MyShopClient.Views
             var activeBrush = (SolidColorBrush)Resources["SidebarActiveBrush"];
             var inactiveBrush = (SolidColorBrush)Resources["SidebarInactiveBrush"];
 
+            var activeText = new SolidColorBrush(Colors.Black);
+            var inactiveText = (SolidColorBrush)Resources["SidebarIconColor"];
+
             DashboardButton.Background = (menu == SidebarMenu.Dashboard) ? activeBrush : inactiveBrush;
             ProductsButton.Background = (menu == SidebarMenu.Products) ? activeBrush : inactiveBrush;
             OrdersButton.Background = (menu == SidebarMenu.Orders) ? activeBrush : inactiveBrush;
             CustomersButton.Background = (menu == SidebarMenu.Customers) ? activeBrush : inactiveBrush;
             PromotionsButton.Background = (menu == SidebarMenu.Promotions) ? activeBrush : inactiveBrush;
             ReportsButton.Background = (menu == SidebarMenu.Reports) ? activeBrush : inactiveBrush;
+            KpiButton.Background = (menu == SidebarMenu.Kpi) ? activeBrush : inactiveBrush;
             SettingsButton.Background = (menu == SidebarMenu.Settings) ? activeBrush : inactiveBrush;
 
             // màu chữ: active thì trắng, inactive thì hơi mờ
-            DashboardButton.Foreground = (menu == SidebarMenu.Dashboard)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
-
-            ProductsButton.Foreground = (menu == SidebarMenu.Products)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
-
-            OrdersButton.Foreground = (menu == SidebarMenu.Orders)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
-
-            CustomersButton.Foreground = (menu == SidebarMenu.Customers)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
-
-            PromotionsButton.Foreground = (menu == SidebarMenu.Promotions)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
-
-            ReportsButton.Foreground = (menu == SidebarMenu.Reports)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
-
-            SettingsButton.Foreground = (menu == SidebarMenu.Settings)
-                ? new SolidColorBrush(Colors.White)
-                : new SolidColorBrush(Colors.Gainsboro);
+            DashboardButton.Foreground = (menu == SidebarMenu.Dashboard) ? activeText : inactiveText;
+            ProductsButton.Foreground = (menu == SidebarMenu.Products) ? activeText : inactiveText;
+            OrdersButton.Foreground = (menu == SidebarMenu.Orders) ? activeText : inactiveText;
+            CustomersButton.Foreground = (menu == SidebarMenu.Customers) ? activeText : inactiveText;
+            PromotionsButton.Foreground = (menu == SidebarMenu.Promotions) ? activeText : inactiveText;
+            ReportsButton.Foreground = (menu == SidebarMenu.Reports) ? activeText : inactiveText;
+            KpiButton.Foreground = (menu == SidebarMenu.Kpi) ? activeText : inactiveText;
+            SettingsButton.Foreground = (menu == SidebarMenu.Settings) ? activeText : inactiveText;
         }
     }
 }

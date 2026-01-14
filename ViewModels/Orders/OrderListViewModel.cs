@@ -13,6 +13,18 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Linq.Expressions;
+using MyShopClient.Services.Customer;
+using System.Threading;
 
 namespace MyShopClient.ViewModels
 {
@@ -20,6 +32,9 @@ namespace MyShopClient.ViewModels
     {
         private int _productId;
         public int ProductId { get => _productId; set => SetProperty(ref _productId, value); }
+
+        private string? _productName;
+        public string? ProductName { get => _productName; set => SetProperty(ref _productName, value); }
 
         private int _quantity;
         public int Quantity { get => _quantity; set => SetProperty(ref _quantity, value); }
@@ -32,17 +47,25 @@ namespace MyShopClient.ViewModels
         private readonly IPdfExportService _pdfExportService;
         private readonly IAppSettingsService _app_settings;
         private readonly IPromotionService _promotionService;
+        private readonly ICustomerService _customerService;
+        private readonly Services.Product.IProductService _productService;
 
         private Orders.OrderDeleteViewModel? _deleter;
+        private int _searchVersion;
 
         public ObservableCollection<OrderListItemDto> Orders { get; } = new();
 
+        // Status options cho list page (có "All" để filter)
         public ObservableCollection<string> StatusOptions { get; } =
             new(new[] { "All", "Created", "Paid", "Cancelled" });
 
+        // Status options cho edit dialog (không có "All")
+        public ObservableCollection<string> EditStatusOptions { get; } =
+            new(new[] { "Created", "Paid", "Cancelled" });
+
         [ObservableProperty] private string selectedStatus = "All";
-        [ObservableProperty] private string? customerIdText;
-        [ObservableProperty] private string? saleIdText;
+        [ObservableProperty] private string? customerNameText;
+        [ObservableProperty] private string? saleNameText;
         [ObservableProperty] private string? fromDateText;
         [ObservableProperty] private string? toDateText;
 
@@ -72,13 +95,15 @@ namespace MyShopClient.ViewModels
         // Bulk delete message used by UI
         [ObservableProperty] private string bulkDeleteConfirmMessage = string.Empty;
 
-        public OrderListViewModel(IOrderService orderService, IPdfExportService pdfExportService, IAppSettingsService appSettings, IPromotionService promotionService)
+        public OrderListViewModel(IOrderService orderService, IPdfExportService pdfExportService, IAppSettingsService appSettings, IPromotionService promotionService, ICustomerService customerService, Services.Product.IProductService productService)
             : base(appSettings, s => s.OrdersPageSize)
         {
             _orderService = orderService;
             _pdfExportService = pdfExportService;
             _app_settings = appSettings;
             _promotionService = promotionService;
+            _customerService = customerService;
+            _productService = productService;
             _deleter = new Orders.OrderDeleteViewModel(_orderService);
 
             PageSize = _app_settings.OrdersPageSize;
@@ -100,6 +125,15 @@ namespace MyShopClient.ViewModels
         {
             SelectedOrdersCount = SelectedItems.Count;
             HasSelectedOrders = SelectedItems.Count >0;
+        }
+        
+        // Normalize text for accent-insensitive search
+        private static string NormalizeForSearch(string? text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return string.Empty;
+            var formD = text.Normalize(NormalizationForm.FormD);
+            var filtered = formD.Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark);
+            return new string(filtered.ToArray()).ToLowerInvariant();
         }
 
         private static DateTime? ParseFilterDate(string? text)
@@ -130,11 +164,12 @@ namespace MyShopClient.ViewModels
         {
             ErrorMessage = string.Empty;
 
-            int? customerId = int.TryParse(CustomerIdText, out var c) ? c : null;
-            int? saleId = int.TryParse(SaleIdText, out var s) ? s : null;
-
-            DateTime? from = DateTime.TryParse(FromDateText, out var f) ? f : null;
-            DateTime? to = DateTime.TryParse(ToDateText, out var t) ? t : null;
+            DateTime? fromDate = DateTime.TryParse(FromDateText, out var fromDt) ? fromDt.Date : null;
+            DateTime? toDate = DateTime.TryParse(ToDateText, out var toDt) ? toDt.Date : null;
+            // Shift selected date range to UTC when sending to API to avoid timezone day-shift
+            var offset = TimeZoneInfo.Local.BaseUtcOffset;
+            DateTime? apiFromDate = fromDate?.Add(-offset);
+            DateTime? apiToDateExclusive = toDate?.AddDays(1).Add(-offset);
 
             OrderStatus? status = null;
             if (!string.IsNullOrEmpty(SelectedStatus) && SelectedStatus != "All")
@@ -142,16 +177,20 @@ namespace MyShopClient.ViewModels
                 if (Enum.TryParse<OrderStatus>(SelectedStatus, true, out var parsed)) status = parsed;
             }
 
+            bool hasNameFilter = !string.IsNullOrWhiteSpace(CustomerNameText) || !string.IsNullOrWhiteSpace(SaleNameText);
+            int requestPage = hasNameFilter ? 1 : page;
+            int requestPageSize = hasNameFilter ? Math.Max(pageSize, 1000) : pageSize;
+
             var opt = new OrderQueryOptions
             {
-                Page = page,
-                PageSize = pageSize,
-                CustomerId = customerId,
-                SaleId = saleId,
+                Page = requestPage,
+                PageSize = requestPageSize,
+                CustomerId = null,
+                SaleId = null,
                 Status = status,
-                FromDate = ParseFilterDate(FromDateText),
-                ToDate = ParseFilterDate(ToDateText)
-            };
+                FromDate = apiFromDate,
+                ToDate = apiToDateExclusive
+             };
 
             try
             {
@@ -167,11 +206,62 @@ namespace MyShopClient.ViewModels
 
                 var pageData = result.Data;
 
+                // Local filter by customer/sale name (accent- and case-insensitive)
+                var items = pageData.Items.AsEnumerable();
+
+                // Client-side date filter in local time to avoid UTC/day-shift issues
+                if (fromDate != null || toDate != null)
+                {
+                    items = items.Where(o =>
+                    {
+                        var createdDate = (o.CreatedAt.Kind == DateTimeKind.Utc
+                            ? o.CreatedAt.ToLocalTime()
+                            : DateTime.SpecifyKind(o.CreatedAt, DateTimeKind.Utc).ToLocalTime()).Date;
+                         if (fromDate != null && createdDate < fromDate.Value) return false;
+                         if (toDate != null && createdDate > toDate.Value) return false;
+                         return true;
+                    });
+                }
+
+                if (!string.IsNullOrWhiteSpace(CustomerNameText))
+                {
+                    var needleRaw = CustomerNameText.Trim();
+                    var needle = NormalizeForSearch(needleRaw);
+                    items = items.Where(o => !string.IsNullOrWhiteSpace(o.CustomerName) &&
+                        (NormalizeForSearch(o.CustomerName).Contains(needle) || o.CustomerName.Contains(needleRaw, StringComparison.OrdinalIgnoreCase)));
+                }
+
+                if (!string.IsNullOrWhiteSpace(SaleNameText))
+                {
+                    var needleRaw = SaleNameText.Trim();
+                    var needle = NormalizeForSearch(needleRaw);
+                    items = items.Where(o => !string.IsNullOrWhiteSpace(o.SaleName) &&
+                        (NormalizeForSearch(o.SaleName).Contains(needle) || o.SaleName.Contains(needleRaw, StringComparison.OrdinalIgnoreCase)));
+                }
+
+                var filtered = items.ToList();
+
+                // Apply local paging when using name filter
+                int effectivePage = hasNameFilter ? page : pageData.Page;
+                int effectivePageSize = pageSize;
+                var pagedFiltered = hasNameFilter
+                    ? filtered.Skip((effectivePage - 1) * effectivePageSize).Take(effectivePageSize).ToList()
+                    : filtered;
+
                 Orders.Clear();
                 SelectedItems.Clear();
-                foreach (var o in pageData.Items) Orders.Add(o);
+                foreach (var o in pagedFiltered) Orders.Add(o);
 
-                SetPageResult(pageData.Page, pageData.PageSize, pageData.TotalItems, Math.Max(1, pageData.TotalPages));
+                if (hasNameFilter)
+                {
+                    var filteredTotalPages = Math.Max(1, (int)Math.Ceiling((double)filtered.Count / effectivePageSize));
+                    if (effectivePage > filteredTotalPages) effectivePage = filteredTotalPages;
+                    SetPageResult(effectivePage, effectivePageSize, filtered.Count, filteredTotalPages);
+                }
+                else
+                {
+                    SetPageResult(pageData.Page, pageData.PageSize, pageData.TotalItems, Math.Max(1, pageData.TotalPages));
+                }
 
                 TotalOrdersOnPage = Orders.Count;
                 TotalPaidOnPage = Orders.Count(o => o.Status == OrderStatus.Paid);
@@ -380,5 +470,26 @@ namespace MyShopClient.ViewModels
         {
             OpenDeleteConfirm(order);
         }
+
+        private async Task DebounceSearchAsync()
+        {
+            var version = Interlocked.Increment(ref _searchVersion);
+            try
+            {
+                await Task.Delay(300);
+                if (version != _searchVersion) return;
+                await LoadPageAsync(1);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+                OnPropertyChanged(nameof(HasError));
+            }
+        }
+
+        partial void OnCustomerNameTextChanged(string value) => _ = DebounceSearchAsync();
+        partial void OnSaleNameTextChanged(string value) => _ = DebounceSearchAsync();
+        partial void OnFromDateTextChanged(string? value) => _ = DebounceSearchAsync();
+        partial void OnToDateTextChanged(string? value) => _ = DebounceSearchAsync();
     }
 }

@@ -104,6 +104,10 @@ namespace MyShopClient.ViewModels
                     TotalOrdersToday = overviewResult.Data.TotalOrdersToday;
                     RevenueTodayText = FormatCurrency(overviewResult.Data.RevenueToday);
                 }
+                else
+                {
+                    SetError(overviewResult.Message ?? "Không thể tải dữ liệu tổng quan.");
+                }
 
                 // Low stock
                 var lowStockResult = await lowStockTask;
@@ -114,6 +118,10 @@ namespace MyShopClient.ViewModels
                     {
                         LowStockProducts.Add(item);
                     }
+                }
+                else
+                {
+                    SetError(lowStockResult.Message ?? "Không thể tải danh sách tồn kho thấp.");
                 }
 
                 // Top selling
@@ -126,6 +134,10 @@ namespace MyShopClient.ViewModels
                         TopSellingProducts.Add(item);
                     }
                 }
+                else
+                {
+                    SetError(topSellingResult.Message ?? "Không thể tải top sản phẩm bán chạy.");
+                }
 
                 // Recent orders
                 var recentOrdersResult = await recentOrdersTask;
@@ -137,12 +149,20 @@ namespace MyShopClient.ViewModels
                         RecentOrders.Add(item);
                     }
                 }
+                else
+                {
+                    SetError(recentOrdersResult.Message ?? "Không thể tải đơn hàng gần đây.");
+                }
 
                 // Daily revenue chart
                 var dailyRevenueResult = await dailyRevenueTask;
                 if (dailyRevenueResult.Success && dailyRevenueResult.Data != null)
                 {
                     BuildDailyRevenueChart(dailyRevenueResult.Data);
+                }
+                else
+                {
+                    SetError(dailyRevenueResult.Message ?? "Không thể tải biểu đồ doanh thu.");
                 }
             }
             catch (Exception ex)
@@ -213,7 +233,14 @@ Name = "Revenue",
 
         private string FormatCurrency(decimal amount)
         {
-            return $"${amount:N0}";
+            return "$" + amount.ToString("N0");
+        }
+
+        private void SetError(string? message)
+        {
+            if (string.IsNullOrWhiteSpace(message)) return;
+            if (!string.IsNullOrWhiteSpace(ErrorMessage)) return;
+            ErrorMessage = message;
         }
 
         [RelayCommand]

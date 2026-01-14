@@ -8,6 +8,7 @@
     <Platforms>x86;x64;ARM64</Platforms>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <PublishProfile>win-$(Platform).pubxml</PublishProfile>
+	 <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
@@ -19,6 +20,7 @@
     <None Remove="Views\CustomerPage.xaml" />
     <None Remove="Views\DashboardHomePage.xaml" />
     <None Remove="Views\DashboardPage.xaml" />
+    <None Remove="Views\KpiPage.xaml" />
     <None Remove="Views\LoginPage.xaml" />
     <None Remove="Views\OrderPage.xaml" />
     <None Remove="Views\ProductPage.xaml" />
@@ -61,9 +63,17 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
     <PackageReference Include="QuestPDF" Version="2024.12.3" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.1" />
+    <!-- Source generators for trimming compatibility -->
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\OnboardingOverlay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\KpiPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\KpiPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <None Update="Views\SettingsPage.xaml">
@@ -144,7 +154,10 @@
   <PropertyGroup>
     <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
     <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+    <!-- Disable trimming để tránh issues với reflection-based serialization -->
     <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
-    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
+    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">False</PublishTrimmed>
+    <SelfContained Condition="'$(Configuration)' == 'Debug'">False</SelfContained>
+    <SelfContained Condition="'$(Configuration)' != 'Debug'">True</SelfContained>
   </PropertyGroup>
 </Project>

@@ -49,6 +49,8 @@ namespace MyShopClient.ViewModels
             CustomersPageSize = 10;
             PromotionsPageSize = 10;
             ReportsPageSize = 10;
+
         }
     }
 }
+//Happy new year 2026

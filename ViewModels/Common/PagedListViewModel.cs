@@ -57,6 +57,10 @@ namespace MyShopClient.ViewModels
             {
                 await LoadPageCoreAsync(CurrentPage, PageSize);
             }
+            catch (OperationCanceledException)
+            {
+                // ignore cancellations triggered by debounce/refresh
+            }
             catch (Exception ex)
             {
                 ErrorMessage = ex.Message;

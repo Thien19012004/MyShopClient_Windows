@@ -10,6 +10,104 @@
  mc:Ignorable="d"
  d:DataContext="{d:DesignInstance Type=viewmodels:CustomerListViewModel}">
 
+    <Page.Resources>
+        <!-- Wide template (table layout) -->
+        <DataTemplate x:Key="CustomerWideTemplate" x:DataType="models:CustomerListItemDto">
+            <Grid Padding="16,12" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="120"/>
+                </Grid.ColumnDefinitions>
+
+                <controls:BlueCheckBox Grid.Column="0"
+                                       IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+
+                <TextBlock Grid.Column="1" Text="{x:Bind CustomerId}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="{x:Bind Phone}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="4" Text="{x:Bind Email}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="5" Text="{x:Bind Address}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="6" Text="{x:Bind OrderCount}" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+
+                <StackPanel Grid.Column="7"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="8">
+                    <Button Width="32" Height="32" Padding="0"
+                            Command="{Binding DataContext.OpenEditDialogCommand, ElementName=CustomerListView}"
+                            CommandParameter="{Binding}"
+                            ToolTipService.ToolTip="Edit customer">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14"/>
+                    </Button>
+                    <Button Width="32" Height="32" Padding="0"
+                            Command="{Binding DataContext.OpenDeleteConfirmCommand, ElementName=CustomerListView}"
+                            CommandParameter="{Binding}"
+                            ToolTipService.ToolTip="Delete customer">
+                        <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Narrow template: hide Address, stack Phone/Email -->
+        <DataTemplate x:Key="CustomerNarrowTemplate" x:DataType="models:CustomerListItemDto">
+            <Grid Padding="12,10" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="2.4*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="120"/>
+                </Grid.ColumnDefinitions>
+
+                <controls:BlueCheckBox Grid.Column="0"
+                                       IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+
+                <TextBlock Grid.Column="1" Text="{x:Bind CustomerId}" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="2" Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="3" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="{x:Bind Phone}"/>
+                    <TextBlock Text="{x:Bind Email}" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+
+                <TextBlock Grid.Column="4" Text="{x:Bind OrderCount}" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+
+                <StackPanel Grid.Column="5"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="8">
+                    <Button Width="32" Height="32" Padding="0"
+                            Command="{Binding DataContext.OpenEditDialogCommand, ElementName=CustomerListView}"
+                            CommandParameter="{Binding}"
+                            ToolTipService.ToolTip="Edit customer">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14"/>
+                    </Button>
+                    <Button Width="32" Height="32" Padding="0"
+                            Command="{Binding DataContext.OpenDeleteConfirmCommand, ElementName=CustomerListView}"
+                            CommandParameter="{Binding}"
+                            ToolTipService.ToolTip="Delete customer">
+                        <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
     <Grid Background="#FFF5F5F7">
 
         <!-- ================== MAIN CONTENT ================== -->
@@ -64,7 +162,7 @@
 <TextBox Width="250"
         PlaceholderText="Name, phone, or email"
         VerticalAlignment="Center"
-Text="{Binding SearchText, Mode=TwoWay}"/>
+Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
        <Button VerticalAlignment="Center"
     Command="{Binding SearchCommand}">
             <StackPanel Orientation="Horizontal" Spacing="4">
@@ -79,20 +177,16 @@ Text="{Binding SearchText, Mode=TwoWay}"/>
 
       <!-- Bulk Delete Button -->
    <Button Grid.Column="2"
-       Margin="0,0,8,0"
-     VerticalAlignment="Center"
-   IsEnabled="{Binding HasSelectedCustomers}"
-        Command="{Binding OpenBulkDeleteConfirmCommand}">
-    <Button.Background>
-<SolidColorBrush Color="#FFF44336"/>
-   </Button.Background>
-<Button.Foreground>
-      <SolidColorBrush Color="White"/>
-  </Button.Foreground>
- <StackPanel Orientation="Horizontal" Spacing="4">
-   <FontIcon Glyph="&#xE74D;" FontSize="14" Foreground="White"/>
-             <TextBlock Text="Delete" Foreground="White"/>
-</StackPanel>
+           Margin="0,0,8,0"
+           VerticalAlignment="Center"
+           IsEnabled="{Binding HasSelectedCustomers}"
+           Command="{Binding OpenBulkDeleteConfirmCommand}"
+           Background="#FFF44336"
+           Foreground="White">
+     <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+       <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+       <TextBlock Text="Delete"/>
+     </StackPanel>
    </Button>
 
 <!-- Add Customer Button -->
@@ -136,8 +230,8 @@ Text="{Binding SearchText, Mode=TwoWay}"/>
           <RowDefinition Height="*"/>
   </Grid.RowDefinitions>
 
-          <!-- Header row -->
-       <Grid Grid.Row="0"
+          <!-- Header row (wide) -->
+       <Grid x:Name="HeaderWideGrid" Grid.Row="0"
             Background="#FFEDEEF2"
         Padding="16,12"
    Margin="0,0,0,0"
@@ -149,14 +243,14 @@ Text="{Binding SearchText, Mode=TwoWay}"/>
            <ColumnDefinition Width="1.5*"/>
  <ColumnDefinition Width="2*"/>
            <ColumnDefinition Width="2*"/>
-         <ColumnDefinition Width="100"/>
- <ColumnDefinition Width="Auto"/>
+         <ColumnDefinition Width="80"/>
+ <ColumnDefinition Width="120"/>
  </Grid.ColumnDefinitions>
 
- <controls:BlueCheckBox x:Name="SelectAllCheckBox"
+ <controls:BlueCheckBox x:Name="SelectAllCheckBoxWide"
     Grid.Column="0"
    VerticalAlignment="Center"
-  HorizontalAlignment="Left"
+  HorizontalAlignment="Center"
         Click="SelectAllCheckBox_Click"/>
 
         <TextBlock Grid.Column="1" Text="ID" FontWeight="SemiBold" VerticalAlignment="Center"/>
@@ -164,77 +258,58 @@ Text="{Binding SearchText, Mode=TwoWay}"/>
         <TextBlock Grid.Column="3" Text="Phone" FontWeight="SemiBold" VerticalAlignment="Center"/>
         <TextBlock Grid.Column="4" Text="Email" FontWeight="SemiBold" VerticalAlignment="Center"/>
      <TextBlock Grid.Column="5" Text="Address" FontWeight="SemiBold" VerticalAlignment="Center"/>
-       <TextBlock Grid.Column="6" Text="Orders" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="7" Text="Action" FontWeight="SemiBold" VerticalAlignment="Center"/>
+       <TextBlock Grid.Column="6" Text="Orders" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                <TextBlock Grid.Column="7" Text="Action" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
   </Grid>
 
-         <!-- List -->
+          <!-- Header row (narrow) -->
+       <Grid x:Name="HeaderNarrowGrid" Grid.Row="0"
+            Background="#FFEDEEF2"
+        Padding="12,10"
+   Margin="0,0,0,0"
+            CornerRadius="8,8,0,0"
+            Visibility="Collapsed">
+             <Grid.ColumnDefinitions>
+  <ColumnDefinition Width="40"/>
+     <ColumnDefinition Width="70"/>
+           <ColumnDefinition Width="2.4*"/>
+           <ColumnDefinition Width="2*"/>
+         <ColumnDefinition Width="80"/>
+ <ColumnDefinition Width="120"/>
+ </Grid.ColumnDefinitions>
+
+ <controls:BlueCheckBox x:Name="SelectAllCheckBoxNarrow"
+    Grid.Column="0"
+   VerticalAlignment="Center"
+  HorizontalAlignment="Center"
+        Click="SelectAllCheckBox_Click"/>
+
+        <TextBlock Grid.Column="1" Text="ID" FontWeight="SemiBold" VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="2" Text="Name" FontWeight="SemiBold" VerticalAlignment="Center"/>
+        <TextBlock Grid.Column="3" Text="Phone / Email" FontWeight="SemiBold" VerticalAlignment="Center"/>
+       <TextBlock Grid.Column="4" Text="Orders" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                <TextBlock Grid.Column="5" Text="Action" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+  </Grid>
+ 
+             <!-- List -->
              <ListView Grid.Row="1"
       x:Name="CustomerListView"
     ItemsSource="{Binding Customers}"
     SelectionMode="None"
-            Margin="0,-2,0,0"
+             Margin="0,-2,0,0"
       Background="Transparent"
-     BorderThickness="0"
-        IsItemClickEnabled="False">
-                <ListView.ItemContainerStyle>
-  <Style TargetType="ListViewItem">
- <Setter Property="Padding" Value="0"/>
-    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-     <Setter Property="Background" Value="White"/>
-   <Setter Property="Margin" Value="0,1,0,0"/>
-      </Style>
-       </ListView.ItemContainerStyle>
-
-            <ListView.ItemTemplate>
-       <DataTemplate x:DataType="models:CustomerListItemDto">
-           <Grid Padding="16,12">
-  <Grid.ColumnDefinitions>
-     <ColumnDefinition Width="40"/>
-      <ColumnDefinition Width="80"/>
-       <ColumnDefinition Width="2*"/>
-   <ColumnDefinition Width="1.5*"/>
-    <ColumnDefinition Width="2*"/>
-           <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="100"/>
-     <ColumnDefinition Width="Auto"/>
-         </Grid.ColumnDefinitions>
-
-        <controls:BlueCheckBox Grid.Column="0"
-       IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
-     VerticalAlignment="Center"
-         HorizontalAlignment="Left"/>
-
-              <TextBlock Grid.Column="1" Text="{x:Bind CustomerId}" VerticalAlignment="Center"/>
-     <TextBlock Grid.Column="2" Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-          <TextBlock Grid.Column="3" Text="{x:Bind Phone}" VerticalAlignment="Center"/>
-      <TextBlock Grid.Column="4" Text="{x:Bind Email}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-         <TextBlock Grid.Column="5" Text="{x:Bind Address}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-      <TextBlock Grid.Column="6" Text="{x:Bind OrderCount}" VerticalAlignment="Center"/>
-
-             <StackPanel Grid.Column="7"
-    Orientation="Horizontal"
-          HorizontalAlignment="Right"
-                 VerticalAlignment="Center"
-    Spacing="8"
-    Margin="8,0,0,0">
-            <Button Width="32" Height="32" Padding="0"
-     Command="{Binding DataContext.OpenEditDialogCommand, ElementName=CustomerListView}"
-      CommandParameter="{Binding}"
- ToolTipService.ToolTip="Edit customer">
-       <FontIcon Glyph="&#xE70F;" FontSize="14"/>
-        </Button>
-       <Button Width="32" Height="32" Padding="0"
-           Command="{Binding DataContext.OpenDeleteConfirmCommand, ElementName=CustomerListView}"
-        CommandParameter="{Binding}"
-     ToolTipService.ToolTip="Delete customer">
- <FontIcon Glyph="&#xE74D;" FontSize="14"/>
-        </Button>
-      </StackPanel>
-       </Grid>
-   </DataTemplate>
-     </ListView.ItemTemplate>
-         </ListView>
+      BorderThickness="0"
+         IsItemClickEnabled="False"
+         ItemTemplate="{StaticResource CustomerWideTemplate}">
+                     <ListView.ItemContainerStyle>
+                         <Style TargetType="ListViewItem">
+                             <Setter Property="Padding" Value="0"/>
+                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                             <Setter Property="Background" Value="White"/>
+                             <Setter Property="Margin" Value="0"/>
+                         </Style>
+                     </ListView.ItemContainerStyle>
+          </ListView>
     </Grid>
 
        <!-- Pagination -->
@@ -267,8 +342,8 @@ Text="{Binding SearchText, Mode=TwoWay}"/>
         </Grid>
 
         <!-- ================== OVERLAY ADD CUSTOMER ================== -->
-        <Grid Background="#99000000"
-            Visibility="{Binding AddVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+         <Grid Background="#99000000"
+             Visibility="{Binding AddVm.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
         <Border Width="500"
    Background="White"
        CornerRadius="16"

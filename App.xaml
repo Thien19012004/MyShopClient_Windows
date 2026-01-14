@@ -19,6 +19,7 @@
             <conv:HasMoreThanConverter x:Key="HasMoreThanConverter" />
             <conv:CollectionHasExactlyConverter x:Key="CollectionHasExactlyConverter" />
             <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+            <conv:NumberFormatConverter x:Key="NumberFormatConverter" />
      
             <!-- Custom CheckBox Style with Blue Fill when Checked -->
             <Style x:Key="OrderCheckBoxStyle" TargetType="CheckBox">

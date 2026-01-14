@@ -12,7 +12,7 @@ namespace MyShopClient.ViewModels
         private ViewModels.Orders.OrderAddViewModel? _addVm;
         private ViewModels.Orders.OrderEditViewModel? _editVm;
 
-        public ViewModels.Orders.OrderAddViewModel AddVm => _addVm ??= new ViewModels.Orders.OrderAddViewModel(_orderService, _promotionService, async () => await LoadPageAsync(CurrentPage));
+        public ViewModels.Orders.OrderAddViewModel AddVm => _addVm ??= new ViewModels.Orders.OrderAddViewModel(_orderService, _promotionService, _customerService, _productService, async () => await LoadPageAsync(CurrentPage));
         public ViewModels.Orders.OrderEditViewModel EditVm => _editVm ??= new ViewModels.Orders.OrderEditViewModel(_orderService, _promotionService, async () => await LoadPageAsync(CurrentPage));
 
         [RelayCommand]

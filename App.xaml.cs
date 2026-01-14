@@ -23,6 +23,8 @@ using MyShopClient.Services.Navigation;
 using MyShopClient.Services.AppSettings;
 using MyShopClient.Services.OnBoarding;
 using MyShopClient.Services.SecureStorage;
+using MyShopClient.Services.Kpi;
+using MyShopClient.ViewModels.Kpi;
 
 namespace MyShopClient;
 
@@ -84,6 +86,7 @@ public partial class App : Application
                 baseUrl += "/";
 
             client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
+            // Đặt timeout mặc định là 5 phút cho regular requests, multipart sẽ tự set timeout riêng
             client.Timeout = TimeSpan.FromMinutes(5);
 
             client.DefaultRequestHeaders.ConnectionClose = false;
@@ -91,17 +94,21 @@ public partial class App : Application
         })
         .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
         {
+            // Connection pooling settings
             PooledConnectionLifetime = TimeSpan.FromMinutes(10),
             PooledConnectionIdleTimeout = TimeSpan.FromMinutes(5),
             MaxConnectionsPerServer = 20,
             EnableMultipleHttp2Connections = true,
 
+            // Keep-alive settings để tránh bị đóng connection
             KeepAlivePingDelay = TimeSpan.FromSeconds(30),
             KeepAlivePingTimeout = TimeSpan.FromSeconds(15),
             KeepAlivePingPolicy = System.Net.Http.HttpKeepAlivePingPolicy.Always,
 
+            // Response handling - important để tránh hanging
             ResponseDrainTimeout = TimeSpan.FromSeconds(10),
             ConnectTimeout = TimeSpan.FromSeconds(30),
+
             AutomaticDecompression = System.Net.DecompressionMethods.All
         })
         .AddHttpMessageHandler(sp => sp.GetRequiredService<MyShopClient.Infrastructure.Http.RetryHandler>())
@@ -128,6 +135,7 @@ public partial class App : Application
         services.AddSingleton<IImageUploadService, ImageUploadService>();
         services.AddSingleton<IPromotionService, PromotionService>();
         services.AddSingleton<IPdfExportService, PdfExportService>();
+        services.AddSingleton<IKpiService, KpiService>();
 
         // 4. ViewModels
         services.AddTransient<LoginViewModel>();
@@ -139,6 +147,7 @@ public partial class App : Application
         services.AddTransient<ReportViewModel>();
         services.AddTransient<PromotionListViewModel>();
         services.AddTransient<SettingsViewModel>();
+        services.AddTransient<KpiViewModel>();
 
         // Register OnboardingService so Dashboard can run onboarding tour on first launch and from Settings if needed.
         services.AddSingleton<IOnboardingService, OnboardingService>();
@@ -177,8 +186,16 @@ public partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        var window = new MainWindow();
-        MainWindow = window;
-        window.Activate();
+        try
+        {
+            var window = new MainWindow();
+            MainWindow = window;
+            window.Activate();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine("[FATAL] OnLaunched exception: " + ex.ToString());
+            System.Diagnostics.Debugger.Break();
+        }
     }
 }
