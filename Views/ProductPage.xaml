@@ -221,7 +221,7 @@
                 <!-- Add Item -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
                     <Button x:Name="AddProductButton"
-                        Content="+ Add Item (mock)"
+                        Content="+ Add Item"
                         Height="40"
                         Margin="12,0,0,0"
                         Padding="16,0"
@@ -494,12 +494,7 @@ CornerRadius="16"
      x:Name="AddUploadImageButton"
    Click="AddUploadImageButton_Click" />
 
-                                <!-- TEST button -->
-                                <Button Content="🧪 Test"
-        Command="{Binding AddTestImageCommand}"
-     ToolTipService.ToolTip="Add test image to verify binding"
-       Background="Orange"
-   Foreground="White" />
+                               
                             </StackPanel>
 
                             <!-- Image list -->
