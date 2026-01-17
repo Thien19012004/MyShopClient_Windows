@@ -267,30 +267,49 @@ _connectionErrorHandler.NotifyConnectionError(lastException);
       /// Determines if an exception is a fatal connection error (server unreachable)
      /// </summary>
         private static bool IsConnectionError(Exception ex)
-        {
-      // SocketException with "No such host is known" or similar
-         if (ex is SocketException socketEx)
-            {
+     {
+   // SocketException with various connection errors
+     if (ex is SocketException socketEx)
+  {
        return socketEx.SocketErrorCode == SocketError.HostNotFound ||
-          socketEx.SocketErrorCode == SocketError.HostUnreachable ||
-     socketEx.SocketErrorCode == SocketError.NetworkUnreachable ||
-     socketEx.SocketErrorCode == SocketError.ConnectionRefused ||
-       socketEx.SocketErrorCode == SocketError.TimedOut;
-      }
+       socketEx.SocketErrorCode == SocketError.HostUnreachable ||
+  socketEx.SocketErrorCode == SocketError.NetworkUnreachable ||
+       socketEx.SocketErrorCode == SocketError.ConnectionRefused ||
+   socketEx.SocketErrorCode == SocketError.ConnectionReset ||  // Connection forcibly closed
+          socketEx.SocketErrorCode == SocketError.ConnectionAborted || // Connection aborted
+     socketEx.SocketErrorCode == SocketError.TimedOut;
+            }
 
-            // HttpRequestException often wraps SocketException
-            if (ex is HttpRequestException httpEx && httpEx.InnerException != null)
-      {
-    return IsConnectionError(httpEx.InnerException);
- }
+ // IOException with "forcibly closed" message
+          if (ex is IOException ioEx)
+          {
+        var message = ioEx.Message?.ToLowerInvariant() ?? "";
+        if (message.Contains("forcibly closed") || 
+     message.Contains("transport connection") ||
+        message.Contains("remote host"))
+  {
+     return true;
+         }
+        // Check inner exception
+      if (ioEx.InnerException != null)
+  {
+    return IsConnectionError(ioEx.InnerException);
+                }
+  }
 
-       // Check inner exception
-     if (ex.InnerException != null)
+       // HttpRequestException often wraps SocketException or IOException
+       if (ex is HttpRequestException httpEx && httpEx.InnerException != null)
             {
-       return IsConnectionError(ex.InnerException);
- }
+      return IsConnectionError(httpEx.InnerException);
+   }
 
-  return false;
+    // Check inner exception for other types
+            if (ex.InnerException != null)
+    {
+        return IsConnectionError(ex.InnerException);
+   }
+
+    return false;
         }
     }
 }
