@@ -5,6 +5,8 @@ using MyShopClient.Services;
 using MyShopClient.Services.Navigation;
 using System;
 using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MyShopClient.ViewModels
@@ -69,20 +71,47 @@ namespace MyShopClient.ViewModels
 
             try
             {
-                // Bạn có thể đổi endpoint health này cho khớp server của bạn
-                var pingUri = new Uri(baseUri, "/api/health");
-                var resp = await _http.GetAsync(pingUri);
+                // Test connection bằng GraphQL introspection query đơn giản
+                var graphqlUri = new Uri(baseUri, "/graphql");
+
+                // Simple introspection query to check if GraphQL server is responding
+                var query = new { query = "{ __typename }" };
+                var jsonContent = JsonSerializer.Serialize(query);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var resp = await _http.PostAsync(graphqlUri, content);
 
                 if (resp.IsSuccessStatusCode)
                 {
-                    StatusMessage = "Kết nối server thành công.";
-                    IsSuccess = true;
+                    var responseBody = await resp.Content.ReadAsStringAsync();
+
+                    // Check if response contains GraphQL data (not an error page)
+                    if (responseBody.Contains("\"data\"") || responseBody.Contains("__typename"))
+                    {
+                        StatusMessage = "Kết nối server thành công! GraphQL endpoint đang hoạt động.";
+                        IsSuccess = true;
+                    }
+                    else
+                    {
+                        StatusMessage = "Server phản hồi nhưng không phải GraphQL endpoint.";
+                        IsSuccess = false;
+                    }
                 }
                 else
                 {
                     StatusMessage = $"Server trả về mã lỗi {(int)resp.StatusCode}.";
                     IsSuccess = false;
                 }
+            }
+            catch (HttpRequestException ex) when (ex.InnerException is System.Net.Sockets.SocketException)
+            {
+                StatusMessage = "Không thể kết nối đến server. Kiểm tra lại URL và đảm bảo server đang chạy.";
+                IsSuccess = false;
+            }
+            catch (TaskCanceledException)
+            {
+                StatusMessage = "Kết nối timeout. Server có thể không phản hồi.";
+                IsSuccess = false;
             }
             catch (Exception ex)
             {
