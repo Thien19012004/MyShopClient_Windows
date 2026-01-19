@@ -148,7 +148,8 @@
                 HorizontalAlignment="Center"
                 Spacing="4">
                 <TextBlock Text="New User?" />
-                <TextBlock Text="Signup" Foreground="#FF5C4DFF" />
+                <TextBlock Text="Contact us at: " />
+                <TextBlock Text="0987654321" Foreground="#FF5C4DFF" />
             </StackPanel>
         </Grid>
     </Grid>
