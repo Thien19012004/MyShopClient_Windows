@@ -254,62 +254,76 @@ namespace MyShopClient.Infrastructure.GraphQL
         /// </summary>
         private static bool IsTransientError(Exception ex)
         {
+ // ObjectDisposedException on NetworkStream is a transient error
+            if (ex is ObjectDisposedException)
+       return true;
+      
             if (ex is IOException || ex is SocketException || ex is HttpRequestException || ex is TimeoutException)
-                return true;
+        return true;
 
-            if (ex.InnerException != null)
-                return IsTransientError(ex.InnerException);
+      if (ex.InnerException != null)
+     return IsTransientError(ex.InnerException);
 
-            return false;
-        }
+  return false;
+      }
 
-        /// <summary>
+     /// <summary>
         /// Determines if an exception is a fatal connection error (server unreachable)
-        /// </summary>
+     /// </summary>
         private static bool IsConnectionError(Exception ex)
-        {
-            // SocketException with various connection errors
-            if (ex is SocketException socketEx)
+   {
+        // ObjectDisposedException on NetworkStream indicates connection was closed
+        if (ex is ObjectDisposedException disposedEx)
             {
-                return socketEx.SocketErrorCode == SocketError.HostNotFound ||
-                socketEx.SocketErrorCode == SocketError.HostUnreachable ||
-           socketEx.SocketErrorCode == SocketError.NetworkUnreachable ||
-                socketEx.SocketErrorCode == SocketError.ConnectionRefused ||
-            socketEx.SocketErrorCode == SocketError.ConnectionReset ||  // Connection forcibly closed
-                   socketEx.SocketErrorCode == SocketError.ConnectionAborted || // Connection aborted
-              socketEx.SocketErrorCode == SocketError.TimedOut;
+       var objectName = disposedEx.ObjectName?.ToLowerInvariant() ?? "";
+          if (objectName.Contains("networkstream") || objectName.Contains("socket"))
+      {
+        return true;
+      }
             }
+          
+            // SocketException with various connection errors
+        if (ex is SocketException socketEx)
+{
+        return socketEx.SocketErrorCode == SocketError.HostNotFound ||
+   socketEx.SocketErrorCode == SocketError.HostUnreachable ||
+       socketEx.SocketErrorCode == SocketError.NetworkUnreachable ||
+   socketEx.SocketErrorCode == SocketError.ConnectionRefused ||
+     socketEx.SocketErrorCode == SocketError.ConnectionReset ||
+      socketEx.SocketErrorCode == SocketError.ConnectionAborted ||
+       socketEx.SocketErrorCode == SocketError.TimedOut;
+       }
 
-            // IOException with "forcibly closed" message
-            if (ex is IOException ioEx)
-            {
-                var message = ioEx.Message?.ToLowerInvariant() ?? "";
+     // IOException with "forcibly closed" message
+   if (ex is IOException ioEx)
+        {
+          var message = ioEx.Message?.ToLowerInvariant() ?? "";
                 if (message.Contains("forcibly closed") ||
-             message.Contains("transport connection") ||
-                message.Contains("remote host"))
-                {
-                    return true;
-                }
-                // Check inner exception
+ message.Contains("transport connection") ||
+           message.Contains("remote host") ||
+ message.Contains("disposed"))
+              {
+     return true;
+        }
                 if (ioEx.InnerException != null)
-                {
-                    return IsConnectionError(ioEx.InnerException);
-                }
+    {
+               return IsConnectionError(ioEx.InnerException);
+    }
             }
 
             // HttpRequestException often wraps SocketException or IOException
-            if (ex is HttpRequestException httpEx && httpEx.InnerException != null)
-            {
-                return IsConnectionError(httpEx.InnerException);
-            }
+if (ex is HttpRequestException httpEx && httpEx.InnerException != null)
+        {
+        return IsConnectionError(httpEx.InnerException);
+     }
 
-            // Check inner exception for other types
-            if (ex.InnerException != null)
-            {
-                return IsConnectionError(ex.InnerException);
-            }
-
-            return false;
+      // Check inner exception for other types
+     if (ex.InnerException != null)
+   {
+              return IsConnectionError(ex.InnerException);
         }
+
+  return false;
+   }
     }
 }
