@@ -75,10 +75,10 @@ namespace MyShopClient.ViewModels
             }
         }
 
-        // Bulk-delete commands now delegate to base ConfirmBulkDeleteAsync via SelectedItems
+
         protected override async Task<bool> DeleteItemsAsync(CustomerListItemDto[] items)
         {
-            // items contains the selected items
+
             var ids = items.Select(i => i.CustomerId).ToArray();
             var result = await _customerService.BulkDeleteCustomersAsync(ids);
             return result.Success;

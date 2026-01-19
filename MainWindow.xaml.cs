@@ -19,7 +19,7 @@ namespace MyShopClient
             this.InitializeComponent();
             RootFrameInstance = RootFrame;
 
-            // Đợi window activate lần đầu rồi mới quyết định đi đâu
+            
             this.Activated += MainWindow_Activated;
         }
 
@@ -32,15 +32,14 @@ namespace MyShopClient
             var nav = App.Services.GetRequiredService<INavigationService>();
             var settings = App.Services.GetRequiredService<IAppSettingsService>();
 
-            // thử auto login bằng credentials đã lưu
             var auto = await auth.TryAutoLoginAsync();
 
             if (auto)
             {
-                // đảm bảo rằng chúng ta có giá trị last page mặc định
+
                 settings.LastVisitedPage ??= nameof(DashboardHomePage);
 
-                // vào shell; shell sẽ tự động khôi phục LastVisitedPage
+
                 nav.NavigateToMainShell();
             }
             else

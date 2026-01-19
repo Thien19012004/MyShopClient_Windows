@@ -2,7 +2,7 @@ namespace MyShopClient.Infrastructure.GraphQL
 {
     public static class KpiQueries
     {
-        // List KPI Tiers
+        
         public const string ListKpiTiersQuery = @"
 query($pagination: PaginationInput, $filter: KpiTierFilterInput) {
     kpiTiers(pagination: $pagination, filter: $filter) {
@@ -26,7 +26,7 @@ query($pagination: PaginationInput, $filter: KpiTierFilterInput) {
     }
 }";
 
-        // Create KPI Tier
+      
         public const string CreateKpiTierMutation = @"
 mutation($input: CreateKpiTierInput!) {
     createKpiTier(input: $input) {
@@ -44,7 +44,7 @@ success
     }
 }";
 
-        // Update KPI Tier
+  
    public const string UpdateKpiTierMutation = @"
 mutation($id: Int!, $input: UpdateKpiTierInput!) {
     updateKpiTier(kpiTierId: $id, input: $input) {
@@ -54,7 +54,7 @@ mutation($id: Int!, $input: UpdateKpiTierInput!) {
     }
 }";
 
-        // Delete KPI Tier
+   
         public const string DeleteKpiTierMutation = @"
 mutation($id: Int!) {
     deleteKpiTier(kpiTierId: $id) {
@@ -64,7 +64,7 @@ success
     }
 }";
 
-      // Set Monthly Target
+      
         public const string SetMonthlyTargetMutation = @"
 mutation($input: SetMonthlyTargetInput!) {
     setMonthlyTarget(input: $input) {
@@ -89,7 +89,7 @@ mutation($input: SetMonthlyTargetInput!) {
     }
 }";
 
-      // List Sale KPI Targets
+ 
         public const string ListSaleKpiTargetsQuery = @"
 query($pagination: PaginationInput, $filter: SaleKpiTargetFilterInput) {
     saleKpiTargets(pagination: $pagination, filter: $filter) {
@@ -119,7 +119,7 @@ query($pagination: PaginationInput, $filter: SaleKpiTargetFilterInput) {
     }
 }";
 
-        // KPI Dashboard (estimate)
+     
         public const string KpiDashboardQuery = @"
 query($input: KpiDashboardInput!) {
   kpiDashboard(input: $input) {
@@ -153,7 +153,7 @@ currentKpiTierName
     }
 }";
 
-        // Calculate Monthly KPI
+      
         public const string CalculateMonthlyKpiMutation = @"
 mutation($input: CalculateMonthlyKpiInput!) {
     calculateMonthlyKpi(input: $input) {
@@ -178,7 +178,7 @@ saleId
     }
 }";
 
-  // List KPI Commissions
+
       public const string ListKpiCommissionsQuery = @"
 query($pagination: PaginationInput, $filter: KpiCommissionFilterInput) {
  kpiCommissions(pagination: $pagination, filter: $filter) {

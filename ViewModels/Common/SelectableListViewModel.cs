@@ -31,17 +31,16 @@ namespace MyShopClient.ViewModels
         {
         }
 
-        // Attach selection tracker to the provided observable collection of items.
-        // Derived classes should call this for their collection after it's created.
+ 
         protected void AttachSelectionTracker(ObservableCollection<TItem> items)
         {
             if (items == null) return;
 
-            // subscribe existing
+  
             foreach (var it in items)
                 SubscribeItem(it);
 
-            // collection changed
+
             items.CollectionChanged += (s, e) =>
             {
                 if (e.NewItems != null)
@@ -56,7 +55,7 @@ namespace MyShopClient.ViewModels
                         UnsubscribeItem(it);
                 }
 
-                // Ensure SelectedItems only contains items still present
+
                 var removed = SelectedItems.Where(si => !items.Contains(si)).ToList();
                 foreach (var r in removed) SelectedItems.Remove(r);
 
@@ -72,7 +71,7 @@ namespace MyShopClient.ViewModels
 
             void Handler(object? sender, PropertyChangedEventArgs e)
             {
-                // react only to IsSelected changes (or null == any change)
+
                 if (!string.IsNullOrEmpty(e.PropertyName) && !string.Equals(e.PropertyName, "IsSelected", StringComparison.OrdinalIgnoreCase))
                     return;
 
@@ -98,7 +97,7 @@ namespace MyShopClient.ViewModels
             item.PropertyChanged += Handler;
             _handlers[item] = Handler;
 
-            // initialize
+
             var p = item.GetType().GetProperty("IsSelected", BindingFlags.Public | BindingFlags.Instance);
             if (p != null && p.PropertyType == typeof(bool))
             {
@@ -159,7 +158,7 @@ namespace MyShopClient.ViewModels
             }
             finally
             {
-                // clear selection and reset busy
+
                 SelectedItems.Clear();
                 IsBusy = false;
                 OnPropertyChanged(nameof(HasError));
@@ -173,7 +172,7 @@ namespace MyShopClient.ViewModels
             }
         }
 
-        // Derived classes implement actual deletion logic for selected items and return true if reload needed
+
         protected abstract Task<bool> DeleteItemsAsync(TItem[] items);
     }
 }

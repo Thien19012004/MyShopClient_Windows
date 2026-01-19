@@ -9,7 +9,7 @@ using System.IO;
 namespace MyShopClient.Infrastructure.Http
 {
     // Simple transient retry handler with exponential backoff + jitter
-    // Không retry khi b? cancellation ho?c timeout
+  
     public class RetryHandler : DelegatingHandler
     {
         private readonly int _maxRetries;
@@ -35,10 +35,10 @@ namespace MyShopClient.Infrastructure.Http
                         return response;
                     }
 
-                    // Treat 5xx as transient
+            
                     if ((int)response.StatusCode >= 500 && attempt < _maxRetries)
                     {
-                        // fall through to retry
+             
                         Debug.WriteLine($"[RetryHandler] Got {response.StatusCode}, retrying...");
                     }
                     else
@@ -48,7 +48,7 @@ namespace MyShopClient.Infrastructure.Http
                 }
                 catch (OperationCanceledException)
                 {
-                    // Don't retry if cancelled
+                   
                     Debug.WriteLine($"[RetryHandler] Operation cancelled on attempt {attempt + 1}");
                     throw;
                 }
@@ -59,12 +59,12 @@ namespace MyShopClient.Infrastructure.Http
                 }
                 catch (Exception ex)
                 {
-                    // Non-transient errors: don't retry
+         
                     Debug.WriteLine($"[RetryHandler] Non-transient error: {ex.GetType().Name}: {ex.Message}");
                     throw;
                 }
 
-                // Delay before next attempt
+              
                 if (attempt < _maxRetries)
                 {
                     int delay = _baseDelayMs * (int)Math.Pow(2, attempt);

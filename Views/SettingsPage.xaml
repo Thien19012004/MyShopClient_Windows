@@ -8,72 +8,72 @@
  d:DataContext="{d:DesignInstance Type=viewmodels:SettingsViewModel}"
  mc:Ignorable="d">
 
-	<Page.Resources>
-		<Style TargetType="TextBlock">
-			<Setter Property="FontFamily" Value="Segoe UI" />
-		</Style>
-	</Page.Resources>
+    <Page.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+        </Style>
+    </Page.Resources>
 
-	<Grid Background="#FFF5F5F7" Padding="40">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="*" />
-		</Grid.RowDefinitions>
+    <Grid Background="#FFF5F5F7" Padding="40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-		<StackPanel x:Name="SettingsHeader" Grid.Row="0" Spacing="4">
-			<TextBlock Text="Settings" FontSize="24" FontWeight="SemiBold" />
-			<TextBlock Text="Configure number of items per page." Opacity="0.7" />
-		</StackPanel>
+        <StackPanel x:Name="SettingsHeader" Grid.Row="0" Spacing="4">
+            <TextBlock Text="Settings" FontSize="24" FontWeight="SemiBold" />
+            <TextBlock Text="Configure number of items per page." Opacity="0.7" />
+        </StackPanel>
 
-		<StackPanel Grid.Row="1" Margin="0,20,0,0" Spacing="14" VerticalAlignment="Top">
+        <StackPanel Grid.Row="1" Margin="0,20,0,0" Spacing="14" VerticalAlignment="Top">
 
-			<TextBlock Text="Page size" FontSize="16" FontWeight="SemiBold" />
+            <TextBlock Text="Page size" FontSize="16" FontWeight="SemiBold" />
 
-			<Grid ColumnSpacing="12" RowSpacing="10">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="180" />
-					<ColumnDefinition Width="200" />
-				</Grid.ColumnDefinitions>
-				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto" />
-					<RowDefinition Height="Auto" />
-					<RowDefinition Height="Auto" />
-					<RowDefinition Height="Auto" />
-					<RowDefinition Height="Auto" />
-				</Grid.RowDefinitions>
+            <Grid ColumnSpacing="12" RowSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-				<TextBlock Grid.Row="0" Grid.Column="0" Text="Products" VerticalAlignment="Center" />
-				<ComboBox Grid.Row="0" Grid.Column="1"
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Products" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="0" Grid.Column="1"
 				ItemsSource="{Binding PageSizeOptions}"
 				SelectedItem="{Binding ProductsPageSize, Mode=TwoWay}" />
 
-				<TextBlock Grid.Row="1" Grid.Column="0" Text="Orders" VerticalAlignment="Center" />
-				<ComboBox Grid.Row="1" Grid.Column="1"
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Orders" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="1" Grid.Column="1"
 				ItemsSource="{Binding PageSizeOptions}"
 				SelectedItem="{Binding OrdersPageSize, Mode=TwoWay}" />
 
-				<TextBlock Grid.Row="2" Grid.Column="0" Text="Customers" VerticalAlignment="Center" />
-				<ComboBox Grid.Row="2" Grid.Column="1"
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Customers" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="2" Grid.Column="1"
 				ItemsSource="{Binding PageSizeOptions}"
 				SelectedItem="{Binding CustomersPageSize, Mode=TwoWay}" />
 
-				<TextBlock Grid.Row="3" Grid.Column="0" Text="Promotions" VerticalAlignment="Center" />
-				<ComboBox Grid.Row="3" Grid.Column="1"
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Promotions" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="3" Grid.Column="1"
 				ItemsSource="{Binding PageSizeOptions}"
 				SelectedItem="{Binding PromotionsPageSize, Mode=TwoWay}" />
 
-				<TextBlock Grid.Row="4" Grid.Column="0" Text="Reports" VerticalAlignment="Center" />
-				<ComboBox Grid.Row="4" Grid.Column="1"
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Reports" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="4" Grid.Column="1"
 				ItemsSource="{Binding PageSizeOptions}"
 				SelectedItem="{Binding ReportsPageSize, Mode=TwoWay}" />
-			</Grid>
+            </Grid>
 
-			<StackPanel Orientation="Horizontal" Spacing="8" Margin="0,16,0,0">
-				<Button Content="Reset defaults" Command="{Binding ResetDefaultsCommand}" />
-				<Button Content="Run tour again" Click="RunTourAgain_Click" />
-			</StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,16,0,0">
+                <Button Content="Reset defaults" Command="{Binding ResetDefaultsCommand}" />
+                <Button Content="Run tour again" Click="RunTourAgain_Click" />
+            </StackPanel>
 
-			<TextBlock Text="Note: Changes apply when you click on another page." Opacity="0.6" TextWrapping="Wrap" />
-		</StackPanel>
-	</Grid>
+            <TextBlock Text="Note: Changes apply when you click on another page." Opacity="0.6" TextWrapping="Wrap" />
+        </StackPanel>
+    </Grid>
 </Page>

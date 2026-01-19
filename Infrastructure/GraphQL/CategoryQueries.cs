@@ -1,8 +1,8 @@
 namespace MyShopClient.Infrastructure.GraphQL
 {
- public static class CategoryQueries
- {
- public const string GetCategoriesQuery = @"
+    public static class CategoryQueries
+    {
+        public const string GetCategoriesQuery = @"
 query GetCategories($page:Int!, $pageSize:Int!, $search:String) {
  categories(
  pagination: { page: $page, pageSize: $pageSize }
@@ -26,7 +26,7 @@ query GetCategories($page:Int!, $pageSize:Int!, $search:String) {
  }
 }";
 
- public const string CreateCategoryMutation = @"
+        public const string CreateCategoryMutation = @"
 mutation CreateCategory($name:String!, $description:String) {
  createCategory(
  input: {
@@ -45,7 +45,7 @@ mutation CreateCategory($name:String!, $description:String) {
  }
 }";
 
- public const string UpdateCategoryMutation = @"
+        public const string UpdateCategoryMutation = @"
 mutation UpdateCategory($id:Int!, $name:String!, $description:String) {
  updateCategory(
  categoryId: $id,
@@ -65,7 +65,7 @@ mutation UpdateCategory($id:Int!, $name:String!, $description:String) {
  }
 }";
 
- public const string DeleteCategoryMutation = @"
+        public const string DeleteCategoryMutation = @"
 mutation DeleteCategory($id:Int!) {
  deleteCategory(categoryId: $id) {
  statusCode
@@ -77,5 +77,5 @@ mutation DeleteCategory($id:Int!) {
  }
  }
 }";
- }
+    }
 }

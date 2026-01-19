@@ -34,7 +34,7 @@ namespace MyShopClient.ViewModels.Orders
         public ObservableCollection<string> ProductPromotionLines { get; } = new ObservableCollection<string>();
         public ObservableCollection<string> CategoryPromotionLines { get; } = new ObservableCollection<string>();
 
-        // Status options cho edit dialog (không có "All")
+   
         public ObservableCollection<string> StatusOptions { get; } =
    new(new[] { "Created", "Paid", "Cancelled" });
 
@@ -94,7 +94,7 @@ namespace MyShopClient.ViewModels.Orders
             OrderPromotionOptions.Clear();
             OrderPromotionOptions.Add(new PromotionItemDto { PromotionId = 0, Name = "(No promotion)", DiscountPercent = 0, StartDate = DateTime.UtcNow.AddYears(-1), EndDate = DateTime.UtcNow.AddYears(1), Scope = PromotionScope.Order });
 
-            // Load promotions if not loaded
+   
             var all = await _promotionService.GetPromotionsAsync(new PromotionQueryOptions { Page = 1, PageSize = 200, OnlyActive = true, At = DateTime.UtcNow });
             if (all.Success && all.Data != null)
             {
@@ -108,7 +108,7 @@ namespace MyShopClient.ViewModels.Orders
             OrderPromotionLines.Clear();
             ProductPromotionLines.Clear();
             CategoryPromotionLines.Clear();
-            // Build promotion display text
+ 
             var promotionDetails = new List<string>();
             var orderPromos = new List<PromotionItemDto>();
             var productPromos = new List<PromotionItemDto>();
@@ -136,7 +136,6 @@ namespace MyShopClient.ViewModels.Orders
                     }
                 }
 
-                // Populate line collections
                 if (orderPromos.Any())
                 {
                     foreach (var p in orderPromos) OrderPromotionLines.Add($"• {p.Name} (-{p.DiscountPercent}%)");
@@ -150,10 +149,10 @@ namespace MyShopClient.ViewModels.Orders
                     foreach (var p in categoryPromos) CategoryPromotionLines.Add($"• {p.Name} (-{p.DiscountPercent}%)");
                 }
 
-                // Keep EditPromotionText for backward compatibility
-                var boxEmoji = "\U0001F4E6"; // 📦
-                var labelEmoji = "\U0001F3F7\uFE0F"; // 🏷️ (label + VS16)
-                var folderEmoji = "\U0001F4C1"; // 📁
+ 
+                var boxEmoji = "\U0001F4E6"; 
+                var labelEmoji = "\U0001F3F7\uFE0F"; 
+                var folderEmoji = "\U0001F4C1"; 
 
                 if (orderPromos.Any())
                 {
@@ -178,7 +177,7 @@ namespace MyShopClient.ViewModels.Orders
                 EditPromotionText = "(none)";
             }
 
-            // map selected order-level promotion
+
             var existingOrderPromoId = detail.PromotionIds?.FirstOrDefault(id => AllPromotionOptions.Any(p => p.PromotionId == id && p.Scope == PromotionScope.Order)) ?? 0;
             EditSelectedOrderPromotion = OrderPromotionOptions.FirstOrDefault(p => p.PromotionId == existingOrderPromoId) ?? OrderPromotionOptions.FirstOrDefault();
 

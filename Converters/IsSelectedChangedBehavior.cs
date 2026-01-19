@@ -5,10 +5,10 @@ using System.Linq;
 
 namespace MyShopClient.Converters
 {
-    /// <summary>
+
     /// Real-time sync behavior for ADD PRODUCT SELECTOR
     /// When user ticks checkbox, immediately add/remove from AddVm.SelectedProducts
-    /// </summary>
+ 
     public static class IsSelectedChangedBehavior
     {
         public static PromotionAddViewModel GetParentViewModel(DependencyObject obj)
@@ -33,7 +33,7 @@ namespace MyShopClient.Converters
             if (d is not MyShopClient.Controls.BlueCheckBox checkbox) return;
             if (e.NewValue is not PromotionAddViewModel addVm) return;
 
-            // Listen for IsChecked changes
+   
             checkbox.RegisterPropertyChangedCallback(
                 MyShopClient.Controls.BlueCheckBox.IsCheckedProperty,
                 (sender, _) =>
@@ -42,16 +42,16 @@ namespace MyShopClient.Converters
                     {
                         if (checkbox.IsChecked)
                         {
-                            // Add to SelectedProducts if not there
+                  
                             if (!addVm.SelectedProducts.Any(p => p.ProductId == product.ProductId))
                             {
-                                // Add the EXACT same object instance
+                    
                                 addVm.SelectedProducts.Add(product);
                             }
                         }
                         else
                         {
-                            // Remove from SelectedProducts
+                 
                             var existing = addVm.SelectedProducts.FirstOrDefault(p => p.ProductId == product.ProductId);
                             if (existing != null)
                             {
@@ -63,10 +63,8 @@ namespace MyShopClient.Converters
         }
     }
 
-    /// <summary>
-    /// Real-time sync behavior for EDIT PRODUCT SELECTOR
-    /// When user ticks checkbox, immediately add/remove from EditVm.SelectedProducts
-    /// </summary>
+
+
     public static class IsSelectedChangedBehaviorEdit
     {
         public static PromotionEditViewModel GetParentViewModel(DependencyObject obj)
@@ -91,7 +89,7 @@ namespace MyShopClient.Converters
             if (d is not MyShopClient.Controls.BlueCheckBox checkbox) return;
             if (e.NewValue is not PromotionEditViewModel editVm) return;
 
-            // Listen for IsChecked changes
+          
             checkbox.RegisterPropertyChangedCallback(
                 MyShopClient.Controls.BlueCheckBox.IsCheckedProperty,
                 (sender, _) =>
@@ -100,16 +98,16 @@ namespace MyShopClient.Converters
                     {
                         if (checkbox.IsChecked)
                         {
-                            // Add to SelectedProducts if not there
+                           
                             if (!editVm.SelectedProducts.Any(p => p.ProductId == product.ProductId))
                             {
-                                // Add the EXACT same object instance
+                               
                                 editVm.SelectedProducts.Add(product);
                             }
                         }
                         else
                         {
-                            // Remove from SelectedProducts
+                            
                             var existing = editVm.SelectedProducts.FirstOrDefault(p => p.ProductId == product.ProductId);
                             if (existing != null)
                             {

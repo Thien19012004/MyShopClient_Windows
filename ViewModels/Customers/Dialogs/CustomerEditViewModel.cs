@@ -112,7 +112,6 @@ namespace MyShopClient.ViewModels
             }
         }
 
-        // Commands for XAML binding
         [RelayCommand]
         private async Task Open(CustomerListItemDto dto)
         {

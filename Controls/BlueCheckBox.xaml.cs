@@ -15,57 +15,57 @@ namespace MyShopClient.Controls
 
         public BlueCheckBox()
         {
-    this.InitializeComponent();
- }
+            this.InitializeComponent();
+        }
 
         public bool IsChecked
         {
-      get => (bool)GetValue(IsCheckedProperty);
-          set => SetValue(IsCheckedProperty, value);
-    }
-
-      private static void OnIsCheckedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-if (d is BlueCheckBox checkBox)
-     {
-       bool isChecked = (bool)e.NewValue;
-                checkBox.RootToggleButton.IsChecked = isChecked;
-                checkBox.UpdateVisualState(isChecked);
-     }
+            get => (bool)GetValue(IsCheckedProperty);
+            set => SetValue(IsCheckedProperty, value);
         }
 
-public event RoutedEventHandler? Click;
+        private static void OnIsCheckedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is BlueCheckBox checkBox)
+            {
+                bool isChecked = (bool)e.NewValue;
+                checkBox.RootToggleButton.IsChecked = isChecked;
+                checkBox.UpdateVisualState(isChecked);
+            }
+        }
+
+        public event RoutedEventHandler? Click;
 
         private void RootToggleButton_Checked(object sender, RoutedEventArgs e)
         {
-    IsChecked = true;
-        UpdateVisualState(true);
-     Click?.Invoke(this, e);
+            IsChecked = true;
+            UpdateVisualState(true);
+            Click?.Invoke(this, e);
         }
 
-     private void RootToggleButton_Unchecked(object sender, RoutedEventArgs e)
+        private void RootToggleButton_Unchecked(object sender, RoutedEventArgs e)
         {
-  IsChecked = false;
-         UpdateVisualState(false);
-    Click?.Invoke(this, e);
+            IsChecked = false;
+            UpdateVisualState(false);
+            Click?.Invoke(this, e);
         }
 
         private void UpdateVisualState(bool isChecked)
         {
-  if (isChecked)
-        {
-       // N?n xanh, d?u tick tr?ng
-    CheckBoxBorder.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 120, 212)); // #0078D4
-           CheckBoxBorder.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 120, 212));
-     CheckMark.Opacity = 1;
+            if (isChecked)
+            {
+              
+                CheckBoxBorder.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 120, 212)); // #0078D4
+                CheckBoxBorder.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 120, 212));
+                CheckMark.Opacity = 1;
             }
-  else
-  {
-      // N?n trong su?t, vi?n xám
-         CheckBoxBorder.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
-          CheckBoxBorder.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 204, 204, 204));
-      CheckMark.Opacity = 0;
-         }
-     }
+            else
+            {
+                
+                CheckBoxBorder.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
+                CheckBoxBorder.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 204, 204, 204));
+                CheckMark.Opacity = 0;
+            }
+        }
     }
 }

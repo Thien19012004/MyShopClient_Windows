@@ -1,11 +1,11 @@
 namespace MyShopClient.Models
 {
- // Input to create customer
- public class CustomerCreateInput
- {
- public string Name { get; set; } = string.Empty;
- public string Phone { get; set; } = string.Empty;
- public string Email { get; set; } = string.Empty;
- public string Address { get; set; } = string.Empty;
- }
+    // Input to create customer
+    public class CustomerCreateInput
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+    }
 }

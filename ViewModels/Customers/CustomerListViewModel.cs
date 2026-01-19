@@ -11,17 +11,17 @@ using System.Threading;
 
 namespace MyShopClient.ViewModels
 {
-    // Core paging, collections and filter responsibilities
+
     public partial class CustomerListViewModel : SelectableListViewModel<CustomerListItemDto>
     {
         private readonly ICustomerService _customerService;
 
         public ObservableCollection<CustomerListItemDto> Customers { get; } = new();
 
-        // debounce version for search-as-you-type
+
         private int _searchVersion;
 
-        // Filter
+
         [ObservableProperty] private string? searchText;
 
         partial void OnSearchTextChanged(string? value)
@@ -46,20 +46,18 @@ namespace MyShopClient.ViewModels
             }
         }
 
-        // Summary
+
         public int TotalCustomersOnPage => Customers.Count;
         public int SelectedCustomersCount => SelectedItems.Count;
         public bool HasSelectedCustomers => SelectedItems.Count > 0;
 
-        // Delete / single-delete state
+
         [ObservableProperty] private bool isDeleteConfirmOpen;
         [ObservableProperty] private CustomerListItemDto? customerToDelete;
-        // Note: bulk-delete dialog state is provided by SelectableListViewModel
 
-        // Edit dialog order count shown in XAML
         [ObservableProperty] private int editCustomerOrderCount;
 
-        // Bulk delete message (computed) - used by UI and by subscription
+
         public string BulkDeleteConfirmMessage => $"Are you sure you want to delete {SelectedCustomersCount} selected customer{(SelectedCustomersCount != 1 ? "s" : "")}?";
 
         public CustomerListViewModel(ICustomerService customerService, IAppSettingsService appSettings)
@@ -67,9 +65,9 @@ namespace MyShopClient.ViewModels
         {
             _customerService = customerService;
 
-            // Attach selection tracking for items
+ 
             AttachSelectionTracker(Customers);
-            // When SelectedItems changes, raise summary properties
+      
             SelectedItems.CollectionChanged += (s, e) =>
             {
                 OnPropertyChanged(nameof(HasSelectedCustomers));
@@ -111,7 +109,7 @@ namespace MyShopClient.ViewModels
             OnPropertyChanged(nameof(TotalCustomersOnPage));
         }
 
-        // Filter / paging commands
+
         [RelayCommand]
         private Task ApplyFilterAsync() => LoadPageAsync(1);
 

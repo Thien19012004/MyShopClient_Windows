@@ -6,7 +6,7 @@ namespace MyShopClient.Converters
 {
     public class BooleanToVisibilityConverter : IValueConverter
     {
-        // bool -> Visibility
+ 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             if (value is bool b && b)
@@ -15,7 +15,7 @@ namespace MyShopClient.Converters
             return Visibility.Collapsed;
         }
 
-        // Visibility -> bool (thường không dùng, nhưng implement cho đủ interface)
+  
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             if (value is Visibility v)

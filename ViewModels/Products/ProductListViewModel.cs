@@ -495,34 +495,41 @@ namespace MyShopClient.ViewModels
         private async Task ConfirmDeleteProductAsync()
         {
             IsDeleteConfirmOpen = false;
-            if (ProductToDelete == null) return;
-            if (IsBusy) return;
+             if (ProductToDelete == null) return;
+    if (IsBusy) return;
 
-            IsBusy = true;
-            ErrorMessage = string.Empty;
+ IsBusy = true;
+         ErrorMessage = string.Empty;
+   bool deleted = false;
 
-            try
-            {
-                var result = await _productService.DeleteProductAsync(ProductToDelete.ProductId);
-                if (!result.Success)
-                {
-                    ErrorMessage = result.Message ?? "Delete product failed.";
-                }
-                else
-                {
-                    await LoadPageAsync(CurrentPage);
-                }
+      try
+       {
+   var result = await _productService.DeleteProductAsync(ProductToDelete.ProductId);
+       if (!result.Success)
+   {
+           ErrorMessage = result.Message ?? "Delete product failed.";
+           }
+            else
+     {
+                deleted = true;
             }
-            catch (Exception ex)
+            }
+     catch (Exception ex)
             {
                 ErrorMessage = ex.Message;
             }
             finally
             {
-                IsBusy = false;
-                OnPropertyChanged(nameof(HasError));
-                ProductToDelete = null;
-            }
+       IsBusy = false;
+   OnPropertyChanged(nameof(HasError));
+       ProductToDelete = null;
+     }
+
+    // Reload SAU KHI IsBusy = false
+     if (deleted)
+   {
+  await ReloadCurrentPageAsync();
+  }
         }
 
         // ================= IMAGE MANAGEMENT (ADD DIALOG) =================
@@ -939,6 +946,7 @@ namespace MyShopClient.ViewModels
             if (IsBusy) return;
             IsBusy = true;
             ErrorMessage = string.Empty;
+            bool imported = false;
 
             try
             {
@@ -950,7 +958,7 @@ namespace MyShopClient.ViewModels
                 }
                 else
                 {
-                    await LoadPageAsync(1);
+                    imported = true;
                 }
             }
             catch (Exception ex)
@@ -961,6 +969,12 @@ namespace MyShopClient.ViewModels
             {
                 IsBusy = false;
                 OnPropertyChanged(nameof(HasError));
+            }
+
+            // Reload SAU KHI IsBusy = false
+            if (imported)
+            {
+                await ReloadCurrentPageAsync();
             }
         }
 

@@ -1,8 +1,8 @@
 namespace MyShopClient.Infrastructure.GraphQL
 {
- public static class AuthQueries
- {
- public const string LoginMutation = @"
+    public static class AuthQueries
+    {
+        public const string LoginMutation = @"
 mutation($username: String!, $password: String!) {
  login(input: { username: $username, password: $password }) {
  statusCode
@@ -17,5 +17,5 @@ mutation($username: String!, $password: String!) {
  }
  }
 }";
- }
+    }
 }

@@ -10,12 +10,12 @@
 
     <Grid Background="#FFF5F5F7">
         <Grid.ColumnDefinitions>
-            <!-- cột sidebar: width phụ thuộc SidebarControl.Width -->
+       
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- SIDEBAR DÙNG CHUNG -->
+       
         <views:SidebarControl x:Name="Sidebar"
                               Grid.Column="0"
                               DashboardRequested="Sidebar_DashboardRequested"
@@ -29,10 +29,10 @@
                               SettingsRequested="Sidebar_SettingsRequested"/>
 
         <Grid Grid.Column="1">
-            <!-- NỘI DUNG TRANG (FRAME CON) -->
+           
             <Frame x:Name="ContentFrame" />
 
-            <!-- overlay for onboarding teaching tips -->
+       
             <controls:OnboardingOverlay x:Name="OnboardingOverlay" />
         </Grid>
     </Grid>

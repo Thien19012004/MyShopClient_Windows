@@ -19,7 +19,7 @@ namespace MyShopClient.ViewModels
         [ObservableProperty]
         private string username = string.Empty;
 
-        // Password không đưa vào XAML binding trực tiếp
+        
         [ObservableProperty]
         private string password = string.Empty;
 
@@ -41,7 +41,7 @@ namespace MyShopClient.ViewModels
             _authService = authService;
             _navigation = navigation;
 
-            // Thử auto login
+       
            
         }
 

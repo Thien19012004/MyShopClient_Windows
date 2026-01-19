@@ -97,7 +97,7 @@ namespace MyShopClient.Infrastructure.GraphQL
                 }
                 catch (Exception ex) when (IsConnectionError(ex))
                 {
-                    // Notify connection error handler for fatal connection errors after all retries
+                 
                     if (attempt >= MaxRetries - 1)
                     {
                         _connectionErrorHandler.NotifyConnectionError(ex);
@@ -249,81 +249,77 @@ namespace MyShopClient.Infrastructure.GraphQL
             }
         }
 
-        /// <summary>
-        /// Determines if an exception is a transient network error that should be retried.
-        /// </summary>
+ 
         private static bool IsTransientError(Exception ex)
         {
- // ObjectDisposedException on NetworkStream is a transient error
+            // ObjectDisposedException on NetworkStream is a transient error
             if (ex is ObjectDisposedException)
-       return true;
-      
+                return true;
+
             if (ex is IOException || ex is SocketException || ex is HttpRequestException || ex is TimeoutException)
-        return true;
+                return true;
 
-      if (ex.InnerException != null)
-     return IsTransientError(ex.InnerException);
+            if (ex.InnerException != null)
+                return IsTransientError(ex.InnerException);
 
-  return false;
-      }
+            return false;
+        }
 
-     /// <summary>
-        /// Determines if an exception is a fatal connection error (server unreachable)
-     /// </summary>
+  
         private static bool IsConnectionError(Exception ex)
-   {
-        // ObjectDisposedException on NetworkStream indicates connection was closed
-        if (ex is ObjectDisposedException disposedEx)
-            {
-       var objectName = disposedEx.ObjectName?.ToLowerInvariant() ?? "";
-          if (objectName.Contains("networkstream") || objectName.Contains("socket"))
-      {
-        return true;
-      }
-            }
-          
-            // SocketException with various connection errors
-        if (ex is SocketException socketEx)
-{
-        return socketEx.SocketErrorCode == SocketError.HostNotFound ||
-   socketEx.SocketErrorCode == SocketError.HostUnreachable ||
-       socketEx.SocketErrorCode == SocketError.NetworkUnreachable ||
-   socketEx.SocketErrorCode == SocketError.ConnectionRefused ||
-     socketEx.SocketErrorCode == SocketError.ConnectionReset ||
-      socketEx.SocketErrorCode == SocketError.ConnectionAborted ||
-       socketEx.SocketErrorCode == SocketError.TimedOut;
-       }
-
-     // IOException with "forcibly closed" message
-   if (ex is IOException ioEx)
         {
-          var message = ioEx.Message?.ToLowerInvariant() ?? "";
+            // ObjectDisposedException on NetworkStream indicates connection was closed
+            if (ex is ObjectDisposedException disposedEx)
+            {
+                var objectName = disposedEx.ObjectName?.ToLowerInvariant() ?? "";
+                if (objectName.Contains("networkstream") || objectName.Contains("socket"))
+                {
+                    return true;
+                }
+            }
+
+            // SocketException with various connection errors
+            if (ex is SocketException socketEx)
+            {
+                return socketEx.SocketErrorCode == SocketError.HostNotFound ||
+           socketEx.SocketErrorCode == SocketError.HostUnreachable ||
+               socketEx.SocketErrorCode == SocketError.NetworkUnreachable ||
+           socketEx.SocketErrorCode == SocketError.ConnectionRefused ||
+             socketEx.SocketErrorCode == SocketError.ConnectionReset ||
+              socketEx.SocketErrorCode == SocketError.ConnectionAborted ||
+               socketEx.SocketErrorCode == SocketError.TimedOut;
+            }
+
+            // IOException with "forcibly closed" message
+            if (ex is IOException ioEx)
+            {
+                var message = ioEx.Message?.ToLowerInvariant() ?? "";
                 if (message.Contains("forcibly closed") ||
  message.Contains("transport connection") ||
            message.Contains("remote host") ||
  message.Contains("disposed"))
-              {
-     return true;
-        }
+                {
+                    return true;
+                }
                 if (ioEx.InnerException != null)
-    {
-               return IsConnectionError(ioEx.InnerException);
-    }
+                {
+                    return IsConnectionError(ioEx.InnerException);
+                }
             }
 
             // HttpRequestException often wraps SocketException or IOException
-if (ex is HttpRequestException httpEx && httpEx.InnerException != null)
-        {
-        return IsConnectionError(httpEx.InnerException);
-     }
+            if (ex is HttpRequestException httpEx && httpEx.InnerException != null)
+            {
+                return IsConnectionError(httpEx.InnerException);
+            }
 
-      // Check inner exception for other types
-     if (ex.InnerException != null)
-   {
-              return IsConnectionError(ex.InnerException);
+            // Check inner exception for other types
+            if (ex.InnerException != null)
+            {
+                return IsConnectionError(ex.InnerException);
+            }
+
+            return false;
         }
-
-  return false;
-   }
     }
 }

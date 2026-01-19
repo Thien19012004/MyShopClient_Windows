@@ -382,11 +382,11 @@ query($pagination: PaginationInput, $filter: UserFilterInput) {
             }
             catch
             {
-                // swallow to avoid breaking typing
+        
             }
         }
 
-        // DTOs used when fetching users via GraphQL
+  
         private class UserItem { public int UserId { get; set; } public string? Username { get; set; } public string? FullName { get; set; } public bool IsActive { get; set; } public List<string>? Roles { get; set; } }
         private class UserPage { public List<UserItem>? Items { get; set; } }
         private class UsersRoot { public ApiResult<UserPage>? Users { get; set; } }

@@ -103,7 +103,7 @@
                     <TextBlock Grid.Column="2" Text="Products" x:Name="ProductsText" Foreground="{StaticResource SidebarTextColor}" VerticalAlignment="Center"/>
                 </Grid>
             </Button>
-     
+
             <!-- Orders -->
             <Button x:Name="OrdersButton"
                     Style="{StaticResource MenuButtonStyle}"
@@ -123,7 +123,7 @@
                     <TextBlock Grid.Column="2" Text="Customers" x:Name="CustomersText" Foreground="{StaticResource SidebarTextColor}" VerticalAlignment="Center"/>
                 </Grid>
             </Button>
-            
+
             <!-- Promotions -->
             <Button x:Name="PromotionsButton"
                     Style="{StaticResource MenuButtonStyle}"
@@ -133,7 +133,7 @@
                     <TextBlock Grid.Column="2" Text="Promotions" x:Name="PromotionsText" Foreground="{StaticResource SidebarTextColor}" VerticalAlignment="Center"/>
                 </Grid>
             </Button>
-            
+
             <!-- Reports -->
             <Button x:Name="ReportsButton"
                     Style="{StaticResource MenuButtonStyle}"
@@ -183,4 +183,4 @@
             </StackPanel>
         </Button>
     </Grid>
- </UserControl>
+</UserControl>

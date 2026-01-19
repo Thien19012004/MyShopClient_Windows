@@ -57,39 +57,39 @@ namespace MyShopClient.ViewModels
             new GroupByOption { Label = "Year", Value = "YEAR" }
             });
 
- public ObservableCollection<SalesViewModeOption> SalesViewModeOptions { get; } =
-        new(new[]
- {
+        public ObservableCollection<SalesViewModeOption> SalesViewModeOptions { get; } =
+               new(new[]
+        {
           new SalesViewModeOption { Label = "Products", Value = "PRODUCTS" },
            new SalesViewModeOption { Label = "Category", Value = "CATEGORY" }
-    });
+           });
 
         [ObservableProperty]
         private GroupByOption? selectedGroupBy;
 
         private SalesViewModeOption? _selectedSalesViewMode;
-      public SalesViewModeOption? SelectedSalesViewMode
-{
+        public SalesViewModeOption? SelectedSalesViewMode
+        {
             get => _selectedSalesViewMode;
             set
             {
-   if (SetProperty(ref _selectedSalesViewMode, value))
-      {
-         OnPropertyChanged(nameof(SalesChartTitle));
-             }
-       }
+                if (SetProperty(ref _selectedSalesViewMode, value))
+                {
+                    OnPropertyChanged(nameof(SalesChartTitle));
+                }
+            }
         }
 
         [ObservableProperty]
         private string? fromDateText;
 
-   [ObservableProperty]
+        [ObservableProperty]
         private string? toDateText;
 
         [ObservableProperty]
         private string? topText;
 
-     [ObservableProperty]
+        [ObservableProperty]
         private bool isBusy;
 
         [ObservableProperty]
@@ -98,18 +98,18 @@ namespace MyShopClient.ViewModels
         public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
         [ObservableProperty]
-   private ISeries[] productSeries = Array.Empty<ISeries>();
-
-  [ObservableProperty]
-        private Axis[] productXAxes = Array.Empty<Axis>();
-
-    [ObservableProperty]
-     private Axis[] productYAxes = Array.Empty<Axis>();
+        private ISeries[] productSeries = Array.Empty<ISeries>();
 
         [ObservableProperty]
-   private ISeries[] revenueSeries = Array.Empty<ISeries>();
+        private Axis[] productXAxes = Array.Empty<Axis>();
 
-    [ObservableProperty]
+        [ObservableProperty]
+        private Axis[] productYAxes = Array.Empty<Axis>();
+
+        [ObservableProperty]
+        private ISeries[] revenueSeries = Array.Empty<ISeries>();
+
+        [ObservableProperty]
         private Axis[] revenueXAxes = Array.Empty<Axis>();
 
         [ObservableProperty]
@@ -122,357 +122,357 @@ namespace MyShopClient.ViewModels
         private ISeries[] _revenuePieSeries = Array.Empty<ISeries>();
         public ISeries[] RevenuePieSeries
         {
-      get => _revenuePieSeries;
-         set
-  {
-         if (_revenuePieSeries != value)
+            get => _revenuePieSeries;
+            set
+            {
+                if (_revenuePieSeries != value)
                 {
-  _revenuePieSeries = value;
-   OnPropertyChanged(nameof(RevenuePieSeries));
-        }
-    }
+                    _revenuePieSeries = value;
+                    OnPropertyChanged(nameof(RevenuePieSeries));
+                }
+            }
         }
 
-      private bool _showRevenueAsPie;
+        private bool _showRevenueAsPie;
         public bool ShowRevenueAsPie
-{
-          get => _showRevenueAsPie;
-    set
+        {
+            get => _showRevenueAsPie;
+            set
             {
- if (_showRevenueAsPie != value)
-    {
-           _showRevenueAsPie = value;
-           OnPropertyChanged(nameof(ShowRevenueAsPie));
-    }
-   }
+                if (_showRevenueAsPie != value)
+                {
+                    _showRevenueAsPie = value;
+                    OnPropertyChanged(nameof(ShowRevenueAsPie));
+                }
+            }
         }
 
         public ReportViewModel(IReportService reportService, ICategoryService categoryService)
         {
-    _reportService = reportService;
-   _categoryService = categoryService;
+            _reportService = reportService;
+            _categoryService = categoryService;
 
             SelectedGroupBy = GroupByOptions.FirstOrDefault(g => g.Value == "MONTH");
-   SelectedSalesViewMode = SalesViewModeOptions.FirstOrDefault(m => m.Value == "PRODUCTS");
+            SelectedSalesViewMode = SalesViewModeOptions.FirstOrDefault(m => m.Value == "PRODUCTS");
 
             var now = DateTime.Now;
-        FromDateText = new DateTime(now.Year, 1, 1).ToString("yyyy-MM-dd");
-        ToDateText = new DateTime(now.Year, 12, 31).ToString("yyyy-MM-dd");
-      TopText = "5";
+            FromDateText = new DateTime(now.Year, 1, 1).ToString("yyyy-MM-dd");
+            ToDateText = new DateTime(now.Year, 12, 31).ToString("yyyy-MM-dd");
+            TopText = "5";
 
-    ProductYAxes = new[] { new Axis { Name = "Quantity" } };
-  RevenueYAxes = new[] { new Axis { Name = "Amount" } };
+            ProductYAxes = new[] { new Axis { Name = "Quantity" } };
+            RevenueYAxes = new[] { new Axis { Name = "Amount" } };
             ProductXAxes = new[] { new Axis { Labels = Array.Empty<string>() } };
-    RevenueXAxes = new[] { new Axis { Labels = Array.Empty<string>() } };
+            RevenueXAxes = new[] { new Axis { Labels = Array.Empty<string>() } };
 
-       _ = LoadReportAsync();
+            _ = LoadReportAsync();
         }
 
         private static DateTime? ParsePeriodToDateTime(string period)
         {
             if (string.IsNullOrWhiteSpace(period)) return null;
-         if (DateTimeOffset.TryParse(period, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var dto))
+            if (DateTimeOffset.TryParse(period, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var dto))
             {
-        return dto.DateTime;
-      }
+                return dto.DateTime;
+            }
             if (DateTime.TryParseExact(period, new[] { "yyyy-MM-dd", "yyyy-MM", "yyyy" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
- {
-             return dt;
-    }
+            {
+                return dt;
+            }
             if (DateTime.TryParse(period, out dt)) return dt;
-    return null;
+            return null;
         }
 
-     private string FormatLabel(string period, string groupBy)
-      {
-        var dt = ParsePeriodToDateTime(period);
-          if (dt == null) return period;
-      return groupBy switch
+        private string FormatLabel(string period, string groupBy)
         {
-      "DAY" => dt.Value.ToString("yyyy-MM-dd"),
-          "WEEK" => ISOWeek.GetYear(dt.Value) + "-W" + ISOWeek.GetWeekOfYear(dt.Value).ToString("D2"),
+            var dt = ParsePeriodToDateTime(period);
+            if (dt == null) return period;
+            return groupBy switch
+            {
+                "DAY" => dt.Value.ToString("yyyy-MM-dd"),
+                "WEEK" => ISOWeek.GetYear(dt.Value) + "-W" + ISOWeek.GetWeekOfYear(dt.Value).ToString("D2"),
                 "MONTH" => dt.Value.ToString("yyyy-MM"),
-     "YEAR" => dt.Value.ToString("yyyy"),
-          _ => dt.Value.ToString("yyyy-MM-dd")
+                "YEAR" => dt.Value.ToString("yyyy"),
+                _ => dt.Value.ToString("yyyy-MM-dd")
             };
         }
 
-[RelayCommand]
+        [RelayCommand]
         private Task ApplyFilterAsync() => LoadReportAsync();
 
         [RelayCommand]
-     private void ToggleRevenuePie()
+        private void ToggleRevenuePie()
         {
-  ShowRevenueAsPie = !ShowRevenueAsPie;
-   }
+            ShowRevenueAsPie = !ShowRevenueAsPie;
+        }
 
         private async Task LoadReportAsync()
         {
-         _loadCts?.Cancel();
+            _loadCts?.Cancel();
             _loadCts?.Dispose();
             _loadCts = new CancellationTokenSource();
-        var cancellationToken = _loadCts.Token;
+            var cancellationToken = _loadCts.Token;
 
             if (IsBusy) return;
-IsBusy = true;
- ErrorMessage = string.Empty;
+            IsBusy = true;
+            ErrorMessage = string.Empty;
 
-       try
+            try
             {
-  // Check if Category mode is selected - show message and still load product data
-       var isCategoryMode = SelectedSalesViewMode?.Value == "CATEGORY";
- 
-    var from = ParseDate(FromDateText);
-         var to = ParseDate(ToDateText);
+                // Check if Category mode is selected - show message and still load product data
+                var isCategoryMode = SelectedSalesViewMode?.Value == "CATEGORY";
 
-     if (from == null || to == null)
-          {
-    ErrorMessage = "Please input valid date range (yyyy-MM-dd).";
-         return;
-     }
+                var from = ParseDate(FromDateText);
+                var to = ParseDate(ToDateText);
 
-         if (from > to)
-     {
-      ErrorMessage = "From date must be before To date.";
-    return;
-     }
+                if (from == null || to == null)
+                {
+                    ErrorMessage = "Please input valid date range (yyyy-MM-dd).";
+                    return;
+                }
 
-     int? top = null;
-    if (int.TryParse(TopText, out var topVal) && topVal > 0)
-        top = topVal;
+                if (from > to)
+                {
+                    ErrorMessage = "From date must be before To date.";
+                    return;
+                }
 
-  var opt = new ReportQueryOptions
- {
-   FromDate = from.Value,
-     ToDate = to.Value,
-              GroupBy = SelectedGroupBy?.Value ?? "MONTH",
-    Top = top,
-         CategoryId = null
-     };
+                int? top = null;
+                if (int.TryParse(TopText, out var topVal) && topVal > 0)
+                    top = topVal;
 
-          // Load revenue data (always needed)
+                var opt = new ReportQueryOptions
+                {
+                    FromDate = from.Value,
+                    ToDate = to.Value,
+                    GroupBy = SelectedGroupBy?.Value ?? "MONTH",
+                    Top = top,
+                    CategoryId = null
+                };
+
+                // Load revenue data (always needed)
                 var revenueTask = _reportService.GetRevenueProfitSeriesAsync(opt);
 
-    if (isCategoryMode)
-      {
-      // Load category sales data
-       var categorySalesData = await LoadCategorySalesAsync(opt, top, cancellationToken);
- var revenueResult = await revenueTask;
+                if (isCategoryMode)
+                {
+                    // Load category sales data
+                    var categorySalesData = await LoadCategorySalesAsync(opt, top, cancellationToken);
+                    var revenueResult = await revenueTask;
 
-              cancellationToken.ThrowIfCancellationRequested();
+                    cancellationToken.ThrowIfCancellationRequested();
 
-          if (!revenueResult.Success)
-      {
- ErrorMessage = revenueResult.Message ?? "Cannot load revenue/profit report.";
-    return;
-         }
+                    if (!revenueResult.Success)
+                    {
+                        ErrorMessage = revenueResult.Message ?? "Cannot load revenue/profit report.";
+                        return;
+                    }
 
-    void UpdateCategoryCharts()
-               {
-    try
-          {
-           BuildCategoryChart(categorySalesData);
-       BuildRevenueChart(revenueResult.Data ?? new());
-   }
-            catch (Exception ex)
-   {
-              ErrorMessage = ex.Message;
-    OnPropertyChanged(nameof(HasError));
-      }
-         }
+                    void UpdateCategoryCharts()
+                    {
+                        try
+                        {
+                            BuildCategoryChart(categorySalesData);
+                            BuildRevenueChart(revenueResult.Data ?? new());
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorMessage = ex.Message;
+                            OnPropertyChanged(nameof(HasError));
+                        }
+                    }
 
-                if (App.MainWindow?.DispatcherQueue != null)
-           {
-    App.MainWindow.DispatcherQueue.TryEnqueue(UpdateCategoryCharts);
-           }
-      else
-        {
-    try { UpdateCategoryCharts(); }
-     catch (Exception ex) { ErrorMessage = ex.Message; OnPropertyChanged(nameof(HasError)); }
-         }
-      }
-    else
-        {
-       // Load product sales data
-         var productTask = _reportService.GetProductSalesSeriesAsync(opt);
- await Task.WhenAll(productTask, revenueTask);
+                    if (App.MainWindow?.DispatcherQueue != null)
+                    {
+                        App.MainWindow.DispatcherQueue.TryEnqueue(UpdateCategoryCharts);
+                    }
+                    else
+                    {
+                        try { UpdateCategoryCharts(); }
+                        catch (Exception ex) { ErrorMessage = ex.Message; OnPropertyChanged(nameof(HasError)); }
+                    }
+                }
+                else
+                {
+                    // Load product sales data
+                    var productTask = _reportService.GetProductSalesSeriesAsync(opt);
+                    await Task.WhenAll(productTask, revenueTask);
 
-        cancellationToken.ThrowIfCancellationRequested();
+                    cancellationToken.ThrowIfCancellationRequested();
 
-      var productResult = productTask.Result;
-    var revenueResult = revenueTask.Result;
+                    var productResult = productTask.Result;
+                    var revenueResult = revenueTask.Result;
 
-      if (!productResult.Success)
-        {
-  ErrorMessage = productResult.Message ?? "Cannot load product sales report.";
-        return;
-     }
+                    if (!productResult.Success)
+                    {
+                        ErrorMessage = productResult.Message ?? "Cannot load product sales report.";
+                        return;
+                    }
 
-  if (!revenueResult.Success)
-           {
-           ErrorMessage = revenueResult.Message ?? "Cannot load revenue/profit report.";
- return;
-              }
+                    if (!revenueResult.Success)
+                    {
+                        ErrorMessage = revenueResult.Message ?? "Cannot load revenue/profit report.";
+                        return;
+                    }
 
-      void UpdateProductCharts()
-         {
-        try
-           {
-     BuildProductChart(productResult.Data ?? new());
-        BuildRevenueChart(revenueResult.Data ?? new());
-   }
-      catch (Exception ex)
-              {
-     ErrorMessage = ex.Message;
-   OnPropertyChanged(nameof(HasError));
-        }
-   }
+                    void UpdateProductCharts()
+                    {
+                        try
+                        {
+                            BuildProductChart(productResult.Data ?? new());
+                            BuildRevenueChart(revenueResult.Data ?? new());
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorMessage = ex.Message;
+                            OnPropertyChanged(nameof(HasError));
+                        }
+                    }
 
-       if (App.MainWindow?.DispatcherQueue != null)
-      {
-   App.MainWindow.DispatcherQueue.TryEnqueue(UpdateProductCharts);
-       }
-     else
-         {
-    try { UpdateProductCharts(); }
-            catch (Exception ex) { ErrorMessage = ex.Message; OnPropertyChanged(nameof(HasError)); }
-    }
-     }
+                    if (App.MainWindow?.DispatcherQueue != null)
+                    {
+                        App.MainWindow.DispatcherQueue.TryEnqueue(UpdateProductCharts);
+                    }
+                    else
+                    {
+                        try { UpdateProductCharts(); }
+                        catch (Exception ex) { ErrorMessage = ex.Message; OnPropertyChanged(nameof(HasError)); }
+                    }
+                }
             }
             catch (OperationCanceledException)
-         {
-   // Ignore cancellation
-    }
-       catch (Exception ex)
-      {
-          ErrorMessage = ex.Message;
+            {
+                // Ignore cancellation
             }
-          finally
-      {
-            IsBusy = false;
-            OnPropertyChanged(nameof(HasError));
-  }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+            }
+            finally
+            {
+                IsBusy = false;
+                OnPropertyChanged(nameof(HasError));
+            }
         }
 
-    /// <summary>
+        /// <summary>
         /// Load sales data for each category by calling API with categoryId filter, then aggregate
         /// </summary>
         private async Task<List<CategorySalesData>> LoadCategorySalesAsync(ReportQueryOptions baseOpt, int? top, CancellationToken cancellationToken)
         {
-     var result = new List<CategorySalesData>();
+            var result = new List<CategorySalesData>();
 
-     // Step 1: Get all categories
-          var categoriesResult = await _categoryService.GetCategoriesAsync(null, 1, 100);
+            // Step 1: Get all categories
+            var categoriesResult = await _categoryService.GetCategoriesAsync(null, 1, 100);
             if (!categoriesResult.Success || categoriesResult.Data?.Items == null)
-   {
+            {
                 Debug.WriteLine("[ReportViewModel] Failed to load categories");
-     return result;
-      }
+                return result;
+            }
 
-         var categories = categoriesResult.Data.Items;
+            var categories = categoriesResult.Data.Items;
             Debug.WriteLine($"[ReportViewModel] Loaded {categories.Count} categories");
 
- // Step 2: For each category, get product sales with categoryId filter
- var tasks = categories.Select(async category =>
+            // Step 2: For each category, get product sales with categoryId filter
+            var tasks = categories.Select(async category =>
+                       {
+                           var opt = new ReportQueryOptions
+                           {
+                               FromDate = baseOpt.FromDate,
+                               ToDate = baseOpt.ToDate,
+                               GroupBy = baseOpt.GroupBy,
+                               Top = 1000, // Get all products in category (backend requires non-null value)
+                               CategoryId = category.CategoryId
+                           };
+
+                           var salesResult = await _reportService.GetProductSalesSeriesAsync(opt);
+
+                           if (!salesResult.Success || salesResult.Data == null || salesResult.Data.Count == 0)
+                           {
+                               return null;
+                           }
+
+                           // Aggregate all products' sales into category total
+                           var allPeriods = salesResult.Data
+     .SelectMany(p => p.Points)
+             .Select(pt => pt.Period)
+            .Distinct()
+         .ToList();
+
+                           var aggregatedPoints = allPeriods.Select(period =>
+                 {
+                    var totalValue = salesResult.Data
+.SelectMany(p => p.Points)
+     .Where(pt => pt.Period == period)
+    .Sum(pt => pt.Value);
+
+                    return new ProductSalesPointDto
+                    {
+                        Period = period,
+                        Value = totalValue
+                    };
+                }).ToList();
+
+                           // Only return if there's actual sales data
+                           if (aggregatedPoints.All(p => p.Value == 0))
+                           {
+                               return null;
+                           }
+
+                           return new CategorySalesData
+                           {
+                               CategoryId = category.CategoryId,
+                               Name = category.Name,
+                               Points = aggregatedPoints
+                           };
+                       });
+
+            var categoryResults = await Task.WhenAll(tasks);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // Filter out nulls and sort by total sales descending
+            result = categoryResults
+                .Where(c => c != null)
+                          .Cast<CategorySalesData>()
+                   .OrderByDescending(c => c.Points.Sum(p => p.Value))
+            .ToList();
+
+            // Apply top filter if specified
+            if (top.HasValue && top.Value > 0)
             {
-    var opt = new ReportQueryOptions
-          {
-      FromDate = baseOpt.FromDate,
-               ToDate = baseOpt.ToDate,
-    GroupBy = baseOpt.GroupBy,
-Top = 1000, // Get all products in category (backend requires non-null value)
-               CategoryId = category.CategoryId
-       };
+                result = result.Take(top.Value).ToList();
+            }
 
-        var salesResult = await _reportService.GetProductSalesSeriesAsync(opt);
-
-      if (!salesResult.Success || salesResult.Data == null || salesResult.Data.Count == 0)
-                {
-            return null;
- }
-
-                // Aggregate all products' sales into category total
-             var allPeriods = salesResult.Data
-  .SelectMany(p => p.Points)
-          .Select(pt => pt.Period)
-         .Distinct()
-      .ToList();
-
-    var aggregatedPoints = allPeriods.Select(period =>
-     {
-                var totalValue = salesResult.Data
-  .SelectMany(p => p.Points)
-            .Where(pt => pt.Period == period)
-           .Sum(pt => pt.Value);
-
-          return new ProductSalesPointDto
-     {
-             Period = period,
-     Value = totalValue
-      };
-       }).ToList();
-
-                // Only return if there's actual sales data
-     if (aggregatedPoints.All(p => p.Value == 0))
-       {
- return null;
-    }
-
-                return new CategorySalesData
-          {
-          CategoryId = category.CategoryId,
-     Name = category.Name,
-   Points = aggregatedPoints
-        };
-            });
-
-     var categoryResults = await Task.WhenAll(tasks);
-
-    cancellationToken.ThrowIfCancellationRequested();
-
-   // Filter out nulls and sort by total sales descending
-  result = categoryResults
-      .Where(c => c != null)
-                .Cast<CategorySalesData>()
-         .OrderByDescending(c => c.Points.Sum(p => p.Value))
-  .ToList();
-
-         // Apply top filter if specified
-         if (top.HasValue && top.Value > 0)
-  {
-        result = result.Take(top.Value).ToList();
-    }
-
-       Debug.WriteLine($"[ReportViewModel] Loaded sales data for {result.Count} categories");
+            Debug.WriteLine($"[ReportViewModel] Loaded sales data for {result.Count} categories");
             return result;
         }
 
         private void BuildProductChart(List<ProductSalesSeriesDto> seriesData)
         {
             if (seriesData == null || seriesData.Count == 0)
-       {
-      ProductSeries = Array.Empty<ISeries>();
-           ProductXAxes = new[] { new Axis { Labels = Array.Empty<string>() } };
-    ProductYAxes = new[] { new Axis { Name = "Quantity" } };
+            {
+                ProductSeries = Array.Empty<ISeries>();
+                ProductXAxes = new[] { new Axis { Labels = Array.Empty<string>() } };
+                ProductYAxes = new[] { new Axis { Name = "Quantity" } };
                 return;
             }
 
- var allPeriodsRaw = seriesData
-                .SelectMany(s => s.Points)
-                .Select(p => p.Period)
-        .Distinct()
-        .ToArray();
+            var allPeriodsRaw = seriesData
+                           .SelectMany(s => s.Points)
+                           .Select(p => p.Period)
+                   .Distinct()
+                   .ToArray();
 
-         var parsed = allPeriodsRaw
-           .Select(p => new { Raw = p, Dt = ParsePeriodToDateTime(p) })
-      .OrderBy(x => x.Dt ?? DateTime.MinValue)
-             .ToArray();
+            var parsed = allPeriodsRaw
+              .Select(p => new { Raw = p, Dt = ParsePeriodToDateTime(p) })
+         .OrderBy(x => x.Dt ?? DateTime.MinValue)
+                .ToArray();
 
-     var allPeriods = parsed.Select(x => x.Raw).ToArray();
-  var labels = parsed.Select(x => FormatLabel(x.Raw, SelectedGroupBy?.Value ?? "MONTH")).ToArray();
+            var allPeriods = parsed.Select(x => x.Raw).ToArray();
+            var labels = parsed.Select(x => FormatLabel(x.Raw, SelectedGroupBy?.Value ?? "MONTH")).ToArray();
 
-         var colors = new[]
-            {
+            var colors = new[]
+               {
    SKColors.DeepSkyBlue,
    SKColors.Crimson,
            SKColors.MediumSeaGreen,
@@ -480,29 +480,29 @@ Top = 1000, // Get all products in category (backend requires non-null value)
     SKColors.Purple
      };
 
-      var lineSeries = seriesData.Select((s, index) =>
-        {
-      var values = allPeriods
-       .Select(period => (double)(s.Points.FirstOrDefault(p => p.Period == period)?.Value ?? 0))
-      .ToArray();
+            var lineSeries = seriesData.Select((s, index) =>
+              {
+                  var values = allPeriods
+             .Select(period => (double)(s.Points.FirstOrDefault(p => p.Period == period)?.Value ?? 0))
+            .ToArray();
 
-       return new LineSeries<double>
-     {
-     Name = s.Name,
-         Values = values,
-         GeometrySize = 15,
-          GeometryStroke = new SolidColorPaint(colors[index % colors.Length]) { StrokeThickness = 2 },
-    GeometryFill = new SolidColorPaint(colors[index % colors.Length]),
-              Stroke = new SolidColorPaint(colors[index % colors.Length]) { StrokeThickness = 3 },
-         Fill = null,
-        LineSmoothness = 0,
-           DataLabelsSize = 12,
-  DataLabelsPaint = new SolidColorPaint(colors[index % colors.Length]),
-DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Top
-    } as ISeries;
-            }).ToArray();
+                  return new LineSeries<double>
+                  {
+                      Name = s.Name,
+                      Values = values,
+                      GeometrySize = 15,
+                      GeometryStroke = new SolidColorPaint(colors[index % colors.Length]) { StrokeThickness = 2 },
+                      GeometryFill = new SolidColorPaint(colors[index % colors.Length]),
+                      Stroke = new SolidColorPaint(colors[index % colors.Length]) { StrokeThickness = 3 },
+                      Fill = null,
+                      LineSmoothness = 0,
+                      DataLabelsSize = 12,
+                      DataLabelsPaint = new SolidColorPaint(colors[index % colors.Length]),
+                      DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Top
+                  } as ISeries;
+              }).ToArray();
 
-       ProductSeries = lineSeries;
+            ProductSeries = lineSeries;
             ProductXAxes = new[]
      {
             new Axis
@@ -512,8 +512,8 @@ DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Top
    TextSize = 12
                 }
        };
-   ProductYAxes = new[]
-            {
+            ProductYAxes = new[]
+                     {
               new Axis
   {
                   Name = "Quantity",
@@ -521,31 +521,31 @@ DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Top
             MinLimit = 0
   }
             };
-      }
+        }
 
         private void BuildCategoryChart(List<CategorySalesData> seriesData)
         {
-     if (seriesData == null || seriesData.Count == 0)
-       {
-     ProductSeries = Array.Empty<ISeries>();
-  ProductXAxes = new[] { new Axis { Labels = Array.Empty<string>() } };
+            if (seriesData == null || seriesData.Count == 0)
+            {
+                ProductSeries = Array.Empty<ISeries>();
+                ProductXAxes = new[] { new Axis { Labels = Array.Empty<string>() } };
                 ProductYAxes = new[] { new Axis { Name = "Quantity" } };
-   return;
+                return;
             }
 
-  var allPeriodsRaw = seriesData
-    .SelectMany(s => s.Points)
-    .Select(p => p.Period)
-           .Distinct()
-            .ToArray();
+            var allPeriodsRaw = seriesData
+              .SelectMany(s => s.Points)
+              .Select(p => p.Period)
+                     .Distinct()
+                      .ToArray();
 
             var parsed = allPeriodsRaw
        .Select(p => new { Raw = p, Dt = ParsePeriodToDateTime(p) })
           .OrderBy(x => x.Dt ?? DateTime.MinValue)
             .ToArray();
 
-      var allPeriods = parsed.Select(x => x.Raw).ToArray();
-    var labels = parsed.Select(x => FormatLabel(x.Raw, SelectedGroupBy?.Value ?? "MONTH")).ToArray();
+            var allPeriods = parsed.Select(x => x.Raw).ToArray();
+            var labels = parsed.Select(x => FormatLabel(x.Raw, SelectedGroupBy?.Value ?? "MONTH")).ToArray();
 
             var colors = new[]
        {
@@ -565,25 +565,25 @@ SKColors.HotPink
      .Select(period => (double)(s.Points.FirstOrDefault(p => p.Period == period)?.Value ?? 0))
      .ToArray();
 
-           return new LineSeries<double>
-    {
-         Name = s.Name,
-        Values = values,
-   GeometrySize = 15,
-  GeometryStroke = new SolidColorPaint(colors[index % colors.Length]) { StrokeThickness = 2 },
-   GeometryFill = new SolidColorPaint(colors[index % colors.Length]),
-Stroke = new SolidColorPaint(colors[index % colors.Length]) { StrokeThickness = 3 },
+       return new LineSeries<double>
+       {
+           Name = s.Name,
+           Values = values,
+           GeometrySize = 15,
+           GeometryStroke = new SolidColorPaint(colors[index % colors.Length]) { StrokeThickness = 2 },
+           GeometryFill = new SolidColorPaint(colors[index % colors.Length]),
+           Stroke = new SolidColorPaint(colors[index % colors.Length]) { StrokeThickness = 3 },
            Fill = null,
-   LineSmoothness = 0,
-   DataLabelsSize = 12,
-       DataLabelsPaint = new SolidColorPaint(colors[index % colors.Length]),
+           LineSmoothness = 0,
+           DataLabelsSize = 12,
+           DataLabelsPaint = new SolidColorPaint(colors[index % colors.Length]),
            DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Top
-              } as ISeries;
-            }).ToArray();
+       } as ISeries;
+   }).ToArray();
 
             ProductSeries = lineSeries;
-  ProductXAxes = new[]
-            {
+            ProductXAxes = new[]
+                      {
        new Axis
                 {
     Labels = labels,
@@ -591,8 +591,8 @@ Stroke = new SolidColorPaint(colors[index % colors.Length]) { StrokeThickness = 
          TextSize = 12
      }
        };
-      ProductYAxes = new[]
-   {
+            ProductYAxes = new[]
+         {
            new Axis
         {
       Name = "Quantity",
@@ -602,28 +602,28 @@ Stroke = new SolidColorPaint(colors[index % colors.Length]) { StrokeThickness = 
   };
         }
 
-    private void BuildRevenueChart(List<RevenueProfitPointDto> points)
+        private void BuildRevenueChart(List<RevenueProfitPointDto> points)
         {
             if (points == null || points.Count == 0)
             {
-      RevenueSeries = Array.Empty<ISeries>();
- RevenueXAxes = new[] { new Axis { Labels = Array.Empty<string>() } };
-           RevenueYAxes = new[] { new Axis { Name = "Amount" } };
+                RevenueSeries = Array.Empty<ISeries>();
+                RevenueXAxes = new[] { new Axis { Labels = Array.Empty<string>() } };
+                RevenueYAxes = new[] { new Axis { Name = "Amount" } };
                 RevenuePieSeries = Array.Empty<ISeries>();
-            return;
-      }
+                return;
+            }
 
-         var parsed = points
-          .Select(p => new { Raw = p.Period, Dt = ParsePeriodToDateTime(p.Period), Point = p })
-         .OrderBy(x => x.Dt ?? DateTime.MinValue)
-       .ToArray();
+            var parsed = points
+             .Select(p => new { Raw = p.Period, Dt = ParsePeriodToDateTime(p.Period), Point = p })
+            .OrderBy(x => x.Dt ?? DateTime.MinValue)
+          .ToArray();
 
-     var labels = parsed.Select(x => FormatLabel(x.Raw, SelectedGroupBy?.Value ?? "MONTH")).ToArray();
-       var revenueValues = parsed.Select(x => (double)x.Point.Revenue).ToArray();
-        var profitValues = parsed.Select(x => (double)x.Point.Profit).ToArray();
+            var labels = parsed.Select(x => FormatLabel(x.Raw, SelectedGroupBy?.Value ?? "MONTH")).ToArray();
+            var revenueValues = parsed.Select(x => (double)x.Point.Revenue).ToArray();
+            var profitValues = parsed.Select(x => (double)x.Point.Profit).ToArray();
 
-RevenueSeries = new ISeries[]
- {
+            RevenueSeries = new ISeries[]
+             {
          new ColumnSeries<double>
  {
                Name = "Revenue",
@@ -636,7 +636,7 @@ RevenueSeries = new ISeries[]
          Values = profitValues,
              Fill = new SolidColorPaint(SKColors.SteelBlue)
          }
-      };
+                  };
 
             RevenueXAxes = new[]
  {
@@ -646,33 +646,33 @@ RevenueSeries = new ISeries[]
           LabelsRotation = 45
      }
    };
- RevenueYAxes = new[] { new Axis { Name = "Amount" } };
+            RevenueYAxes = new[] { new Axis { Name = "Amount" } };
 
-       if (revenueValues.Length > 1)
+            if (revenueValues.Length > 1)
             {
-     var pie = parsed.Select(x => (ISeries)new PieSeries<double>
- {
-        Name = FormatLabel(x.Raw, SelectedGroupBy?.Value ?? "MONTH"),
-      Values = new double[] { x.Point.Revenue },
-     DataLabelsPaint = new SolidColorPaint(SKColors.Black)
-      }).ToArray();
+                var pie = parsed.Select(x => (ISeries)new PieSeries<double>
+                {
+                    Name = FormatLabel(x.Raw, SelectedGroupBy?.Value ?? "MONTH"),
+                    Values = new double[] { x.Point.Revenue },
+                    DataLabelsPaint = new SolidColorPaint(SKColors.Black)
+                }).ToArray();
 
-     RevenuePieSeries = pie;
- }
-else
-         {
-  RevenuePieSeries = Array.Empty<ISeries>();
-    }
+                RevenuePieSeries = pie;
+            }
+            else
+            {
+                RevenuePieSeries = Array.Empty<ISeries>();
+            }
         }
 
-    private static DateTime? ParseDate(string? text)
- {
-       if (string.IsNullOrWhiteSpace(text)) return null;
-      if (DateTime.TryParseExact(text.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
+        private static DateTime? ParseDate(string? text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return null;
+            if (DateTime.TryParseExact(text.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
             {
-    return dt.Date;
-      }
-      return null;
+                return dt.Date;
+            }
+            return null;
         }
     }
 }

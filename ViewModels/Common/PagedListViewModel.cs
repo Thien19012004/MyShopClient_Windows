@@ -43,7 +43,7 @@ namespace MyShopClient.ViewModels
             }
         }
 
-        // Public wrapper that handles IsBusy/Error guard and delegates actual data load to derived classes
+
         public async Task LoadPageAsync(int? page = null)
         {
             if (IsBusy) return;
@@ -64,7 +64,7 @@ namespace MyShopClient.ViewModels
             catch (Exception ex)
             {
                 ErrorMessage = ex.Message;
-                // Let derived class decide how to clear its collection; still set sensible paging defaults
+
                 SetPageResult(1, PageSize, 0, 1);
             }
             finally
@@ -74,10 +74,9 @@ namespace MyShopClient.ViewModels
             }
         }
 
-        // Derived classes implement how to fetch and populate their item collection for the given page/pageSize
+
         protected abstract Task LoadPageCoreAsync(int page, int pageSize);
 
-        // Helper for derived classes to update paging properties after receiving page result
         protected void SetPageResult(int page, int pageSize, int totalItems, int totalPages)
         {
             CurrentPage = page;
@@ -86,7 +85,7 @@ namespace MyShopClient.ViewModels
             TotalPages = Math.Max(1, totalPages);
         }
 
-        // Navigation helpers exposed as commands
+
         [RelayCommand]
         public Task NextPageAsync()
         {

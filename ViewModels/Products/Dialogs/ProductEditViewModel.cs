@@ -17,103 +17,102 @@ namespace MyShopClient.ViewModels.Products.Dialogs
         private readonly Func<Task> _reloadCallback;
 
         public ObservableCollection<ProductImageItem> EditProductImages { get; } = new();
- 
+
         // Categories available for selection in the dialog
         public ObservableCollection<CategoryOption> AvailableCategories { get; } = new();
 
         public ProductEditViewModel(IProductService productService, IImageUploadService imageUploadService, Func<Task> reloadCallback)
         {
- _productService = productService ?? throw new ArgumentNullException(nameof(productService));
+            _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _imageUploadService = imageUploadService ?? throw new ArgumentNullException(nameof(imageUploadService));
-_reloadCallback = reloadCallback ?? throw new ArgumentNullException(nameof(reloadCallback));
+            _reloadCallback = reloadCallback ?? throw new ArgumentNullException(nameof(reloadCallback));
         }
 
-  private bool _isOpen;
+        private bool _isOpen;
         public bool IsOpen { get => _isOpen; set => SetProperty(ref _isOpen, value); }
 
         private string? _error;
         public string? Error { get => _error; set { SetProperty(ref _error, value); OnPropertyChanged(nameof(HasError)); } }
-      public bool HasError => !string.IsNullOrWhiteSpace(Error);
+        public bool HasError => !string.IsNullOrWhiteSpace(Error);
 
         public int EditingProductId { get; private set; }
-        
+
         private string? _sku;
         public string? Sku { get => _sku; set => SetProperty(ref _sku, value); }
 
         private string? _name;
         public string? Name { get => _name; set => SetProperty(ref _name, value); }
-    
+
         private string? _importPriceText;
         public string? ImportPriceText { get => _importPriceText; set => SetProperty(ref _importPriceText, value); }
-        
-    private string? _salePriceText;
+
+        private string? _salePriceText;
         public string? SalePriceText { get => _salePriceText; set => SetProperty(ref _salePriceText, value); }
-        
-    private string? _stockQuantityText;
+
+        private string? _stockQuantityText;
         public string? StockQuantityText { get => _stockQuantityText; set => SetProperty(ref _stockQuantityText, value); }
-        
-      private string? _description;
+
+        private string? _description;
         public string? Description { get => _description; set => SetProperty(ref _description, value); }
-   
+
         private CategoryOption? _category;
-      public CategoryOption? Category { get => _category; set => SetProperty(ref _category, value); }
- 
+        public CategoryOption? Category { get => _category; set => SetProperty(ref _category, value); }
+
         private string? _imagePath;
-   public string? ImagePath { get => _imagePath; set => SetProperty(ref _imagePath, value); }
+        public string? ImagePath { get => _imagePath; set => SetProperty(ref _imagePath, value); }
 
         public async Task DoOpenAsync(ProductItemDto product, CategoryOption? productCategory, ObservableCollection<CategoryOption> allCategories, string baseUrl)
- {
- Error = string.Empty;
-         IsOpen = false;
+        {
+            Error = string.Empty;
+            IsOpen = false;
             EditProductImages.Clear();
-      
-            // Populate available categories for the ComboBox
-          AvailableCategories.Clear();
-      foreach (var cat in allCategories)
-   {
-         AvailableCategories.Add(cat);
-         }
+
+            AvailableCategories.Clear();
+            foreach (var cat in allCategories)
+            {
+                AvailableCategories.Add(cat);
+            }
 
             try
-    {
-    var detailResult = await _productService.GetProductByIdAsync(product.ProductId);
-        if (!detailResult.Success || detailResult.Data == null)
-  {
-      Error = detailResult.Message ?? "Cannot load product detail.";
- OnPropertyChanged(nameof(HasError));
-            return;
-         }
-            var detail = detailResult.Data;
+            {
+                var detailResult = await _productService.GetProductByIdAsync(product.ProductId);
+                if (!detailResult.Success || detailResult.Data == null)
+                {
+                    Error = detailResult.Message ?? "Cannot load product detail.";
+                    OnPropertyChanged(nameof(HasError));
+                    return;
+                }
+                var detail = detailResult.Data;
 
-          EditingProductId = detail.ProductId;
-         Sku = detail.Sku;
-     Name = detail.Name;
-      ImportPriceText = detail.ImportPrice.ToString();
-  SalePriceText = detail.SalePrice.ToString();
-         StockQuantityText = detail.StockQuantity.ToString();
-           Description = detail.Description;
+                EditingProductId = detail.ProductId;
+                Sku = detail.Sku;
+                Name = detail.Name;
+                ImportPriceText = detail.ImportPrice.ToString();
+                SalePriceText = detail.SalePrice.ToString();
+                StockQuantityText = detail.StockQuantity.ToString();
+                Description = detail.Description;
 
-            // Find the category from available categories that matches the product's category
-      Category = AvailableCategories.FirstOrDefault(c => c.Id == detail.CategoryId) 
-      ?? productCategory 
-    ?? new CategoryOption { Id = detail.CategoryId, Name = detail.CategoryName ?? string.Empty };
 
-       if (detail.ImagePaths != null)
-      {
-            foreach (var imagePath in detail.ImagePaths)
-  {
- var absoluteUrl = Helpers.UrlHelper.ToAbsoluteUrl(imagePath, baseUrl);
-         EditProductImages.Add(new ProductImageItem { Url = absoluteUrl, PublicId = string.Empty });
-               }
-    }
+                Category = AvailableCategories.FirstOrDefault(c => c.Id == detail.CategoryId)
+                ?? productCategory
+              ?? new CategoryOption { Id = detail.CategoryId, Name = detail.CategoryName ?? string.Empty };
 
-    IsOpen = true;
-   }
-          catch (Exception ex)
-     {
-            Error = ex.Message;
- OnPropertyChanged(nameof(HasError));
-    }
+                if (detail.ImagePaths != null)
+                {
+                    foreach (var imagePath in detail.ImagePaths)
+                    {
+                        var absoluteUrl = Helpers.UrlHelper.ToAbsoluteUrl(imagePath, baseUrl);
+                        EditProductImages.Add(new ProductImageItem { Url = absoluteUrl, PublicId = string.Empty });
+                    }
+                }
+
+                IsOpen = true;
+            }
+            catch (Exception ex)
+            {
+                Error = ex.Message;
+                OnPropertyChanged(nameof(HasError));
+            }
         }
 
         public void DoCancel()
@@ -121,115 +120,115 @@ _reloadCallback = reloadCallback ?? throw new ArgumentNullException(nameof(reloa
             IsOpen = false;
             EditProductImages.Clear();
             Error = string.Empty;
-          OnPropertyChanged(nameof(HasError));
-     }
+            OnPropertyChanged(nameof(HasError));
+        }
 
         public async Task<bool> DoConfirmAsync()
         {
             Error = string.Empty;
-         OnPropertyChanged(nameof(HasError));
+            OnPropertyChanged(nameof(HasError));
 
-   if (string.IsNullOrWhiteSpace(Name))
+            if (string.IsNullOrWhiteSpace(Name))
             {
-           Error = "Name is required.";
-  OnPropertyChanged(nameof(HasError));
-   return false;
-}
-
-            if (!int.TryParse(ImportPriceText, out var importPrice) || importPrice < 0)
-     {
-           Error = "Import price must be a non-negative integer.";
+                Error = "Name is required.";
                 OnPropertyChanged(nameof(HasError));
                 return false;
-    }
+            }
 
-    if (!int.TryParse(SalePriceText, out var salePrice) || salePrice < 0)
- {
-    Error = "Sale price must be a non-negative integer.";
-        OnPropertyChanged(nameof(HasError));
-     return false;
-       }
+            if (!int.TryParse(ImportPriceText, out var importPrice) || importPrice < 0)
+            {
+                Error = "Import price must be a non-negative integer.";
+                OnPropertyChanged(nameof(HasError));
+                return false;
+            }
+
+            if (!int.TryParse(SalePriceText, out var salePrice) || salePrice < 0)
+            {
+                Error = "Sale price must be a non-negative integer.";
+                OnPropertyChanged(nameof(HasError));
+                return false;
+            }
 
             if (!int.TryParse(StockQuantityText, out var stock) || stock < 0)
             {
-        Error = "Stock quantity must be a non-negative integer.";
-          OnPropertyChanged(nameof(HasError));
-    return false;
-     }
+                Error = "Stock quantity must be a non-negative integer.";
+                OnPropertyChanged(nameof(HasError));
+                return false;
+            }
 
-      // Use the Category property which is bound to the ComboBox in dialog
-  if (Category == null || Category.Id == null)
-     {
-   Error = "Please select category.";
-      OnPropertyChanged(nameof(HasError));
-    return false;
-  }
 
-      try
- {
-      var imagePaths = EditProductImages.Where(img => !string.IsNullOrWhiteSpace(img.Url) && img.Url != "Uploading...").Select(img => img.Url).ToList();
+            if (Category == null || Category.Id == null)
+            {
+                Error = "Please select category.";
+                OnPropertyChanged(nameof(HasError));
+                return false;
+            }
 
-  var input = new ProductUpdateInput
-     {
-          Name = Name!,
-          ImportPrice = importPrice,
-  SalePrice = salePrice,
-      StockQuantity = stock,
-  Description = Description,
-    CategoryId = Category.Id.Value,
-        ImagePaths = imagePaths.Any() ? imagePaths : null
-        };
+            try
+            {
+                var imagePaths = EditProductImages.Where(img => !string.IsNullOrWhiteSpace(img.Url) && img.Url != "Uploading...").Select(img => img.Url).ToList();
 
-      var result = await _productService.UpdateProductAsync(EditingProductId, input);
+                var input = new ProductUpdateInput
+                {
+                    Name = Name!,
+                    ImportPrice = importPrice,
+                    SalePrice = salePrice,
+                    StockQuantity = stock,
+                    Description = Description,
+                    CategoryId = Category.Id.Value,
+                    ImagePaths = imagePaths.Any() ? imagePaths : null
+                };
+
+                var result = await _productService.UpdateProductAsync(EditingProductId, input);
                 if (!result.Success)
-     {
-       Error = result.Message ?? "Update product failed.";
-           OnPropertyChanged(nameof(HasError));
-  return false;
-        }
+                {
+                    Error = result.Message ?? "Update product failed.";
+                    OnPropertyChanged(nameof(HasError));
+                    return false;
+                }
 
-         IsOpen = false;
-           EditProductImages.Clear();
-   OnPropertyChanged(nameof(HasError));
-     await _reloadCallback();
-   return true;
+                IsOpen = false;
+                EditProductImages.Clear();
+                OnPropertyChanged(nameof(HasError));
+                await _reloadCallback();
+                return true;
             }
             catch (Exception ex)
             {
-   Error = ex.Message;
-       OnPropertyChanged(nameof(HasError));
-     return false;
-     }
-      }
+                Error = ex.Message;
+                OnPropertyChanged(nameof(HasError));
+                return false;
+            }
+        }
 
-      // Overload for backward compatibility (không c?n truy?n category t? ngoài)
+
         public async Task<bool> DoConfirmAsync(CategoryOption? selectedCategory)
         {
-   // N?u có truy?n category t? ngoài, dùng nó; n?u không, dùng Category property
-            if (selectedCategory != null)
-       {
-       Category = selectedCategory;
-       }
-    return await DoConfirmAsync();
-    }
 
-        // Commands for XAML
+            if (selectedCategory != null)
+            {
+                Category = selectedCategory;
+            }
+            return await DoConfirmAsync();
+        }
+
+
         [RelayCommand]
         private void Open(ProductItemDto product)
         {
             _ = DoOpenAsync(product, null, new ObservableCollection<CategoryOption>(), string.Empty);
         }
 
-     [RelayCommand]
+        [RelayCommand]
         private void Cancel()
         {
             DoCancel();
-    }
+        }
 
         [RelayCommand]
         private async Task Confirm()
         {
-      await DoConfirmAsync();
+            await DoConfirmAsync();
         }
     }
 }

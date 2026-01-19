@@ -13,34 +13,34 @@
 
     <Grid Padding="24,24,24,24">
         <Grid.RowDefinitions>
-          <RowDefinition Height="Auto"/>
- <RowDefinition Height="Auto"/>
-       <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Header - Wrap on smaller screens -->
         <Border Grid.Row="0" Padding="0,0,0,8">
-   <StackPanel>
-     <TextBlock Text="📊 KPI Commission" FontSize="24" FontWeight="Bold" Margin="0,0,0,12"/>
-             
-  <!-- Controls wrap -->
- <StackPanel Orientation="Horizontal" Spacing="12">
-       <!-- Sale Selector (Admin or Sale) -->
-       <ComboBox ItemsSource="{Binding Sales}" 
+            <StackPanel>
+                <TextBlock Text="📊 KPI Commission" FontSize="24" FontWeight="Bold" Margin="0,0,0,12"/>
+
+                <!-- Controls wrap -->
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <!-- Sale Selector (Admin or Sale) -->
+                    <ComboBox ItemsSource="{Binding Sales}" 
     SelectedItem="{Binding SelectedSale, Mode=TwoWay}"
   MinWidth="150" VerticalAlignment="Center"
      PlaceholderText="Select Sale"
         Visibility="{Binding ShowSaleSelector, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-      
-    <ComboBox ItemsSource="{Binding Years}" 
+
+                    <ComboBox ItemsSource="{Binding Years}" 
       SelectedItem="{Binding SelectedYear, Mode=TwoWay}"
          MinWidth="85" VerticalAlignment="Center"/>
-<ComboBox ItemsSource="{Binding Months}" 
+                    <ComboBox ItemsSource="{Binding Months}" 
    SelectedItem="{Binding SelectedMonth, Mode=TwoWay}"
     MinWidth="65" VerticalAlignment="Center"/>
-          <Button Content="🔄 Refresh" Command="{Binding LoadDashboardCommand}" VerticalAlignment="Center"/>
-      </StackPanel>
-         </StackPanel>
+                    <Button Content="🔄 Refresh" Command="{Binding LoadDashboardCommand}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
         </Border>
 
         <!-- Alerts Row -->
@@ -67,531 +67,531 @@
         </StackPanel>
 
         <!-- Main Content with Tabs -->
-    <Pivot Grid.Row="2" Margin="0,8,0,0">
- 
-  <!-- ==================== Tab 1: Dashboard ==================== -->
-        <PivotItem Header="📊 Dashboard">
-     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,16,0,0">
-  <StackPanel Spacing="16">
-    
-  <!-- User Info -->
-        <TextBlock FontSize="15" Opacity="0.7">
+        <Pivot Grid.Row="2" Margin="0,8,0,0">
+
+            <!-- ==================== Tab 1: Dashboard ==================== -->
+            <PivotItem Header="📊 Dashboard">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,16,0,0">
+                    <StackPanel Spacing="16">
+
+                        <!-- User Info -->
+                        <TextBlock FontSize="15" Opacity="0.7">
  <Run Text="Viewing KPI for: "/>
      <Run Text="{Binding DashboardData.SaleName}" FontWeight="SemiBold"/>
-    </TextBlock>
+                        </TextBlock>
 
-   <!-- Summary Cards - Responsive Grid -->
-       <ItemsControl>
-      <ItemsControl.ItemsPanel>
-  <ItemsPanelTemplate>
-    <VariableSizedWrapGrid Orientation="Horizontal" 
+                        <!-- Summary Cards - Responsive Grid -->
+                        <ItemsControl>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VariableSizedWrapGrid Orientation="Horizontal" 
           ItemWidth="260" ItemHeight="95" 
    MaximumRowsOrColumns="4"/>
-     </ItemsPanelTemplate>
-             </ItemsControl.ItemsPanel>
-   <ItemsControl.Items>
-            <!-- Target Card -->
-         <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
-      <StackPanel>
-            <TextBlock Text="🎯 Target" Opacity="0.6" FontSize="12"/>
-   <TextBlock FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0">
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.Items>
+                                <!-- Target Card -->
+                                <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
+                                    <StackPanel>
+                                        <TextBlock Text="🎯 Target" Opacity="0.6" FontSize="12"/>
+                                        <TextBlock FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0">
       <Run Text="{Binding TargetRevenue, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
-       </TextBlock>
-     </StackPanel>
-        </Border>
-  
-      <!-- Actual Card -->
-   <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
-     <StackPanel>
- <TextBlock Text="💰 Actual Revenue" Opacity="0.6" FontSize="12"/>
-    <TextBlock FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0" Foreground="#FF13B16A">
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Actual Card -->
+                                <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
+                                    <StackPanel>
+                                        <TextBlock Text="💰 Actual Revenue" Opacity="0.6" FontSize="12"/>
+                                        <TextBlock FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0" Foreground="#FF13B16A">
       <Run Text="{Binding ActualRevenue, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
-      </TextBlock>
- </StackPanel>
-        </Border>
-      
-       <!-- Progress Card -->
-         <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
-           <StackPanel>
-      <TextBlock Text="📈 Progress" Opacity="0.6" FontSize="12"/>
-  <TextBlock FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0">
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Progress Card -->
+                                <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
+                                    <StackPanel>
+                                        <TextBlock Text="📈 Progress" Opacity="0.6" FontSize="12"/>
+                                        <TextBlock FontSize="22" FontWeight="SemiBold" Margin="0,6,0,0">
     <Run Text="{Binding ProgressPercent}"/><Run Text="%"/>
-     </TextBlock>
-  </StackPanel>
-   </Border>
-   
-     <!-- Current Tier Card -->
-        <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
-  <StackPanel>
-   <TextBlock Text="🏆 Current Tier" Opacity="0.6" FontSize="12"/>
- <TextBlock Text="{Binding CurrentTierName}" FontSize="18" FontWeight="SemiBold" 
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Current Tier Card -->
+                                <Border Margin="0,0,12,12" Padding="16" CornerRadius="12" Background="White">
+                                    <StackPanel>
+                                        <TextBlock Text="🏆 Current Tier" Opacity="0.6" FontSize="12"/>
+                                        <TextBlock Text="{Binding CurrentTierName}" FontSize="18" FontWeight="SemiBold" 
    Foreground="#FF5D5FEF" Margin="0,6,0,0"/>
-          </StackPanel>
-     </Border>
-           </ItemsControl.Items>
-            </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </ItemsControl.Items>
+                        </ItemsControl>
 
-    <!-- Orders Card - Responsive -->
-         <Border Padding="20" CornerRadius="12" Background="White">
-        <StackPanel Spacing="12">
-        <TextBlock Text="📦 Orders This Month" FontSize="15" FontWeight="SemiBold"/>
-        <StackPanel Orientation="Horizontal" Spacing="40">
-           <StackPanel>
-       <TextBlock Text="Total Orders" Opacity="0.6" FontSize="12"/>
- <TextBlock Text="{Binding TotalOrdersThisMonth}" FontSize="26" FontWeight="Bold"/>
-    </StackPanel>
-             <StackPanel>
-   <TextBlock Text="Paid Orders" Opacity="0.6" FontSize="12"/>
-             <TextBlock Text="{Binding TotalOrdersPaid}" FontSize="26" FontWeight="Bold" Foreground="#FF13B16A"/>
-   </StackPanel>
-     </StackPanel>
-       </StackPanel>
-            </Border>
+                        <!-- Orders Card - Responsive -->
+                        <Border Padding="20" CornerRadius="12" Background="White">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="📦 Orders This Month" FontSize="15" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal" Spacing="40">
+                                    <StackPanel>
+                                        <TextBlock Text="Total Orders" Opacity="0.6" FontSize="12"/>
+                                        <TextBlock Text="{Binding TotalOrdersThisMonth}" FontSize="26" FontWeight="Bold"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Paid Orders" Opacity="0.6" FontSize="12"/>
+                                        <TextBlock Text="{Binding TotalOrdersPaid}" FontSize="26" FontWeight="Bold" Foreground="#FF13B16A"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
 
-   <!-- Commission Estimate Card - Responsive -->
-  <Border Padding="20" CornerRadius="12" Background="White">
-      <StackPanel Spacing="16">
-    <TextBlock Text="💵 Estimated Commission" FontSize="16" FontWeight="SemiBold"/>
- 
-        <!-- Wrap grid for smaller screens -->
-      <VariableSizedWrapGrid Orientation="Horizontal" ItemWidth="200" ItemHeight="70" MaximumRowsOrColumns="3">
-          <StackPanel Margin="0,0,24,8">
-        <TextBlock Text="Base (10%)" Opacity="0.6" FontSize="12"/>
-      <TextBlock FontSize="20" FontWeight="SemiBold" Margin="0,4,0,0" FontFamily="Consolas">
+                        <!-- Commission Estimate Card - Responsive -->
+                        <Border Padding="20" CornerRadius="12" Background="White">
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="💵 Estimated Commission" FontSize="16" FontWeight="SemiBold"/>
+
+                                <!-- Wrap grid for smaller screens -->
+                                <VariableSizedWrapGrid Orientation="Horizontal" ItemWidth="200" ItemHeight="70" MaximumRowsOrColumns="3">
+                                    <StackPanel Margin="0,0,24,8">
+                                        <TextBlock Text="Base (10%)" Opacity="0.6" FontSize="12"/>
+                                        <TextBlock FontSize="20" FontWeight="SemiBold" Margin="0,4,0,0" FontFamily="Consolas">
     <Run Text="{Binding EstimatedBaseCommission, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
-           </TextBlock>
-          </StackPanel>
+                                        </TextBlock>
+                                    </StackPanel>
 
-     <StackPanel Margin="0,0,24,8">
-          <TextBlock Text="Bonus (Tier)" Opacity="0.6" FontSize="12"/>
-    <TextBlock FontSize="20" FontWeight="SemiBold" Margin="0,4,0,0" Foreground="#FFFFC107" FontFamily="Consolas">
+                                    <StackPanel Margin="0,0,24,8">
+                                        <TextBlock Text="Bonus (Tier)" Opacity="0.6" FontSize="12"/>
+                                        <TextBlock FontSize="20" FontWeight="SemiBold" Margin="0,4,0,0" Foreground="#FFFFC107" FontFamily="Consolas">
    <Run Text="+"/><Run Text="{Binding EstimatedBonusCommission, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
-   </TextBlock>
-      </StackPanel>
+                                        </TextBlock>
+                                    </StackPanel>
 
-          <StackPanel Margin="0,0,0,8">
-  <TextBlock Text="Total" Opacity="0.6" FontSize="12"/>
- <TextBlock FontSize="24" FontWeight="Bold" Margin="0,4,0,0" Foreground="#FF13B16A" FontFamily="Consolas">
+                                    <StackPanel Margin="0,0,0,8">
+                                        <TextBlock Text="Total" Opacity="0.6" FontSize="12"/>
+                                        <TextBlock FontSize="24" FontWeight="Bold" Margin="0,4,0,0" Foreground="#FF13B16A" FontFamily="Consolas">
 <Run Text="{Binding EstimatedTotalCommission, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
-     </TextBlock>
-       </StackPanel>
-           </VariableSizedWrapGrid>
-      </StackPanel>
- </Border>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </VariableSizedWrapGrid>
+                            </StackPanel>
+                        </Border>
 
-  <!-- Available Tiers Card -->
-            <Border Padding="20" CornerRadius="12" Background="White">
-             <StackPanel Spacing="12">
-             <TextBlock Text="🎖️ KPI Tier Levels" FontSize="15" FontWeight="SemiBold"/>
-        <ItemsControl ItemsSource="{Binding DashboardData.AvailableTiers}">
-<ItemsControl.ItemTemplate>
-    <DataTemplate>
-    <Border Padding="12,10" Margin="0,0,0,6" Background="#FFF8F9FA" CornerRadius="8">
-      <Grid>
-         <Grid.ColumnDefinitions>
-       <ColumnDefinition Width="Auto" MinWidth="80"/>
-      <ColumnDefinition Width="*"/>
-         <ColumnDefinition Width="Auto"/>
-     </Grid.ColumnDefinitions>
-          <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
- <TextBlock Grid.Column="1" Opacity="0.6" VerticalAlignment="Center" Margin="16,0">
+                        <!-- Available Tiers Card -->
+                        <Border Padding="20" CornerRadius="12" Background="White">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="🎖️ KPI Tier Levels" FontSize="15" FontWeight="SemiBold"/>
+                                <ItemsControl ItemsSource="{Binding DashboardData.AvailableTiers}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Padding="12,10" Margin="0,0,0,6" Background="#FFF8F9FA" CornerRadius="8">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" MinWidth="80"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="1" Opacity="0.6" VerticalAlignment="Center" Margin="16,0">
       <Run Text="≥ "/><Run Text="{Binding MinRevenue}"/><Run Text="% progress"/>
-          </TextBlock>
-        <Border Grid.Column="2" Background="#FFE8F5E9" CornerRadius="4" Padding="8,4">
-         <TextBlock FontWeight="SemiBold" Foreground="#FF13B16A" FontSize="12">
+                                                    </TextBlock>
+                                                    <Border Grid.Column="2" Background="#FFE8F5E9" CornerRadius="4" Padding="8,4">
+                                                        <TextBlock FontWeight="SemiBold" Foreground="#FF13B16A" FontSize="12">
       <Run Text="+"/><Run Text="{Binding BonusPercent}"/><Run Text="%"/>
-              </TextBlock>
-          </Border>
-    </Grid>
-  </Border>
-</DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
-        </StackPanel>
- </Border>
-  </StackPanel>
- </ScrollViewer>
+                                                        </TextBlock>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
             </PivotItem>
 
-          <!-- ==================== Tab 2: History ==================== -->
+            <!-- ==================== Tab 2: History ==================== -->
             <PivotItem Header="📜 History">
-      <Grid Padding="0,16,0,0">
-      <Grid.RowDefinitions>
-    <RowDefinition Height="Auto"/>
-    <RowDefinition Height="*"/>
-    </Grid.RowDefinitions>
+                <Grid Padding="0,16,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-     <Button Content="🔄 Load History" Command="{Binding LoadCommissionHistoryCommand}" 
+                    <Button Content="🔄 Load History" Command="{Binding LoadCommissionHistoryCommand}" 
  Margin="0,0,0,12" HorizontalAlignment="Left"/>
 
-     <!-- History Table - Full width responsive -->
-    <Border Grid.Row="1" Background="White" CornerRadius="12">
-        <Grid>
-    <Grid.RowDefinitions>
-  <RowDefinition Height="Auto"/>
-  <RowDefinition Height="*"/>
-     </Grid.RowDefinitions>
+                    <!-- History Table - Full width responsive -->
+                    <Border Grid.Row="1" Background="White" CornerRadius="12">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-    <!-- Table Header -->
-   <Border Background="#FFF1F3F4" CornerRadius="12,12,0,0" Padding="20,14">
-     <Grid>
-       <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="2*" MinWidth="120"/>
-      <ColumnDefinition Width="1*" MinWidth="70"/>
-     <ColumnDefinition Width="1*" MinWidth="70"/>
-<ColumnDefinition Width="1.5*" MinWidth="100"/>
-      <ColumnDefinition Width="1.5*" MinWidth="100"/>
-      <ColumnDefinition Width="1.5*" MinWidth="100"/>
-         <ColumnDefinition Width="1.5*" MinWidth="110"/>
-  </Grid.ColumnDefinitions>
-     <TextBlock Text="Sale" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
-          <TextBlock Grid.Column="1" Text="Period" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
-  <TextBlock Grid.Column="2" Text="Tier" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
-          <TextBlock Grid.Column="3" Text="Revenue" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
-     <TextBlock Grid.Column="4" Text="Base" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
-  <TextBlock Grid.Column="5" Text="Bonus" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
- <TextBlock Grid.Column="6" Text="Total" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
-      </Grid>
-   </Border>
+                            <!-- Table Header -->
+                            <Border Background="#FFF1F3F4" CornerRadius="12,12,0,0" Padding="20,14">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*" MinWidth="120"/>
+                                        <ColumnDefinition Width="1*" MinWidth="70"/>
+                                        <ColumnDefinition Width="1*" MinWidth="70"/>
+                                        <ColumnDefinition Width="1.5*" MinWidth="100"/>
+                                        <ColumnDefinition Width="1.5*" MinWidth="100"/>
+                                        <ColumnDefinition Width="1.5*" MinWidth="100"/>
+                                        <ColumnDefinition Width="1.5*" MinWidth="110"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Sale" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
+                                    <TextBlock Grid.Column="1" Text="Period" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
+                                    <TextBlock Grid.Column="2" Text="Tier" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
+                                    <TextBlock Grid.Column="3" Text="Revenue" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Column="4" Text="Base" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Column="5" Text="Bonus" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Column="6" Text="Total" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
 
-          <!-- Table Body -->
-        <ListView Grid.Row="1" ItemsSource="{Binding CommissionHistory}" 
+                            <!-- Table Body -->
+                            <ListView Grid.Row="1" ItemsSource="{Binding CommissionHistory}" 
        SelectionMode="None" Padding="0">
-       <ListView.ItemContainerStyle>
-        <Style TargetType="ListViewItem">
-<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-     <Setter Property="Padding" Value="0"/>
-  <Setter Property="Margin" Value="0"/>
-   </Style>
-  </ListView.ItemContainerStyle>
-      <ListView.ItemTemplate>
-     <DataTemplate>
-    <Border BorderBrush="#FFEEEEEE" BorderThickness="0,0,0,1" Padding="20,14">
-    <Grid>
-   <Grid.ColumnDefinitions>
-     <ColumnDefinition Width="2*" MinWidth="120"/>
-   <ColumnDefinition Width="1*" MinWidth="70"/>
-     <ColumnDefinition Width="1*" MinWidth="70"/>
- <ColumnDefinition Width="1.5*" MinWidth="100"/>
-      <ColumnDefinition Width="1.5*" MinWidth="100"/>
-      <ColumnDefinition Width="1.5*" MinWidth="100"/>
-   <ColumnDefinition Width="1.5*" MinWidth="110"/>
-      </Grid.ColumnDefinitions>
-     <TextBlock Text="{Binding SaleName}" FontWeight="Medium" FontSize="14" VerticalAlignment="Center" 
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="Margin" Value="0"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#FFEEEEEE" BorderThickness="0,0,0,1" Padding="20,14">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="2*" MinWidth="120"/>
+                                                    <ColumnDefinition Width="1*" MinWidth="70"/>
+                                                    <ColumnDefinition Width="1*" MinWidth="70"/>
+                                                    <ColumnDefinition Width="1.5*" MinWidth="100"/>
+                                                    <ColumnDefinition Width="1.5*" MinWidth="100"/>
+                                                    <ColumnDefinition Width="1.5*" MinWidth="100"/>
+                                                    <ColumnDefinition Width="1.5*" MinWidth="110"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding SaleName}" FontWeight="Medium" FontSize="14" VerticalAlignment="Center" 
 TextTrimming="CharacterEllipsis"/>
-        <TextBlock Grid.Column="1" VerticalAlignment="Center" Opacity="0.8" FontSize="14">
+                                                <TextBlock Grid.Column="1" VerticalAlignment="Center" Opacity="0.8" FontSize="14">
         <Run Text="{Binding Month}"/><Run Text="/"/><Run Text="{Binding Year}"/>
-       </TextBlock>
- <Border Grid.Column="2" Background="#FFEFF2FF" CornerRadius="4" 
+                                                </TextBlock>
+                                                <Border Grid.Column="2" Background="#FFEFF2FF" CornerRadius="4" 
       Padding="8,4" HorizontalAlignment="Left" VerticalAlignment="Center">
-      <TextBlock Text="{Binding KpiTierName}" FontSize="12" Foreground="#FF5D5FEF" FontWeight="Medium"/>
-      </Border>
-       <TextBlock Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                                                    <TextBlock Text="{Binding KpiTierName}" FontSize="12" Foreground="#FF5D5FEF" FontWeight="Medium"/>
+                                                </Border>
+                                                <TextBlock Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" 
             FontFamily="Consolas" FontSize="14">
   <Run Text="{Binding TotalRevenue, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
-       </TextBlock>
-            <TextBlock Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center" 
      FontFamily="Consolas" FontSize="14">
         <Run Text="{Binding BaseCommission, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
-              </TextBlock>
-        <TextBlock Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" 
      Foreground="#FFFFC107" FontWeight="SemiBold" FontFamily="Consolas" FontSize="14">
   <Run Text="{Binding BonusCommission, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
-          </TextBlock>
-     <TextBlock Grid.Column="6" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="6" HorizontalAlignment="Right" VerticalAlignment="Center"
      FontWeight="Bold" Foreground="#FF13B16A" FontSize="15" FontFamily="Consolas">
      <Run Text="{Binding TotalCommission, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
-     </TextBlock>
-  </Grid>
-   </Border>
-  </DataTemplate>
-            </ListView.ItemTemplate>
-     </ListView>
-         </Grid>
-    </Border>
-  </Grid>
-       </PivotItem>
+                                                </TextBlock>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </PivotItem>
 
-   <!-- ==================== Tab 3: Targets (Admin) ==================== -->
-  <PivotItem Header="🎯 Targets" Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
-     <Grid Padding="0,16,0,0">
-       <Grid.RowDefinitions>
-    <RowDefinition Height="Auto"/>
-   <RowDefinition Height="Auto"/>
-      <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        
-   <!-- Set Target Form -->
-   <Border Grid.Row="0" Padding="20" Background="White" CornerRadius="12" Margin="0,0,0,12">
-    <StackPanel Spacing="16">
-        <TextBlock Text="➕ Set Monthly Target" FontWeight="SemiBold" FontSize="15"/>
-      <StackPanel Orientation="Horizontal" Spacing="16">
-        <StackPanel Spacing="4">
-     <TextBlock Text="Sale" FontSize="12" Opacity="0.7"/>
-     <ComboBox ItemsSource="{Binding Sales}"
+            <!-- ==================== Tab 3: Targets (Admin) ==================== -->
+            <PivotItem Header="🎯 Targets" Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid Padding="0,16,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Set Target Form -->
+                    <Border Grid.Row="0" Padding="20" Background="White" CornerRadius="12" Margin="0,0,0,12">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="➕ Set Monthly Target" FontWeight="SemiBold" FontSize="15"/>
+                            <StackPanel Orientation="Horizontal" Spacing="16">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Sale" FontSize="12" Opacity="0.7"/>
+                                    <ComboBox ItemsSource="{Binding Sales}"
     SelectedValuePath="SaleId"
     SelectedValue="{Binding TargetSaleId, Mode=TwoWay}"
     MinWidth="150"
     PlaceholderText="Select Sale"
     DisplayMemberPath="DisplayName"/>
-     </StackPanel>
-<StackPanel Spacing="4">
-   <TextBlock Text="Target Revenue (VND)" FontSize="12" Opacity="0.7"/>
-        <NumberBox Value="{Binding TargetRevenueInput, Mode=TwoWay}" 
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Target Revenue (VND)" FontSize="12" Opacity="0.7"/>
+                                    <NumberBox Value="{Binding TargetRevenueInput, Mode=TwoWay}" 
     Minimum="0" SpinButtonPlacementMode="Hidden" 
   Width="180" PlaceholderText="0"/>
-     </StackPanel>
-   <Button Content="✓ Set Target" Command="{Binding SetTargetCommand}" 
+                                </StackPanel>
+                                <Button Content="✓ Set Target" Command="{Binding SetTargetCommand}" 
       Style="{StaticResource AccentButtonStyle}" VerticalAlignment="Bottom" 
        Height="32" Margin="0,20,0,0"/>
-       </StackPanel>
-</StackPanel>
-        </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
 
-  <Button Grid.Row="1" Content="🔄 Load Targets" Command="{Binding LoadTargetsCommand}" 
+                    <Button Grid.Row="1" Content="🔄 Load Targets" Command="{Binding LoadTargetsCommand}" 
       HorizontalAlignment="Left" Margin="0,0,0,12"/>
 
-    <!-- Targets Table - Full width responsive -->
-    <Border Grid.Row="2" Background="White" CornerRadius="12">
-      <Grid>
-    <Grid.RowDefinitions>
-   <RowDefinition Height="Auto"/>
-      <RowDefinition Height="*"/>
-  </Grid.RowDefinitions>
+                    <!-- Targets Table - Full width responsive -->
+                    <Border Grid.Row="2" Background="White" CornerRadius="12">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-        <!-- Header -->
-  <Border Background="#FFF1F3F4" CornerRadius="12,12,0,0" Padding="20,14">
-    <Grid>
-     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="2*" MinWidth="120"/>
-  <ColumnDefinition Width="1*" MinWidth="70"/>
-   <ColumnDefinition Width="1.5*" MinWidth="100"/>
-    <ColumnDefinition Width="1.5*" MinWidth="100"/>
-   <ColumnDefinition Width="1*" MinWidth="80"/>
-<ColumnDefinition Width="1*" MinWidth="80"/>
-   </Grid.ColumnDefinitions>
-         <TextBlock Text="Sale" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
-          <TextBlock Grid.Column="1" Text="Period" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
-      <TextBlock Grid.Column="2" Text="Target" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
-   <TextBlock Grid.Column="3" Text="Actual" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
-        <TextBlock Grid.Column="4" Text="Progress" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
-   <TextBlock Grid.Column="5" Text="Tier" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
-</Grid>
-  </Border>
+                            <!-- Header -->
+                            <Border Background="#FFF1F3F4" CornerRadius="12,12,0,0" Padding="20,14">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*" MinWidth="120"/>
+                                        <ColumnDefinition Width="1*" MinWidth="70"/>
+                                        <ColumnDefinition Width="1.5*" MinWidth="100"/>
+                                        <ColumnDefinition Width="1.5*" MinWidth="100"/>
+                                        <ColumnDefinition Width="1*" MinWidth="80"/>
+                                        <ColumnDefinition Width="1*" MinWidth="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Sale" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
+                                    <TextBlock Grid.Column="1" Text="Period" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
+                                    <TextBlock Grid.Column="2" Text="Target" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Column="3" Text="Actual" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Column="4" Text="Progress" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Column="5" Text="Tier" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
 
-      <!-- Body -->
-  <ListView Grid.Row="1" ItemsSource="{Binding Targets}" SelectionMode="None">
-     <ListView.ItemContainerStyle>
-             <Style TargetType="ListViewItem">
-     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-  <Setter Property="Padding" Value="0"/>
- </Style>
-    </ListView.ItemContainerStyle>
-       <ListView.ItemTemplate>
-     <DataTemplate>
-   <Border BorderBrush="#FFEEEEEE" BorderThickness="0,0,0,1" Padding="20,14">
- <Grid>
-  <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="2*" MinWidth="120"/>
- <ColumnDefinition Width="1*" MinWidth="70"/>
-  <ColumnDefinition Width="1.5*" MinWidth="100"/>
- <ColumnDefinition Width="1.5*" MinWidth="100"/>
-<ColumnDefinition Width="1*" MinWidth="80"/>
-      <ColumnDefinition Width="1*" MinWidth="80"/>
-      </Grid.ColumnDefinitions>
-    <TextBlock Text="{Binding SaleName}" FontWeight="Medium" FontSize="14" TextTrimming="CharacterEllipsis"/>
-    <TextBlock Grid.Column="1" Opacity="0.8" FontSize="14">
+                            <!-- Body -->
+                            <ListView Grid.Row="1" ItemsSource="{Binding Targets}" SelectionMode="None">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#FFEEEEEE" BorderThickness="0,0,0,1" Padding="20,14">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="2*" MinWidth="120"/>
+                                                    <ColumnDefinition Width="1*" MinWidth="70"/>
+                                                    <ColumnDefinition Width="1.5*" MinWidth="100"/>
+                                                    <ColumnDefinition Width="1.5*" MinWidth="100"/>
+                                                    <ColumnDefinition Width="1*" MinWidth="80"/>
+                                                    <ColumnDefinition Width="1*" MinWidth="80"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding SaleName}" FontWeight="Medium" FontSize="14" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Column="1" Opacity="0.8" FontSize="14">
       <Run Text="{Binding Month}"/><Run Text="/"/><Run Text="{Binding Year}"/>
-    </TextBlock>
-   <TextBlock Grid.Column="2" HorizontalAlignment="Right" FontFamily="Consolas" FontSize="14">
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="2" HorizontalAlignment="Right" FontFamily="Consolas" FontSize="14">
    <Run Text="{Binding TargetRevenue, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
-    </TextBlock>
-  <TextBlock Grid.Column="3" HorizontalAlignment="Right" FontFamily="Consolas" FontSize="14" Foreground="#FF13B16A">
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="3" HorizontalAlignment="Right" FontFamily="Consolas" FontSize="14" Foreground="#FF13B16A">
 <Run Text="{Binding ActualRevenue, Converter={StaticResource NumberFormatConverter}}"/><Run Text=" VND"/>
-     </TextBlock>
-     <TextBlock Grid.Column="4" HorizontalAlignment="Right" FontWeight="SemiBold" FontSize="14">
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="4" HorizontalAlignment="Right" FontWeight="SemiBold" FontSize="14">
    <Run Text="{Binding Progress}"/><Run Text="%"/>
-          </TextBlock>
-       <Border Grid.Column="5" Background="#FFEFF2FF" CornerRadius="4" 
+                                                </TextBlock>
+                                                <Border Grid.Column="5" Background="#FFEFF2FF" CornerRadius="4" 
        Padding="8,4" HorizontalAlignment="Right">
-    <TextBlock Text="{Binding KpiTierName}" FontSize="12" Foreground="#FF5D5FEF"/>
-   </Border>
-        </Grid>
-    </Border>
-       </DataTemplate>
-</ListView.ItemTemplate>
-      </ListView>
-         </Grid>
-     </Border>
- </Grid>
-       </PivotItem>
+                                                    <TextBlock Text="{Binding KpiTierName}" FontSize="12" Foreground="#FF5D5FEF"/>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </PivotItem>
 
-        <!-- ==================== Tab 4: Calculate (Admin) ==================== -->
-          <PivotItem Header="🧮 Calculate" Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <!-- ==================== Tab 4: Calculate (Admin) ==================== -->
+            <PivotItem Header="🧮 Calculate" Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,16,0,0">
-         <StackPanel Spacing="20" MaxWidth="500" HorizontalAlignment="Left">
-          <Border Padding="24" Background="White" CornerRadius="12">
-   <StackPanel Spacing="16">
-       <TextBlock Text="🧮 Calculate Monthly KPI" FontSize="20" FontWeight="SemiBold"/>
-          <TextBlock Opacity="0.7" TextWrapping="Wrap" FontSize="13">
+                    <StackPanel Spacing="20" MaxWidth="500" HorizontalAlignment="Left">
+                        <Border Padding="24" Background="White" CornerRadius="12">
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="🧮 Calculate Monthly KPI" FontSize="20" FontWeight="SemiBold"/>
+                                <TextBlock Opacity="0.7" TextWrapping="Wrap" FontSize="13">
               Calculate and save KPI commission for all Sales in the selected month.
               The results will be stored in the database.
-           </TextBlock>
- 
-        <Border Background="#FFF1F3F4" CornerRadius="8" Padding="14">
-        <StackPanel Orientation="Horizontal" Spacing="8">
-     <TextBlock Text="📅 Period:" VerticalAlignment="Center" FontWeight="Medium"/>
-      <TextBlock VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="#FF5D5FEF">
+                                </TextBlock>
+
+                                <Border Background="#FFF1F3F4" CornerRadius="8" Padding="14">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="📅 Period:" VerticalAlignment="Center" FontWeight="Medium"/>
+                                        <TextBlock VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="#FF5D5FEF">
         <Run Text="{Binding SelectedMonth}"/><Run Text="/"/><Run Text="{Binding SelectedYear}"/>
-   </TextBlock>
-        </StackPanel>
-        </Border>
-           
-   <Button Content="⚡ Calculate KPI Now" Command="{Binding CalculateKpiCommand}" 
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+
+                                <Button Content="⚡ Calculate KPI Now" Command="{Binding CalculateKpiCommand}" 
    Style="{StaticResource AccentButtonStyle}" 
            HorizontalAlignment="Stretch" Height="40" FontSize="14"/>
-          </StackPanel>
-             </Border>
+                            </StackPanel>
+                        </Border>
 
-    <Border Background="#FFFFF3CD" CornerRadius="8" Padding="14">
-                  <StackPanel Orientation="Horizontal" Spacing="8">
-     <FontIcon Glyph="&#xE946;" Foreground="#FF856404" FontSize="14"/>
-         <TextBlock Text="Go to the History tab to see the results after calculation." 
+                        <Border Background="#FFFFF3CD" CornerRadius="8" Padding="14">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE946;" Foreground="#FF856404" FontSize="14"/>
+                                <TextBlock Text="Go to the History tab to see the results after calculation." 
             Foreground="#FF856404" TextWrapping="Wrap" FontSize="13"/>
-</StackPanel>
- </Border>
-              </StackPanel>
-      </ScrollViewer>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
             </PivotItem>
 
             <!-- ==================== Tab 5: Tiers (Admin) ==================== -->
             <PivotItem Header="🏆 Tiers" Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
-     <Grid Padding="0,16,0,0">
-        <Grid.RowDefinitions>
-    <RowDefinition Height="Auto"/>
-   <RowDefinition Height="Auto"/>
-      <RowDefinition Height="*"/>
-      </Grid.RowDefinitions>
-        
-     <!-- Add Tier Form -->
-    <Border Grid.Row="0" Padding="20" Background="White" CornerRadius="12" Margin="0,0,0,12">
-   <StackPanel Spacing="16">
-       <TextBlock Text="➕ Add New Tier" FontWeight="SemiBold" FontSize="15"/>
-     <StackPanel Orientation="Horizontal" Spacing="16">
-    <StackPanel Spacing="4">
-<TextBlock Text="Name" FontSize="12" Opacity="0.7"/>
-     <TextBox Text="{Binding NewTierName, Mode=TwoWay}" 
+                <Grid Padding="0,16,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Add Tier Form -->
+                    <Border Grid.Row="0" Padding="20" Background="White" CornerRadius="12" Margin="0,0,0,12">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="➕ Add New Tier" FontWeight="SemiBold" FontSize="15"/>
+                            <StackPanel Orientation="Horizontal" Spacing="16">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Name" FontSize="12" Opacity="0.7"/>
+                                    <TextBox Text="{Binding NewTierName, Mode=TwoWay}" 
     PlaceholderText="e.g. Gold" Width="120"/>
-     </StackPanel>
-    <StackPanel Spacing="4">
-    <TextBlock Text="Min %" FontSize="12" Opacity="0.7"/>
-    <NumberBox Value="{Binding NewTierMinRevenue, Mode=TwoWay}" 
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Min %" FontSize="12" Opacity="0.7"/>
+                                    <NumberBox Value="{Binding NewTierMinRevenue, Mode=TwoWay}" 
   Minimum="0" SpinButtonPlacementMode="Hidden" Width="80"/>
-       </StackPanel>
-        <StackPanel Spacing="4">
-      <TextBlock Text="Bonus %" FontSize="12" Opacity="0.7"/>
-    <NumberBox Value="{Binding NewTierBonusPercent, Mode=TwoWay}" 
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Bonus %" FontSize="12" Opacity="0.7"/>
+                                    <NumberBox Value="{Binding NewTierBonusPercent, Mode=TwoWay}" 
        Minimum="0" SpinButtonPlacementMode="Hidden" Width="80"/>
-      </StackPanel>
-<StackPanel Spacing="4">
-     <TextBlock Text="Description" FontSize="12" Opacity="0.7"/>
-         <TextBox Text="{Binding NewTierDescription, Mode=TwoWay}" 
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Description" FontSize="12" Opacity="0.7"/>
+                                    <TextBox Text="{Binding NewTierDescription, Mode=TwoWay}" 
    PlaceholderText="Optional" Width="180"/>
-   </StackPanel>
-  <StackPanel Spacing="4">
-     <TextBlock Text="Order" FontSize="12" Opacity="0.7"/>
-  <NumberBox Value="{Binding NewTierDisplayOrder, Mode=TwoWay}" 
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Order" FontSize="12" Opacity="0.7"/>
+                                    <NumberBox Value="{Binding NewTierDisplayOrder, Mode=TwoWay}" 
     Minimum="0" SpinButtonPlacementMode="Hidden" Width="60"/>
-  </StackPanel>
-   <Button Content="➕ Add" Command="{Binding CreateTierCommand}" 
+                                </StackPanel>
+                                <Button Content="➕ Add" Command="{Binding CreateTierCommand}" 
    Style="{StaticResource AccentButtonStyle}" VerticalAlignment="Bottom" 
    Height="32" Margin="0,20,0,0"/>
-   </StackPanel>
- </StackPanel>
-   </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
 
-   <Button Grid.Row="1" Content="🔄 Load Tiers" Command="{Binding LoadTiersCommand}" 
+                    <Button Grid.Row="1" Content="🔄 Load Tiers" Command="{Binding LoadTiersCommand}" 
        HorizontalAlignment="Left" Margin="0,0,0,12"/>
 
-      <!-- Tiers Table - Full width responsive -->
-   <Border Grid.Row="2" Background="White" CornerRadius="12">
- <Grid>
-     <Grid.RowDefinitions>
-    <RowDefinition Height="Auto"/>
-   <RowDefinition Height="*"/>
-     </Grid.RowDefinitions>
+                    <!-- Tiers Table - Full width responsive -->
+                    <Border Grid.Row="2" Background="White" CornerRadius="12">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-  <!-- Header -->
- <Border Background="#FFF1F3F4" CornerRadius="12,12,0,0" Padding="20,14">
-   <Grid>
-       <Grid.ColumnDefinitions>
-       <ColumnDefinition Width="1.5*" MinWidth="100"/>
-    <ColumnDefinition Width="1*" MinWidth="80"/>
-    <ColumnDefinition Width="1*" MinWidth="80"/>
-  <ColumnDefinition Width="3*" MinWidth="150"/>
-      <ColumnDefinition Width="0.7*" MinWidth="60"/>
-  </Grid.ColumnDefinitions>
-    <TextBlock Text="Name" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
- <TextBlock Grid.Column="1" Text="Min %" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Center"/>
- <TextBlock Grid.Column="2" Text="Bonus %" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Center"/>
-   <TextBlock Grid.Column="3" Text="Description" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
-    <TextBlock Grid.Column="4" Text="Order" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Center"/>
-   </Grid>
-   </Border>
+                            <!-- Header -->
+                            <Border Background="#FFF1F3F4" CornerRadius="12,12,0,0" Padding="20,14">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1.5*" MinWidth="100"/>
+                                        <ColumnDefinition Width="1*" MinWidth="80"/>
+                                        <ColumnDefinition Width="1*" MinWidth="80"/>
+                                        <ColumnDefinition Width="3*" MinWidth="150"/>
+                                        <ColumnDefinition Width="0.7*" MinWidth="60"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Name" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
+                                    <TextBlock Grid.Column="1" Text="Min %" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="Bonus %" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="3" Text="Description" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368"/>
+                                    <TextBlock Grid.Column="4" Text="Order" FontWeight="SemiBold" FontSize="13" Foreground="#FF5F6368" HorizontalAlignment="Center"/>
+                                </Grid>
+                            </Border>
 
-     <!-- Body -->
-  <ListView Grid.Row="1" ItemsSource="{Binding Tiers}" 
+                            <!-- Body -->
+                            <ListView Grid.Row="1" ItemsSource="{Binding Tiers}" 
      SelectedItem="{Binding SelectedTier, Mode=TwoWay}" SelectionMode="Single">
-<ListView.ItemContainerStyle>
- <Style TargetType="ListViewItem">
-  <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-  <Setter Property="Padding" Value="0"/>
-  </Style>
-       </ListView.ItemContainerStyle>
-    <ListView.ItemTemplate>
-     <DataTemplate>
-    <Border BorderBrush="#FFEEEEEE" BorderThickness="0,0,0,1" Padding="20,14">
-  <Grid>
-   <Grid.ColumnDefinitions>
- <ColumnDefinition Width="1.5*" MinWidth="100"/>
- <ColumnDefinition Width="1*" MinWidth="80"/>
-  <ColumnDefinition Width="1*" MinWidth="80"/>
-   <ColumnDefinition Width="3*" MinWidth="150"/>
-   <ColumnDefinition Width="0.7*" MinWidth="60"/>
-      </Grid.ColumnDefinitions>
- <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14"/>
-   <TextBlock Grid.Column="1" HorizontalAlignment="Center" FontWeight="Medium" FontSize="14">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#FFEEEEEE" BorderThickness="0,0,0,1" Padding="20,14">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1.5*" MinWidth="100"/>
+                                                    <ColumnDefinition Width="1*" MinWidth="80"/>
+                                                    <ColumnDefinition Width="1*" MinWidth="80"/>
+                                                    <ColumnDefinition Width="3*" MinWidth="150"/>
+                                                    <ColumnDefinition Width="0.7*" MinWidth="60"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14"/>
+                                                <TextBlock Grid.Column="1" HorizontalAlignment="Center" FontWeight="Medium" FontSize="14">
   <Run Text="≥"/><Run Text="{Binding MinRevenue}"/><Run Text="%"/>
-  </TextBlock>
-   <TextBlock Grid.Column="2" HorizontalAlignment="Center" 
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="2" HorizontalAlignment="Center" 
     Foreground="#FF13B16A" FontWeight="Bold" FontSize="14">
 <Run Text="+"/><Run Text="{Binding BonusPercent}"/><Run Text="%"/>
-  </TextBlock>
-        <TextBlock Grid.Column="3" Text="{Binding Description}" 
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="3" Text="{Binding Description}" 
    Opacity="0.7" TextTrimming="CharacterEllipsis" FontSize="14"/>
-  <TextBlock Grid.Column="4" Text="{Binding DisplayOrder}" 
+                                                <TextBlock Grid.Column="4" Text="{Binding DisplayOrder}" 
   HorizontalAlignment="Center" Opacity="0.5" FontSize="14"/>
-      </Grid>
-   </Border>
-    </DataTemplate>
-   </ListView.ItemTemplate>
-         </ListView>
-     </Grid>
-    </Border>
-</Grid>
-      </PivotItem>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </PivotItem>
         </Pivot>
 
-   <!-- Loading overlay -->
+        <!-- Loading overlay -->
         <Grid Grid.RowSpan="3" Background="#80000000"
  Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-        <Border Background="White" CornerRadius="12" Padding="28" 
+            <Border Background="White" CornerRadius="12" Padding="28" 
        HorizontalAlignment="Center" VerticalAlignment="Center">
-         <StackPanel Spacing="12" HorizontalAlignment="Center">
-     <ProgressRing IsActive="True" Width="40" Height="40"/>
-   <TextBlock Text="Loading..." Opacity="0.7" FontSize="13"/>
-        </StackPanel>
-    </Border>
-     </Grid>
+                <StackPanel Spacing="12" HorizontalAlignment="Center">
+                    <ProgressRing IsActive="True" Width="40" Height="40"/>
+                    <TextBlock Text="Loading..." Opacity="0.7" FontSize="13"/>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Page>

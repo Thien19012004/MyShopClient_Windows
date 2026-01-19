@@ -40,7 +40,7 @@ namespace MyShopClient.ViewModels
         public int Quantity { get => _quantity; set => SetProperty(ref _quantity, value); }
     }
 
-    // Refactored to use SelectableListViewModel for selection & bulk delete
+    
     public partial class OrderListViewModel : SelectableListViewModel<OrderListItemDto>
     {
         private readonly IOrderService _orderService;
@@ -55,11 +55,11 @@ namespace MyShopClient.ViewModels
 
         public ObservableCollection<OrderListItemDto> Orders { get; } = new();
 
-        // Status options cho list page (có "All" để filter)
+  
         public ObservableCollection<string> StatusOptions { get; } =
             new(new[] { "All", "Created", "Paid", "Cancelled" });
 
-        // Status options cho edit dialog (không có "All")
+
         public ObservableCollection<string> EditStatusOptions { get; } =
             new(new[] { "Created", "Paid", "Cancelled" });
 
@@ -69,22 +69,22 @@ namespace MyShopClient.ViewModels
         [ObservableProperty] private string? fromDateText;
         [ObservableProperty] private string? toDateText;
 
-        // Use base paging properties (CurrentPage/PageSize/TotalItems/TotalPages)
+
 
         [ObservableProperty] private bool isBusy;
         [ObservableProperty] private string? errorMessage;
         public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
-        // summary đơn giản
+
         [ObservableProperty] private int totalOrdersOnPage;
         [ObservableProperty] private int totalPaidOnPage;
         [ObservableProperty] private int totalAmountOnPage;
 
-        // ===== Selection summary (legacy names used by XAML) =====
+
         [ObservableProperty] private bool hasSelectedOrders;
         [ObservableProperty] private int selectedOrdersCount;
 
-        // Single delete / print dialog state (restore properties expected by XAML)
+
         [ObservableProperty] private bool isDeleteConfirmOpen;
         [ObservableProperty] private OrderListItemDto? orderToDelete;
         [ObservableProperty] private string deleteConfirmMessage = string.Empty;
@@ -151,10 +151,10 @@ namespace MyShopClient.ViewModels
                  DateTimeStyles.None,
              out var dt))
             {
-                return dt.Date;   // chỉ lấy phần ngày
+                return dt.Date; 
             }
 
-            // nếu sai format thì coi như không có filter
+           
             return null;
         }
 

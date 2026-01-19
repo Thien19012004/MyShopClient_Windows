@@ -25,7 +25,6 @@ namespace MyShopClient.ViewModels
         private async Task OpenEditDialogAsync(CustomerListItemDto? customer)
         {
             if (customer == null) return;
-            // populate any parent-level properties used in XAML (e.g., order count)
             EditCustomerOrderCount = customer.OrderCount;
             await EditVm.DoOpenAsync(customer);
         }

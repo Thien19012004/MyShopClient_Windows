@@ -17,14 +17,14 @@
      Checked="RootToggleButton_Checked"
       Unchecked="RootToggleButton_Unchecked">
         <ToggleButton.Content>
-     <Border x:Name="CheckBoxBorder"
+            <Border x:Name="CheckBoxBorder"
   Width="20"
      Height="20"
   CornerRadius="3"
         BorderThickness="2"
        BorderBrush="#FFCCCCCC"
    Background="Transparent">
-        <TextBlock x:Name="CheckMark"
+                <TextBlock x:Name="CheckMark"
             Text="&#xE001;"
          FontFamily="Segoe MDL2 Assets"
   FontSize="12"
@@ -32,7 +32,7 @@
        VerticalAlignment="Center"
     Foreground="White"
     Opacity="0"/>
-      </Border>
+            </Border>
         </ToggleButton.Content>
     </ToggleButton>
 

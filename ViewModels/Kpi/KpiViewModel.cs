@@ -32,11 +32,11 @@ namespace MyShopClient.ViewModels.Kpi
             _selectedYear = now.Year;
             _selectedMonth = now.Month;
 
-            // Initialize years (5 years back, current, 1 year forward)
+
             for (int y = now.Year - 5; y <= now.Year + 1; y++)
                 Years.Add(y);
 
-            // Months 1-12
+
             for (int m = 1; m <= 12; m++)
                 Months.Add(m);
 
